@@ -1,0 +1,18 @@
+Always receiving messages from other robots
+Keeps hash map of the transport requests - delete if transport is going to be done by some robot or time
+
+the time it waits to receive others distance is related to the time to delete the messages. Not equal.
+A robot can receive messages before broadcast then wait for other messages for X time. Maybe lifespan is X times 2.
+
+Message Handler - add time to diagrams.
+	Takes messages and interpret them, basically a router
+
+moveToDestination and recalculating path at all:
+	When are paths recalculated?
+		Upon other robots crossing nodes?
+		Time? What frequence?
+
+Broadcast expected next edge? Maybe whole path?
+
+follow line - add sonars and error when finding some obstacle?
+

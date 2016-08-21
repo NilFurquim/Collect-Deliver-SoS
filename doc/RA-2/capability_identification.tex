@@ -1,0 +1,162 @@
+\section{Step RA-2: Capability Identification}
+In this step the flows of different views of the system are modeled using BPMN diagrams. Then capabilities are identified by mapping these functional requirements with RefSORS requirements and analyzing the each flow. Finally these capabilities are assessed based on their functionalities to decide which are going to be exposed as services and which are going to be provided as components that support these services.
+
+\subsection{System Flow Model}
+From functional requirements and concepts from the reference architecture BPMN diagrams were modeled to represent the application flow. The modeled application flow was divided in six BPMN diagrams and seven polls shown in order of occurrence, each lane represents a possible capability and tasks are inspired by the robotic system required functionalities.
+Figure 1 shows the most abstract flow, the flow of the broadest system. Each robot initializes and requests the map to the master, that delivers it. Then they determine their own positions. After they know their own positions, the master can process the product transport request. It asks the distance of the robots from the product, chooses the closest one, and continues to wait for other requests.
+
+%Broad System Flow
+% \begin{figure}[h!]
+%  \centering
+%  \includegraphics[scale=.4]{BroadSystemFlow.svg}
+%  \caption{Figure 1: Broad System Flow}
+%  \label{fig:broadsystemflow}
+% \end{figure}
+
+Figure 1: This BPMN diagram shows how the individual robots decide wether to answer to a transport request or not.
+
+The robot receives a transport request. After the request is received, it gets the product's position and it's own position in the map then calculates the Manhattan distance between them and broadcasts it. The distance calculated by it is compared to the distances calculated by other robots, if the former is smaller it broadcasts a message saying that it will take the request. If there is any robot closer to the product it waits for another request.
+
+
+
+%Move to Destination Flow
+% \begin{figure}[h!]
+%  \centering
+%  \includegraphics[scale=.4]{moveToDestination.svg}
+%  \caption{Figure 2: Move to Destination Robot Flow}
+%  \label{fig:movetodestination}
+% \end{figure}
+Figure 2: This BPMN diagram shows how the robot moves to a destination.
+
+Upon a need to navigate to a destination on the map, the robot needs it's own position and the other robots positions. When this positions needed are aquired, it calculates the best path using a dijkstra algorithm but removing the pathways blocked by other robots. Then while a path recalculation triggering event is waited the last calculated path is executed. The execution of the path is done by following the guide line until a crossing is found, then it chooses wether to go straigth, turn left or turn right based on the calculated path. Everytime the robot goes by a crossing it broadcasts it's location.
+
+%Pick Up Product Flow
+% \begin{figure}[h!]
+%  \centering
+%  \includegraphics[scale=.4]{pickup.svg}
+%  \caption{Figure 3: Pick Up Product Flow}
+%  \label{fig:pickup}
+% \end{figure}
+
+Figure 3: This BPMN diagram shows how the robot picks up a product.
+
+When the robot reaches the product's position, meaning the product is close by, the fork is moved to predetermined height and the sonars are used to find where the product is. Then the robot moves to position the fork under the product. It repeates the sensing and moving process until the fork is in a satisfying place when it lifts the product.
+
+%Release Product
+% \begin{figure}[h!]
+%  \centering
+%  \includegraphics[scale=.4]{release.svg}
+%  \caption{Figure 4: Release Product Flow}
+%  \label{fig:release}
+% \end{figure}
+
+Figure 4: This BPMN diagram shows the process of releasing the product on the ground.
+
+Once the product reaches destination the robot stops and starts the product drop off. The fork is lower until product reaches the ground and the robot moves straight backward until the fork is far away enough from the product so it can move it to navigation position.
+
+%Subscribe to Sensors Flow
+% \begin{figure}[h!]
+%  \centering
+%  \includegraphics[scale=.4]{subscribeSensors.svg}
+%  \caption{Figure 4: Subscribe to Sensors Flow}
+%  \label{fig:subscribeSensors}
+% \end{figure}
+
+Figure 5: This BPMN diagram shows the generic flow of subscribing to sensors and handling their data.
+
+This flow happens during the robot's initialization. After subscribing to sonars topic the distances are get and handled, simultaneously the distances are updated. The same thing happens to the camera, but instead of distances images are handled.
+
+%Follow Guide Line Flow
+% \begin{figure}[h!]
+%  \centering
+%  \includegraphics[scale=.4]{followLine.svg}
+%  \caption{Figure 1: Follow Guide Line Flow}
+%  \label{fig:followline}
+% \end{figure}
+
+Figure 6: This BPMN diagram shows how the robot follows the guide line.
+
+To follow the guide line the robot uses the camera, it gets the image and processes it. If the line is facing right or is translated to the right it turns right, if the line is facing forward and is at the center it goes straingth else if the line is facing left or translated to the left it turns left. If the line is facing one orientation and translated to the other it takes the decision based on the translation.
+
+\subsection{Decompose Robot Application}
+
+The BPMN diagrams are used to indentify capabilities. The process of analysing the BPMN diagrams to identify capabilities entails in comparing the BPMN to the functional requirements and RefSORS requirements. Due to how the system was modeled using the diagrams, most BPMN lanes are potential capabilities. Then the potential capabilities are compared to functional requirements and RefSORS requirements, if they fulfill at least part of a functional or RefSORS requirement they go to the next step. They next step is compare them to the domain concepts and RefSORS capabilities, if they are related they become capabilities.
+
+%Robotic Application: 1..9 | 1 2 3 4 5 6 7 8 9
+%Robotic Agent: 6..9 | 6 7 8 9
+%Task: 10..19 | 10 11 12 13 14 15 16 17 18 19
+%Knowledge: 20..23 | 20 21 22 23
+%Device Driver: 24..30 | 24 25 26 27 28 29 30
+%General: 31 32
+
+\begin{tabular}{| r | l | c | c |}
+	Functional Requirement & RefSORS Requirement & Domain Concept & Capability \\ 
+	\hline
+	FR1, FR2, FR6 			& R-R1 	& Application & Application \\
+							& R-R2 	& Application & \\
+	FR3, FR4, FR7, FR31 	& R-R3 	& Application & Application\\
+	FR12, FR13, FR23 		& R-R3 	& Application & Mapping\\
+	FR22 					& R-R3 	& Application & Control\\ %Done
+							& R-R4 	& Application & \\
+	FR6, FR7 				& R-R5 	& Application & Application\\
+	FR12, FR13, FR23		& R-R5 	& Application & Mapping\\
+	FR15					& R-R5 	& Application & Navigation\\
+	FR25					& R-R5 	& Application & Path Planing\\
+	FR22					& R-R5 	& Application & Control\\
+							& R-R6 	& Application and Robotic Agent & \\
+							& R-R7 	& Application and Robotic Agent & \\
+	FR18	 				& R-R8 	& Application and Robotic Agent & Localization\\
+	FR28 					& R-R8 	& Application and Robotic Agent & Robot Agent\\
+							& R-R9 	& Application and Robotic Agent & \\
+							& R-R10 & Task & \\
+	FR12 					& R-R11 & Task & Mapping\\
+	FR22 					& R-R11 & Task & Control\\
+	FR26				 	& R-R12 & Task & Control\\
+	FR28				 	& R-R12 & Task & Robot Agent\\
+	FR29, FR30			 	& R-R12 & Task & Application\\
+	FR9 					& R-R13 & Task & Fork Lift Actuator\\
+	FR19, FR20, FR27		& R-R13 & Task & Object Manipulation\\
+	FR12, FR16				& R-R14 & Task & Mapping\\
+	FR17, FR18 				& R-R14 & Task & Localization\\
+	FR5 					& R-R15 & Task & Application\\
+	FR8, FR15, FR21 		& R-R15 & Task & Drive Actuator\\
+	R15 					& R-R15 & Task & Navigation\\
+	FR21 					& R-R15 & Task & Robotic Agent\\
+	FR12, FR13 				& R-R16 & Task & Mapping\\
+	FR24 					& R-R16 & Task & Path Planning\\
+	FR12, FR13 				& R-R17 & Task & Mapping\\
+							& R-R18 & Task & \\
+	FR10 					& R-R19 & Task & Camera Sensor\\
+	FR14	 				& R-R19 & Task & Image Processing\\
+	FR11 					& R-R20 & Knowledge & Sonar Sensor\\
+	FR13 					& R-R20 & Knowledge & Mapping\\
+	FR3 					& R-R21 & Knowledge & Application\\
+	FR22 					& R-R21 & Knowledge & Control\\
+	FR23 					& R-R21 & Knowledge & Mapping\\
+							& R-R22 & Knowledge & \\
+							& R-R23 & Knowledge & \\
+	FR10 					& R-R24 & Device Driver & Camera Sensor\\
+	FR11 					& R-R24 & Device Driver & Sonar Sensor\\
+							& R-R25 & Device Driver & \\
+	FR22 					& R-R26 & Device Driver & Control\\
+							& R-R27 & Device Driver & \\
+							& R-R28 & Device Driver & \\
+	FR8 					& R-R29 & Device Driver & Drive Actuator\\
+	FR9 					& R-R29 & Device Driver & Drive Actuator\\
+
+\end{tabular}
+
+
+%Capabilities
+% \begin{figure}[h!]
+%  \centering
+%  \includegraphics[scale=.4]{capabilities.svg}
+%  \caption{Figure 9: Capabilites}
+%  \label{fig:capabilities}
+% \end{figure}
+
+Figure 9: The diagram shows the identified capabilities, with their functionalities and relationship.
+
+
+
+\subsection{Rationalize Capabilities}
