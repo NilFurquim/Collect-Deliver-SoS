@@ -20,12 +20,12 @@ The robots must be able to follow the guide lines on the floor. At all times nav
 	%SYSTEM
 	\item The system must be able to take requests. %RR1 %Application
 	\item The system must be able to transport products from one PA to another. %RR1 %Application
-	\item The system must work decentralized. %RR3, RR21 %Application
+	\item The system must work decentralized. %RR3 %Application
 	\item The system must be able to choose the closest Manhattan distance robot to the product for the job. %RR3 %Application
 	\item The system must avoid full stop of robots. %RR15 %Application 
 	\item The system must transport products simultaneously if there are robots avaible. %RR1, RR5 %Application 
 	\item The robots must operate individually. No robot must stop if any robot stops. They must still be able to deliver product and take requests. *Exception if robots block other robots' path and there are no other avaible paths. %RR3, RR5 %Application %ROBOTS
-	\item Robots must be able to control differential drive. %RR15, RR29 %Drive Actuator
+	\item Robots must be able to control differential drive. %RR29 %Drive Actuator
 	\item Robots must be able control the fork lift. %RR13, RR29 %Fork Lift Actuator
 	\item Robots must be able process images captured by the camera. %RR19, RR24 %Camera Sensor
 	\item Robots must be able process 12 sonar data from the front and back of the robot. %RR20, RR24 %Sonar Sensor
@@ -38,14 +38,14 @@ The robots must be able to follow the guide lines on the floor. At all times nav
 	\item Robots must be able know their aproximate positon based on the grid and when they go by crossings. %RR14 %Localization
 	\item Robots must be able to lift the product. %RR13 %Object Manipulation
 	\item Robots, once close by, must use sonars to locate the product. %RR13 %Object Manipulation
-	\item Robots must avoid collision with other robots. %RR15 %Robot Agent
-	\item Robots must be able to communicate with each other. %RR3, RR5, RR11, RR21, RR26 %Control
-	\item Robots must be able know the position of other robots. %RR3, RR5, RR21 %Mapping
+	\item Robots must avoid collision with other robots. %RR15 %Navigation
+	\item Robots must be able to communicate with each other. %RR3??, RR11, RR21, RR26 %Control
+	\item Robots must be able know the position of other robots. %RR3???, RR21, RR15, RR16 %Mapping
 	\item Robots must be able to calculate shortest path using the dijkstra algorithm. %RR16 %Path Planning
-	\item Robots must be able calculate the shortest path considering the posistion of other robots. %RR5 %Path Planning
+	\item Robots must be able calculate the shortest path considering the posistion of other robots. %RR5, RR15??? %Path Planning %SEM DOMAIN CONCEPT
 	\item Robots must be able to notify when done transporting. %RR12 %Control
 	\item Robots must release products in vertical position. %RR13 %Object Manipulation
-	\item Robots must be able to be controled be an operator if needed. %RR8, RR12 %Robot Agent%TRANSPORT ORDER
+	\item Robots must be able to be controled be an operator if needed. %RR8, RR12 %Robot Agent??%TRANSPORT ORDER
 	\item The transport order must be done by an operator on a remote computer. %RR12 %Application
 	\item The transport order must inform the PAs where the product must be collected and where it must be delivered. %RR12 %Application
 	\item The transport order must be broadcast to all robots. %RR3 %Application
