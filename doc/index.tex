@@ -1,36 +1,31 @@
-\documentclass{report}
+\documentclass{article}  
 \usepackage[utf8]{inputenc}
 
-\title{Arquitecture Instanciation}
+\title{Arquitecture Instantiation of ...}
 \author{nilfurquimds}
 \date{August 2016}
 
 \usepackage{natbib}
 \usepackage{graphicx}
-
 \begin{document}
 
 \maketitle
 
 \section*{Introduction}
 %REESCREVER
-This document describes the requirements and architecture instantiation of RefSORS (Reference Architecture for Service Oriented Robotic Systems)[1], which is a reference architecture based on Service-Oriented Architecture (SOA) [2] specifically for indoor, grounded mobile robotic system. The instantiated architecture will be designed following the ArchSORS process [3]. The resulting system will be a System-of-Systems composed by multiple robots transporting products on predetermined grid with guide lines dynamically calculating the best path to navigate the industrial shop floor.
+This document describes the requirements and architecture instantiation of RefSORS (Reference Architecture for Service Oriented Robotic Systems). which is a reference architecture based on Service-Oriented Architecture (SOA) specifically for indoor, grounded mobile robotic system. The instantiated architecture will be designed following the ArchSORS process. The resulting system will be a System-of-Systems composed by multiple robots transporting products on predetermined grid with guide lines dynamically recalcalculating the best path to navigate the industrial shop floor.
 
 \subsection*{Objective}
 The objective of the robotic system is to transport products on an industrial shop floor from a determined area to another. There will be multiple robots on the industrial shop floor, thus they will have to communicate to navigate effectively without collisions.
-
-\input{./RA-1/application_characterization.tex}
-\input{./RA-2/capability_identification.tex}
-
-
-
-% |\begin{figure}[h!]
+% \begin{figure}[h!]
 % \centering
-% \includegraphics[scale=.4]{BroadSystemFlow.svg}
+% \includegraphics[scale=.4]{./RA-2/broadSystemFlow.png}
 % \caption{Broad System Flow}
 % \label{fig:broadsystemflow}
 % \end{figure}
 
+\input{./RA-1/application_characterization.tex}
+\input{./RA-2/capability_identification.tex}
 
 \bibliographystyle{plain}
 \bibliography{references}

@@ -6,12 +6,12 @@ From functional requirements and concepts from the reference architecture BPMN d
 Figure 1 shows the most abstract flow, the flow of the broadest system. Each robot initializes and requests the map to the master, that delivers it. Then they determine their own positions. After they know their own positions, the master can process the product transport request. It asks the distance of the robots from the product, chooses the closest one, and continues to wait for other requests.
 
 %Broad System Flow
-% \begin{figure}[h!]
-%  \centering
-%  \includegraphics[scale=.4]{BroadSystemFlow.svg}
-%  \caption{Figure 1: Broad System Flow}
-%  \label{fig:broadsystemflow}
-% \end{figure}
+\begin{figure}[ht!]
+ \centering
+ \includegraphics[scale=.23]{./RA-2/broadSystemFlow.png}
+ \caption{Figure 1: Broad System Flow}
+ \label{fig:broadsystemflow}
+\end{figure}
 
 Figure 1: This BPMN diagram shows how the individual robots decide wether to answer to a transport request or not.
 
@@ -20,59 +20,59 @@ The robot receives a transport request. After the request is received, it gets t
 
 
 %Move to Destination Flow
-% \begin{figure}[h!]
-%  \centering
-%  \includegraphics[scale=.4]{moveToDestination.svg}
-%  \caption{Figure 2: Move to Destination Robot Flow}
-%  \label{fig:movetodestination}
-% \end{figure}
+\begin{figure}[ht!]
+ \centering
+ \includegraphics[scale=.282]{./RA-2/moveToDestination.png}
+ \caption{Figure 2: Move to Destination Robot Flow}
+ \label{fig:movetodestination}
+\end{figure}
 Figure 2: This BPMN diagram shows how the robot moves to a destination.
 
 Upon a need to navigate to a destination on the map, the robot needs it's own position and the other robots positions. When this positions needed are aquired, it calculates the best path using a dijkstra algorithm but removing the pathways blocked by other robots. Then while a path recalculation triggering event is waited the last calculated path is executed. The execution of the path is done by following the guide line until a crossing is found, then it chooses wether to go straigth, turn left or turn right based on the calculated path. Everytime the robot goes by a crossing it broadcasts it's location.
 
 %Pick Up Product Flow
-% \begin{figure}[h!]
-%  \centering
-%  \includegraphics[scale=.4]{pickup.svg}
-%  \caption{Figure 3: Pick Up Product Flow}
-%  \label{fig:pickup}
-% \end{figure}
+\begin{figure}[ht!]
+ \centering
+ \includegraphics[scale=.276]{./RA-2/pickup.png}
+ \caption{Figure 3: Pick Up Product Flow}
+ \label{fig:pickup}
+\end{figure}
 
 Figure 3: This BPMN diagram shows how the robot picks up a product.
 
 When the robot reaches the product's position, meaning the product is close by, the fork is moved to predetermined height and the sonars are used to find where the product is. Then the robot moves to position the fork under the product. It repeates the sensing and moving process until the fork is in a satisfying place when it lifts the product.
 
 %Release Product
-% \begin{figure}[h!]
-%  \centering
-%  \includegraphics[scale=.4]{release.svg}
-%  \caption{Figure 4: Release Product Flow}
-%  \label{fig:release}
-% \end{figure}
+\begin{figure}[ht!]
+ \centering
+ \includegraphics[scale=.33]{./RA-2/release.png}
+ \caption{Figure 4: Release Product Flow}
+ \label{fig:release}
+\end{figure}
 
 Figure 4: This BPMN diagram shows the process of releasing the product on the ground.
 
 Once the product reaches destination the robot stops and starts the product drop off. The fork is lower until product reaches the ground and the robot moves straight backward until the fork is far away enough from the product so it can move it to navigation position.
 
 %Subscribe to Sensors Flow
-% \begin{figure}[h!]
-%  \centering
-%  \includegraphics[scale=.4]{subscribeSensors.svg}
-%  \caption{Figure 4: Subscribe to Sensors Flow}
-%  \label{fig:subscribeSensors}
-% \end{figure}
+\begin{figure}[ht!]
+ \centering
+ \includegraphics[scale=.45]{./RA-2/subscribeSensors.png}
+ \caption{Figure 4: Subscribe to Sensors Flow}
+ \label{fig:subscribeSensors}
+\end{figure}
 
 Figure 5: This BPMN diagram shows the generic flow of subscribing to sensors and handling their data.
 
 This flow happens during the robot's initialization. After subscribing to sonars topic the distances are get and handled, simultaneously the distances are updated. The same thing happens to the camera, but instead of distances images are handled.
 
 %Follow Guide Line Flow
-% \begin{figure}[h!]
-%  \centering
-%  \includegraphics[scale=.4]{followLine.svg}
-%  \caption{Figure 1: Follow Guide Line Flow}
-%  \label{fig:followline}
-% \end{figure}
+\begin{figure}[ht!]
+ \centering
+ \includegraphics[scale=.359]{./RA-2/followLine.png}
+ \caption{Figure 1: Follow Guide Line Flow}
+ \label{fig:followline}
+\end{figure}
 
 Figure 6: This BPMN diagram shows how the robot follows the guide line.
 
@@ -90,7 +90,7 @@ The BPMN diagrams are used to indentify capabilities. The process of analysing t
 %General: 31 32
 {
 \centering
-\begin{tabular}{| r | l | c | c |}
+\begin{tabular}{| r | p{2cm} | c | c |}
 	\hline
 	Functional Requirement & RefSORS Requirement & Domain Concept & Capability \\ 
 	\hline
@@ -140,21 +140,46 @@ The BPMN diagrams are used to indentify capabilities. The process of analysing t
 							%& R-R27 & Device Driver & \\
 							%& R-R28 & Device Driver & \\
 	FR8 					& R-R29 & Device Driver & Drive Actuator\\
-	FR9 					& R-R29 & Device Driver & Drive Actuator\\
-	FR9 					& R-R12 & Task & Fork Lift Actuator\\
+	FR9 					& R-R29 & Device Driver & For Lift Actuator\\
 	\hline
 \end{tabular}
 }
 
 
 %Capabilities
-% \begin{figure}[h!]
-%  \centering
-%  \includegraphics[scale=.4]{capabilities.svg}
-%  \caption{Figure 9: Capabilites}
-%  \label{fig:capabilities}
-% \end{figure}
+\begin{figure}[ht!]
+ \centering
+ \includegraphics[scale=.3]{./RA-2/capabilityDiagram.png}
+ \caption{Figure 9: Capabilites}
+ \label{fig:capabilities}
+\end{figure}
 
 Figure 9: The diagram shows the identified capabilities, with their functionalities and relationships with each other.
 
 \subsection{Rationalize Capabilities}
+After identifying the capabilities, they must be analyzed to decide whether they will become services. Capabilities might also join other capabilities to form a service if they are too simple. They might also form more than one service if they are too complex. Table 2.3 shows the analysis of each capability and if they became one or more services or not at all.
+
+{
+\centering
+\begin{tabular}{| l | p{6.6cm} | c |}
+	\hline
+	Capability & Analysis & Service\\
+	\hline
+	Camera Sensor & Needed to communicate with camera sensor. & yes\\
+	Sonar Sensor & Needed to communicate with sonar sensor. & yes\\
+	Fork Lift Actuator & Needed to communicate with fork lift actuator. & yes\\
+	Drive Actuator & Needed to communicate with drive actuator. & yes\\
+	\hline
+	Image Processing & Needed to process images to identify the guide lines. & yes\\
+	Mapping & Grid mapping to navigate and know other robots' positions. &\\
+	Localization & Know it's own position on the grid. &\\ %(maybe too simple, join with mapping?, analyze scalability. Possible to create more complex localization?)
+	Navigation & Navigate the grid, although simple, needs to be concise in case of change of logic and maintenance. & yes\\
+	Path Planning & Calculate path to destination. & yes\\
+	Object Manipulation & Logic of picking up and releasing product. & yes\\
+	Control & Control unit. & yes\\
+	Robotic Agent & Abstration of the robots functionalities. & yes\\
+	Application & Interact with operator, send transport messages. & yes\\
+	\hline
+\end{tabular}
+}
+
