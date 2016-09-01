@@ -2,7 +2,6 @@
 
 \subsection{Ambient Characterization}
 The industrial shop floor is a plane area with guide lines painted black forming a grid. The grid assists the robots navigation. There are designed areas to pick up and deliver products, denominated product areas. Multiple product areas are positioned on two opposite sides of the grid. Each product area is given a unique identification. The product is designed to be picked up using a fork lift.
-
 \subsection{Robot Characterization}
 The robots are pioneers model P3-DX. The Pioneer P3-DX have two individually motorized wheels and a swivel for support, six sonars facing back and six sonars facing foward. Additionally a fork lift and a camera was equiped. The wheels enable for differential drive navigation used together with the camera to follow the guide lines of the industrial shop floor. The sonars will prevent collisions and assist product pick up. The product pick up is done with the fork lift.
 
@@ -10,43 +9,44 @@ The robots are pioneers model P3-DX. The Pioneer P3-DX have two individually mot
 The transport request informs all the robots the id of the product areas for pick up and for delivery. The robots must communicate with each other to select the closest robot to the product area determined for product pick up, based on Manhattan distance.%"""(consider or not position of actual robots on the grid)"""
 The robots must be able to follow the guide lines on the floor. At all times navigating the industrial shop floor the robots will have to communicate with each other to dynamically calculate best path, always avoid full stop and never colliding, given that other robots will be moving on the grid and two robots cannot past by each other while following the same guide line.
 
-% \usepackage{enumitem}
-% \newlist{FR}{enumerate}{1}
-% \setlist[FR]{label=FR\arabic*:}
-% \begin{FR}
-% \end{FR}
-\begin{enumerate}
+\newlist{FR}{enumerate}{1}
+\setlist[FR]{label=FR\arabic*:}
+\begin{FR}
 	
+	
+
+
+
 	%SYSTEM
 	\item The system must be able to take requests. %RR1 %Application
 	\item The system must be able to transport products from one PA to another. %RR1 %Application
 	\item The system must work decentralized. %RR3 %Application
-	\item The system must be able to choose the closest Manhattan distance robot to the product for the job. %RR3 %Application
-	\item The system must avoid full stop of robots. %RR15 %Application 
-	\item The system must transport products simultaneously if there are robots avaible. %RR1, RR5 %Application 
-	\item The robots must operate individually. No robot must stop if any robot stops. They must still be able to deliver product and take requests. *Exception if robots block other robots' path and there are no other avaible paths. %RR3, RR5 %Application %ROBOTS
+	\item The system must be able to choose the closest Manhattan distance robot to the product for the job. %RR3, RR5 %Application
+	\item The system must avoid full stop of robots. %RR15 %Navigation 
+	\item The system must transport products simultaneously if there are robots avaible. %RR1, RR3, RR5 %Application 
+	\item The robots must operate individually. No robot must stop if any robot stops. They must still be able to deliver product and take requests. *Exception if robots block other robots' path and there are no other avaible paths. %RR3, RR5, RR8 %Application %ROBOTS
 	\item Robots must be able to control differential drive. %RR29 %Drive Actuator
-	\item Robots must be able control the fork lift. %RR13, RR29 %Fork Lift Actuator
+	\item Robots must be able control the fork lift. %RR29 %Fork Lift Actuator
 	\item Robots must be able process images captured by the camera. %RR19, RR24 %Camera Sensor
-	\item Robots must be able process 12 sonar data from the front and back of the robot. %RR20, RR24 %Sonar Sensor
+	\item Robots must be able process 12 sonar data from the front and back of the robot. %RR24 %Sonar Sensor
 	\item Robots must know the grid. %RR14, RR16, RR17 %Mapping
 	\item Robots must have a graph representing the grid. %RR16, RR17, RR20 %Mapping
 	\item Robots must identify the guide lines using images captured by the camera. %RR19 %Image Processing
-	\item Robots must be able h follow the guide lines of the grid. %RR15 %Navigation
+	\item Robots must be able to follow the guide lines of the grid. %RR15 %Navigation
 	\item Robots must be able know where are the product areas. %RR14 %Mapping
 	\item Robots must be able know their initial position. %RR14 %Localization
-	\item Robots must be able know their aproximate positon based on the grid and when they go by crossings. %RR14 %Localization
+	\item Robots must be able know their aproximate positon based on the grid and as they go by crossings. %RR14 %Localization
 	\item Robots must be able to lift the product. %RR13 %Object Manipulation
 	\item Robots, once close by, must use sonars to locate the product. %RR13 %Object Manipulation
 	\item Robots must avoid collision with other robots. %RR15 %Navigation
-	\item Robots must be able to communicate with each other. %RR3??, RR11, RR21, RR26 %Control
-	\item Robots must be able know the position of other robots. %RR3???, RR21, RR15, RR16 %Mapping
+	\item Robots must be able to communicate with each other. %RR11, RR21(RETIRADO)%Interaction
+	\item Robots must be able know the position of other robots. %RR11, RR21(RETIRADO), RR16 %Mapping
 	\item Robots must be able to calculate shortest path using the dijkstra algorithm. %RR16 %Path Planning
-	\item Robots must be able calculate the shortest path considering the posistion of other robots. %RR5, RR15??? %Path Planning %SEM DOMAIN CONCEPT
+	\item Robots must be able calculate the shortest path considering the posistion of other robots. %RR5, RR11 %Path Planning %SEM DOMAIN CONCEPT
 	\item Robots must be able to notify when done transporting. %RR12 %Control
 	\item Robots must release products in vertical position. %RR13 %Object Manipulation
-	\item Robots must be able to be controled be an operator if needed. %RR8, RR12 %Robot Agent??%TRANSPORT ORDER
+	\item Robots must be able to be controled be an operator if needed. %RR8, RR12 %Robot Agent?? %TRANSPORT ORDER
 	\item The transport order must be done by an operator on a remote computer. %RR12 %Application
 	\item The transport order must inform the PAs where the product must be collected and where it must be delivered. %RR12 %Application
 	\item The transport order must be broadcast to all robots. %RR3 %Application
-\end{enumerate}
+\end{FR}

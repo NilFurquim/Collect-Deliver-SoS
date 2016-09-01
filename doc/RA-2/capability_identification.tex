@@ -94,57 +94,48 @@ The BPMN diagrams are used to indentify capabilities. The process of analysing t
 	\hline
 	Functional Requirement & RefSORS Requirement & Domain Concept & Capability \\ 
 	\hline
-	FR1, FR2, FR6 & R-R1 	& Application & Application \\
-							%& R-R2 	& Application & \\
-	FR3, FR4, FR7, FR31 	& R-R3 & Application & Application\\
-	FR23 					& R-R3 & Application & Mapping\\ %??
-	FR22 					& R-R3 & Application & Control\\ %??
-							%& R-R4 	& Application & \\
-	FR6, FR7 				& R-R5 & Application & Application\\
-							%& R-R6 	& Robotic Agent & \\
-							%& R-R7 	& Robotic Agent & \\
+	FR1, FR2, FR6 & RR1 & Application & Application \\
+	%& RR2 & Application & Robotic Agent or Application \\
+	FR3, FR4, FR6, FR7, FR31 & RR3 & Application & Application\\
+	%& RR4 & Application & Application\\
+	FR4, FR6, FR7, FR25 & RR5 & Application & Application\\
 	\hline
-	FR28 					& R-R8 & Robotic Agent & Robot Agent\\
-							%& R-R9 	& Robotic Agent & \\
-							%& R-R10 & Task & \\
+	%& RR6 & Robotic Agent \\
+	%& RR7 & Robotic Agent or Control 	\\
+	FR7 & RR8 & Robotic Agent & Control \\%or Robotic Agent \\
+	FR28 & RR8 & Robotic Agent & Robotic Agent \\%or Control \\
+	%& RR9 & Robotic Agent or Control\\
+	%& RR10 & Interaction \\
 	\hline
-	FR12 					& R-R11 & Task & Mapping\\
-	FR22 					& R-R11 & Task & Control\\
-	FR26				 	& R-R12 & Task & Control\\
-	FR28				 	& R-R12 & Task & Robot Agent\\%Robot agent?
-	FR29, FR30			 	& R-R12 & Task & Application\\%Application? (Operation no edusig)
-	FR19, FR20, FR27		& R-R13 & Task & Object Manipulation\\
-	FR12, FR16				& R-R14 & Task & Mapping\\
-	FR17, FR18 				& R-R14 & Task & Localization\\
-	FR12 					& R-R15 & Task & Mapping\\
-	R15, FR21 				& R-R15 & Task & Navigation\\
-	FR23, FR35				& R-R15 & Task & Path Planning\\
-	FR12, FR13 				& R-R16 & Task & Mapping\\
-	FR24, FR23				& R-R16 & Task & Path Planning\\
-	FR12, FR13 				& R-R17 & Task & Mapping\\
-							%& R-R18 & Task & \\
-	FR10 					& R-R19 & Task & Camera Sensor\\
-	FR14	 				& R-R19 & Task & Image Processing\\
+	FR22, FR23, FR25 & RR11 & Task & Interaction \\
+	FR26, FR28, FR29, FR30 & RR12 & Task & Interaction \\
+	FR19, FR20, FR27 & RR13 & Task & Object Manipulation\\
+	FR12, FR16, FR17 FR18 & RR14 & Task & Localization\\
+	FR5, FR15, FR21 & RR15 & Task & Navigation\\
+	FR12, FR13, FR23, FR24 & RR16 & Task & Path Planning\\
+	FR12, FR13 & RR17 & Task & Mapping \\
+	%& RR18 & Mapping \\
+	FR10, FR14 & RR19 & Task & Support \\ % or Path Planning or Mapping or Localization 	\\
 	\hline
-	FR11 					& R-R20 & Knowledge & Sonar Sensor\\
-	FR13 					& R-R20 & Knowledge & Mapping\\ %Map information?
-	FR22 					& R-R21 & Knowledge & Control\\
-	FR23 					& R-R21 & Knowledge & Mapping\\
-							%& R-R22 & Knowledge & \\
-							%& R-R23 & Knowledge & \\
+	FR13 & RR20 & Knowledge &Mapping \\
+	%& RR21 & Robotic Agent or Application or Knowledge or Path Planning or Mapping or Localization 	 \\
+	%& RR22 & Knowledge \\
+	%& RR23 & Knowledge \\
 	\hline
-	FR10 					& R-R24 & Device Driver & Camera Sensor\\
-	FR11 					& R-R24 & Device Driver & Sonar Sensor\\
-							%& R-R25 & Device Driver & \\
-	FR22 					& R-R26 & Device Driver & Control\\
-							%& R-R27 & Device Driver & \\
-							%& R-R28 & Device Driver & \\
-	FR8 					& R-R29 & Device Driver & Drive Actuator\\
-	FR9 					& R-R29 & Device Driver & For Lift Actuator\\
-	\hline
+	FR10 & RR24 & Device Driver & Sonar Sensor\\
+	FR11 & RR24 & Device Driver & Camera Sensor\\
+	%& RR25 & Sensor Driver\\
+	%& RR26 & Sensor Driver\\
+	%& RR27 & Resource Driver\\
+	%& RR28 & Resource Driver\\
+	FR8 & RR29 & Device Driver & Drive Actuator\\
+	FR9 & RR29 & Device Driver & Forklift Actuator\\
+	%& RR30 & Actuator Driver\\
+ 	%& RR31 &\\
+ 	%& RR32 &\\
+ 	\hline
 \end{tabular}
 }
-
 
 %Capabilities
 \begin{figure}[ht!]
@@ -161,24 +152,25 @@ After identifying the capabilities, they must be analyzed to decide whether they
 
 {
 \centering
-\begin{tabular}{| l | p{6.6cm} | c |}
+\begin{tabular}{| l | p{6.6cm} | c | c |}
 	\hline
-	Capability & Analysis & Service\\
+	Capability & Too simple & Too complex & Service\\
 	\hline
-	Camera Sensor & Needed to communicate with camera sensor. & yes\\
-	Sonar Sensor & Needed to communicate with sonar sensor. & yes\\
-	Fork Lift Actuator & Needed to communicate with fork lift actuator. & yes\\
-	Drive Actuator & Needed to communicate with drive actuator. & yes\\
+	Camera Sensor & No & No & yes\\
+	Sonar Sensor & No & No & yes\\
+	Fork Lift Actuator & No & No & yes\\
+	Drive Actuator & No & No & yes\\
 	\hline
-	Image Processing & Needed to process images to identify the guide lines. & yes\\
-	Mapping & Grid mapping to navigate and know other robots' positions. &\\
-	Localization & Know it's own position on the grid. &\\ %(maybe too simple, join with mapping?, analyze scalability. Possible to create more complex localization?)
-	Navigation & Navigate the grid, although simple, needs to be concise in case of change of logic and maintenance. & yes\\
-	Path Planning & Calculate path to destination. & yes\\
-	Object Manipulation & Logic of picking up and releasing product. & yes\\
-	Control & Control unit. & yes\\
-	Robotic Agent & Abstration of the robots functionalities. & yes\\
-	Application & Interact with operator, send transport messages. & yes\\
+	Image Processing & No & No & yes\\
+	Mapping & No & No &\\
+	Localization & No & No & yes\\ %(maybe too simple, join with mapping?, analyze scalability. Possible to create more complex localization?)
+	Navigation & Navigate the grid, although simple, needs to be concise in case of change of logic and maintenance. & No & yes\\
+	Path Planning & No & No & yes\\
+	Object Manipulation & No & No & yes\\
+	Interaction & No & No & yes\\
+	Control & No & No & yes\\
+	Robotic Agent & No & No & yes\\
+	Application & No & No & yes\\
 	\hline
 \end{tabular}
 }
