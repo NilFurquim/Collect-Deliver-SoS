@@ -9,11 +9,11 @@ Figure 1 shows the most abstract flow, the flow of the broadest system. Each rob
 \begin{figure}[ht!]
  \centering
  \includegraphics[scale=.23]{./RA-2/broadSystemFlow.png}
- \caption{Figure 1: Broad System Flow}
+ \caption{Broad System Flow}
  \label{fig:broadsystemflow}
 \end{figure}
 
-Figure 1: This BPMN diagram shows how the individual robots decide wether to answer to a transport request or not.
+Figure \ref{fig:broadsystemflow}: This BPMN diagram shows how the individual robots decide wether to answer to a transport request or not.
 
 The robot receives a transport request. After the request is received, it gets the product's position and it's own position in the map then calculates the Manhattan distance between them and broadcasts it. The distance calculated by it is compared to the distances calculated by other robots, if the former is smaller it broadcasts a message saying that it will take the request. If there is any robot closer to the product it waits for another request.
 
@@ -23,10 +23,10 @@ The robot receives a transport request. After the request is received, it gets t
 \begin{figure}[ht!]
  \centering
  \includegraphics[scale=.282]{./RA-2/moveToDestination.png}
- \caption{Figure 2: Move to Destination Robot Flow}
+ \caption{Move to Destination Robot Flow}
  \label{fig:movetodestination}
 \end{figure}
-Figure 2: This BPMN diagram shows how the robot moves to a destination.
+Figure \ref{fig:movetodestination}: This BPMN diagram shows how the robot moves to a destination.
 
 Upon a need to navigate to a destination on the map, the robot needs it's own position and the other robots positions. When this positions needed are aquired, it calculates the best path using a dijkstra algorithm but removing the pathways blocked by other robots. Then while a path recalculation triggering event is waited the last calculated path is executed. The execution of the path is done by following the guide line until a crossing is found, then it chooses wether to go straigth, turn left or turn right based on the calculated path. Everytime the robot goes by a crossing it broadcasts it's location.
 
@@ -34,11 +34,11 @@ Upon a need to navigate to a destination on the map, the robot needs it's own po
 \begin{figure}[ht!]
  \centering
  \includegraphics[scale=.276]{./RA-2/pickup.png}
- \caption{Figure 3: Pick Up Product Flow}
+ \caption{Pick Up Product Flow}
  \label{fig:pickup}
 \end{figure}
 
-Figure 3: This BPMN diagram shows how the robot picks up a product.
+Figure \ref{fig:pickup}: This BPMN diagram shows how the robot picks up a product.
 
 When the robot reaches the product's position, meaning the product is close by, the fork is moved to predetermined height and the sonars are used to find where the product is. Then the robot moves to position the fork under the product. It repeates the sensing and moving process until the fork is in a satisfying place when it lifts the product.
 
@@ -46,11 +46,11 @@ When the robot reaches the product's position, meaning the product is close by, 
 \begin{figure}[ht!]
  \centering
  \includegraphics[scale=.33]{./RA-2/release.png}
- \caption{Figure 4: Release Product Flow}
+ \caption{Release Product Flow}
  \label{fig:release}
 \end{figure}
 
-Figure 4: This BPMN diagram shows the process of releasing the product on the ground.
+Figure \ref{fig:release}: This BPMN diagram shows the process of releasing the product on the ground.
 
 Once the product reaches destination the robot stops and starts the product drop off. The fork is lower until product reaches the ground and the robot moves straight backward until the fork is far away enough from the product so it can move it to navigation position.
 
@@ -58,11 +58,11 @@ Once the product reaches destination the robot stops and starts the product drop
 \begin{figure}[ht!]
  \centering
  \includegraphics[scale=.45]{./RA-2/subscribeSensors.png}
- \caption{Figure 4: Subscribe to Sensors Flow}
+ \caption{Subscribe to Sensors Flow}
  \label{fig:subscribeSensors}
 \end{figure}
 
-Figure 5: This BPMN diagram shows the generic flow of subscribing to sensors and handling their data.
+Figure \ref{fig:subscribeSensors}: This BPMN diagram shows the generic flow of subscribing to sensors and handling their data.
 
 This flow happens during the robot's initialization. After subscribing to sonars topic the distances are get and handled, simultaneously the distances are updated. The same thing happens to the camera, but instead of distances images are handled.
 
@@ -70,11 +70,11 @@ This flow happens during the robot's initialization. After subscribing to sonars
 \begin{figure}[ht!]
  \centering
  \includegraphics[scale=.359]{./RA-2/followLine.png}
- \caption{Figure 1: Follow Guide Line Flow}
+ \caption{Follow Guide Line Flow}
  \label{fig:followline}
 \end{figure}
 
-Figure 6: This BPMN diagram shows how the robot follows the guide line.
+Figure \ref{fig:followline}: This BPMN diagram shows how the robot follows the guide line.
 
 To follow the guide line the robot uses the camera, it gets the image and processes it. If the line is facing right or is translated to the right it turns right, if the line is facing forward and is at the center it goes straingth else if the line is facing left or translated to the left it turns left. If the line is facing one orientation and translated to the other it takes the decision based on the translation.
 
@@ -88,90 +88,107 @@ The BPMN diagrams are used to indentify capabilities. The process of analysing t
 %Knowledge: 20..23 | 20 21 22 23
 %Device Driver: 24..30 | 24 25 26 27 28 29 30
 %General: 31 32
-{
-\centering
-\begin{tabular}{| r | p{2cm} | c | c |}
-	\hline
-	Functional Requirement & RefSORS Requirement & Domain Concept & Capability \\ 
-	\hline
-	FR1, FR2, FR6 & RR1 & Application & Application \\
-	%& RR2 & Application & Robotic Agent or Application \\
-	FR3, FR4, FR6, FR7, FR31 & RR3 & Application & Application\\
-	%& RR4 & Application & Application\\
-	FR4, FR6, FR7, FR25 & RR5 & Application & Application\\
-	\hline
-	%& RR6 & Robotic Agent \\
-	%& RR7 & Robotic Agent or Control 	\\
-	FR7 & RR8 & Robotic Agent & Control \\%or Robotic Agent \\
-	FR28 & RR8 & Robotic Agent & Robotic Agent \\%or Control \\
-	%& RR9 & Robotic Agent or Control\\
-	%& RR10 & Interaction \\
-	\hline
-	FR22, FR23, FR25 & RR11 & Task & Interaction \\
-	FR26, FR28, FR29, FR30 & RR12 & Task & Interaction \\
-	FR19, FR20, FR27 & RR13 & Task & Object Manipulation\\
-	FR12, FR16, FR17 FR18 & RR14 & Task & Localization\\
-	FR5, FR15, FR21 & RR15 & Task & Navigation\\
-	FR12, FR13, FR23, FR24 & RR16 & Task & Path Planning\\
-	FR12, FR13 & RR17 & Task & Mapping \\
-	%& RR18 & Mapping \\
-	FR10, FR14 & RR19 & Task & Support \\ % or Path Planning or Mapping or Localization 	\\
-	\hline
-	FR13 & RR20 & Knowledge &Mapping \\
-	%& RR21 & Robotic Agent or Application or Knowledge or Path Planning or Mapping or Localization 	 \\
-	%& RR22 & Knowledge \\
-	%& RR23 & Knowledge \\
-	\hline
-	FR10 & RR24 & Device Driver & Sonar Sensor\\
-	FR11 & RR24 & Device Driver & Camera Sensor\\
-	%& RR25 & Sensor Driver\\
-	%& RR26 & Sensor Driver\\
-	%& RR27 & Resource Driver\\
-	%& RR28 & Resource Driver\\
-	FR8 & RR29 & Device Driver & Drive Actuator\\
-	FR9 & RR29 & Device Driver & Forklift Actuator\\
-	%& RR30 & Actuator Driver\\
- 	%& RR31 &\\
- 	%& RR32 &\\
- 	\hline
-\end{tabular}
-}
+\begin{table}
+	\centering
+	\begin{tabular}{| r | p{2cm} | c | c |}
+		\hline
+		Functional Requirement & RefSORS Requirement & Domain Concept & Capability \\ 
+		\hline
+		FR1, FR2, FR6 & RR1 & Application & Application \\
+		%& RR2 & Application & Robotic Agent or Application \\
+		FR3, FR4, FR6, FR7, FR31 & RR3 & Application & Application\\
+		%& RR4 & Application & Application\\
+		FR4, FR6, FR7, FR25 & RR5 & Application & Application\\
+		\hline
+		%& RR6 & Robotic Agent \\
+		%& RR7 & Robotic Agent or Control 	\\
+		FR7 & RR8 & Robotic Agent & Control \\%or Robotic Agent \\
+		FR28 & RR8 & Robotic Agent & Robotic Agent \\%or Control \\
+		%& RR9 & Robotic Agent or Control\\
+		%& RR10 & Interaction \\
+		\hline
+		FR22, FR23, FR25 & RR11 & Task & Interaction \\
+		FR26, FR28, FR29, FR30 & RR12 & Task & Interaction \\
+		FR19, FR20, FR27 & RR13 & Task & Object Manipulation\\
+		FR12, FR16, FR17 FR18 & RR14 & Task & Localization\\
+		FR5, FR15, FR21 & RR15 & Task & Navigation\\
+		FR12, FR13, FR23, FR24 & RR16 & Task & Path Planning\\
+		FR12, FR13 & RR17 & Task & Mapping \\
+		%& RR18 & Mapping \\
+		FR10, FR14 & RR19 & Task & Image Processing \\ %Image Processing = support or Path Planning or Mapping or Localization 	\\
+		\hline
+		FR13 & RR20 & Knowledge &Mapping \\
+		%& RR21 & Robotic Agent or Application or Knowledge or Path Planning or Mapping or Localization 	 \\
+		%& RR22 & Knowledge \\
+		%& RR23 & Knowledge \\
+		\hline
+		FR10 & RR24 & Device Driver & Sonar Sensor\\
+		FR11 & RR24 & Device Driver & Camera Sensor\\
+		%& RR25 & Sensor Driver\\
+		%& RR26 & Sensor Driver\\
+		%& RR27 & Resource Driver\\
+		%& RR28 & Resource Driver\\
+		FR8 & RR29 & Device Driver & Drive Actuator\\
+		FR9 & RR29 & Device Driver & Forklift Actuator\\
+		%& RR30 & Actuator Driver\\
+	 	%& RR31 &\\
+	 	%& RR32 &\\
+	 	\hline
+	\end{tabular}
+	\caption{Functional Requirements classification}
+\end{table}
 
-%Capabilities
+
+%Capabilities %TODO: Refazer o diagrama, adicionar o interaction, possivel conexão com localization(mas acho que não)
 \begin{figure}[ht!]
  \centering
  \includegraphics[scale=.3]{./RA-2/capabilityDiagram.png}
- \caption{Figure 9: Capabilites}
+ \caption{Capabilites}
  \label{fig:capabilities}
 \end{figure}
 
-Figure 9: The diagram shows the identified capabilities, with their functionalities and relationships with each other.
+Figure \ref{fig:capabilities}: The diagram shows the identified capabilities, with their functionalities and relationships with each other.
 
 \subsection{Rationalize Capabilities}
 After identifying the capabilities, they must be analyzed to decide whether they will become services. Capabilities might also join other capabilities to form a service if they are too simple. They might also form more than one service if they are too complex. Table 2.3 shows the analysis of each capability and if they became one or more services or not at all.
 
-{
-\centering
-\begin{tabular}{| l | p{6.6cm} | c | c |}
-	\hline
-	Capability & Too simple & Too complex & Service\\
-	\hline
-	Camera Sensor & No & No & yes\\
-	Sonar Sensor & No & No & yes\\
-	Fork Lift Actuator & No & No & yes\\
-	Drive Actuator & No & No & yes\\
-	\hline
-	Image Processing & No & No & yes\\
-	Mapping & No & No &\\
-	Localization & No & No & yes\\ %(maybe too simple, join with mapping?, analyze scalability. Possible to create more complex localization?)
-	Navigation & Navigate the grid, although simple, needs to be concise in case of change of logic and maintenance. & No & yes\\
-	Path Planning & No & No & yes\\
-	Object Manipulation & No & No & yes\\
-	Interaction & No & No & yes\\
-	Control & No & No & yes\\
-	Robotic Agent & No & No & yes\\
-	Application & No & No & yes\\
-	\hline
-\end{tabular}
-}
-
+\begin{table}[h]
+	\centering
+	\begin{tabular}{| l | p{3.2cm} | p{3.2cm} | c |}
+% \begin{tabular*}{\textwidth}{@{\extracolsep{\fill} } | r | l | l | c | }
+% \begin{tabularx}{\textwidth}{>{\bfseries} | r | l | l | c |}
+% \begin{tabularx}{\textwidth}{>{\bfseries} r|X|X|c}
+		\hline
+		Capability & Too simple & Too complex & Service\\
+		\hline
+		Camera Sensor 		& No, deals with camera sensor specifics. & No, deals only with camera sensor. & yes\\
+		\hline
+		Sonar Sensor 		& No, deals with sonar sensor specifics. & No, deals only with sonar sensors. & yes\\
+		\hline
+		Fork Lift Actuator 	& No, deals with forklift actuator specifics. & No, deals only with forklift actuator. & yes\\
+		\hline
+		Drive Actuator 		& No, deals with drive actuator specifics. & No, deals with drive actuator specifics. & yes\\
+		\hline
+		Image Processing 	& No, processess images generated by the camera. & No, cohesive. & yes\\
+		\hline
+		Mapping 			& No, deals with map representation. & No, cohesive. &\\
+		\hline
+		Localization 		& Maybe & No & Maybe\\ %(maybe too simple, join with mapping?, analyze scalability. Possible to create more complex localization?)
+		\hline
+		Navigation 			& No, deals with & No & yes\\
+		\hline
+		Path Planning 		& No, calculates shortest path using two different algorithms. & No & yes\\
+		\hline
+		Object Manipulation & No, abstracts picking and releasing of product. & No, cohesive. & yes\\
+		\hline
+		Interaction 		& No, logic to communicate with other robots. & No, cohesive. & yes\\
+		\hline
+		Control 			& No, talks to several other capabilities. & No, only deals with logic. & yes\\
+		\hline
+		Robotic Agent 		& No, different activities done by the robot. & No, only abstracts robots activities. & yes\\
+		\hline
+		Application 		& No, abstraction of the whole application of transporting products. & No, cohesive. & yes\\
+		\hline
+	\end{tabular}
+	\caption{Capabilities rationalization table}
+\end{table}
