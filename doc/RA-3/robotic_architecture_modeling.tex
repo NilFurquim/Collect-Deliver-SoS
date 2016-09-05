@@ -1,6 +1,177 @@
 \section{Step RA-3: Robotic Architecture Modeling}
 \subsection{Robotic Services Specification}
 %Descição do que o serviço faz
+\subsubsection*{Camera Sensor}
+Instance of sensor driver service. This service is responsible for configuring the camera and capturing images. Images can be captured given an instant or periodicaly.
+%TODO: camera model and specifics. Since it is simulated the camera is yet to be chosen.
+\\Related Requirements:
+
+\subsubsection*{Sonar Sensor}
+Instance of sensor driver service. This service is responsible for configuring the sonar sensors and get the distances gathered by the sensors. Distances can be gathered given an instant or periodicaly.
+\\Related Requirements:
+
+\subsubsection*{Fork Lift Actuator}
+Instance of actuator driver. This service is responsible for configuring and raising and lowering the fork lift.
+\\Related Requirements:
+
+\subsubsection*{Drive Actuator}
+Instace of actuator driver. This service is responsible for configuring and controlling differential drive.
+\\Related Requirements:
+
+\subsubsection*{Image Processing}
+Instance of support service. This service is responsible for gathering images from the camera sensor and process it to provide meaninful information, such as the guide lines positions and crossings.
+\\Related Requirements:
+
+\subsubsection*{Mapping}
+This service is responsible for keeping a map of the grid, represented as a graph. The map will also keep the localization of the other robots, that will be dynamicaly updated.
+\\Related Requirements:
+
+\subsubsection*{Localization}
+This service is responsible for keeping the current location of the robot in the map. 
+\\Related Requirements:
+
+\subsubsection*{Navigation}
+This service is responsible for navigating the map and following the guide lines of the grid. 
+\\Related Requirements:
+
+\subsubsection*{Path Planning}
+This service is responsible for calculating paths using two algorithms, Manhatan Distance and Dijkstra. 
+\\Related Requirements:
+
+\subsubsection*{Object Manipulation}
+Abstraction of object manipulation. This service is responsible for getting the robot to the right position and picking up and realeasing the product.
+\\Related Requirements:
+
+\subsubsection*{Communication}
+This service is responsible for communicating with other robots, sending and receving messages. It will also turn raw data into meaninful information such as a transport request and position information of other robots. 
+\\Related Requirements:
+
+\subsubsection*{Control}
+This service is responsible for taking logical decision of the robots in a broad view.
+\\Related Requirements:
+
+\subsubsection*{Robotic Agent}
+Abstraction of the robots' functionalities. This service is responsible for providing abstraction to all robots functionalities, such as transporting a product.%TODO: Checkar capability diagram.
+\\Related Requirements:
+
+\subsubsection*{Application}
+This service is the application itself. It provides a communication between the operator and the robots to do the task of transporting products.
+\\Related Requirements:
+
 \subsection{Robotic Services Modeling}
 %Contrato, interface e protocolo
+%TODO: Check all CPI to see if handler is dealing with all cases.
+\subsubsection{Camera Sensor} %CPI-IMAGE: Done
+\begin{figure}[ht!]
+ \centering
+ \includegraphics[scale=.43]{./RA-3/cameraSensor_CIP.png}
+ \caption{Camera Sensor}
+ \label{fig:camerasensor_cip}
+\end{figure}
+
+\subsubsection{Sonar Sensor} %CPI-IMAGE: Done
+\begin{figure}[ht!]
+ \centering
+ \includegraphics[scale=.43]{./RA-3/sonarSensor_CIP.png}
+ \caption{Sonar Sensor}
+ \label{fig:sonarsensor_cip}
+\end{figure}
+
+\subsubsection{Fork Lift Actuator} %CPI-IMAGE: Done
+\begin{figure}[ht!]
+ \centering
+ \includegraphics[scale=.48]{./RA-3/forkLiftActuator_CIP.png}
+ \caption{Fork Lift Actuator}
+ \label{fig:forkliftactuator_cip}
+\end{figure}
+
+\subsubsection{Drive Actuator} %CPI-IMAGE: Done
+\begin{figure}[ht!]
+ \centering
+ \includegraphics[scale=.48]{./RA-3/driveActuator_CIP.png}
+ \caption{Drive Actuator}
+ \label{fig:driveactuator_cip}
+\end{figure}
+
+\subsubsection{Image Processing} %CPI-IMAGE: Done* parameters for handleProcessedImage() missing
+\begin{figure}[ht!]
+ \centering
+ \includegraphics[scale=.43]{./RA-3/imageProcessing_CIP.png}
+ \caption{Image Processing}
+ \label{fig:imageprocessing_cip}
+\end{figure}
+
+% \subsubsection{Mapping} %CPI-IMAGE: * TODO: Change to Map information(?)
+% \begin{figure}[ht!]
+%  \centering
+%  \includegraphics[scale=.43]{./RA-3/mapping_CIP.png}
+%  \caption{Mapping}
+%  \label{fig:mapping_CIP}
+% \end{figure}
+
+\subsubsection{Localization} %CPI-IMAGE: Done* missing return for getPosition()
+\begin{figure}[ht!]
+ \centering
+ \includegraphics[scale=.43]{./RA-3/localization_CIP.png}
+ \caption{Localization}
+ \label{fig:localization_cip}
+\end{figure}
+
+\subsubsection{Navigation} %CPI-IMAGE: Done* missing parameters and returns. Needs some tweaks.
+\begin{figure}[ht!]
+ \centering
+ \includegraphics[scale=.43]{./RA-3/navigation_CIP.png}
+ \caption{Navigation}
+ \label{fig:navigation_cip}
+\end{figure}
+
+\subsubsection{Path Planning} %CPI-IMAGE: Done* missing parameters and returns.
+\begin{figure}[ht!]
+ \centering
+ \includegraphics[scale=.43]{./RA-3/pathPlanning_CIP.png}
+ \caption{Path Planning}
+ \label{fig:pathplanning_cip}
+\end{figure}
+
+\subsubsection{Object Manipulation} %CPI-IMAGE: Done* missing parameters and returns.
+\begin{figure}[ht!]
+ \centering
+ \includegraphics[scale=.43]{./RA-3/objectManipulation_CIP.png}
+ \caption{Object Manipulation}
+ \label{fig:objectmanipulation_cip}
+\end{figure}
+
+\subsubsection{Communication} %CPI-IMAGE: Nope TODO: Rethink communication capabilities connections
+% \begin{figure}[ht!]
+%  \centering
+%  \includegraphics[scale=.43]{./RA-3/communication_CIP.png}
+%  \caption{Communication}
+%  \label{fig:communication_cip}
+% \end{figure}
+
+\subsubsection{Control} %CPI-IMAGE: Done* TODO: Rethink Control functionalities, missing parameters and returns.
+\begin{figure}[ht!]
+ \centering
+ \includegraphics[scale=.43]{./RA-3/control_CIP.png}
+ \caption{Control}
+ \label{fig:control_cip}
+\end{figure}
+
+\subsubsection{Robotic Agent} %CPI-IMAGE: Done* missing parameters and returns.
+\begin{figure}[ht!]
+ \centering
+ \includegraphics[scale=.43]{./RA-3/roboticAgent_CIP.png}
+ \caption{Robotic Agent}
+ \label{fig:roboticagent_cip}
+\end{figure}
+
+\subsubsection{Application} %CPI-IMAGE: Nope
+% \begin{figure}[ht!]
+%  \centering
+%  \includegraphics[scale=.43]{./RA-3/application_CIP.png}
+%  \caption{Application}
+%  \label{fig:application_cip}
+% \end{figure}
+
 \subsection{Robotic Service Composition}
+%TODO: Service Architecture

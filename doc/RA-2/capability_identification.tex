@@ -139,11 +139,14 @@ The BPMN diagrams are used to indentify capabilities. The process of analysing t
 \end{table}
 
 
-%Capabilities %TODO: Refazer o diagrama, adicionar o interaction, possivel conexão com localization(mas acho que não)
+%Capabilities 
+%TODO: Refazer o diagrama, adicionar o communication, possivel conexão com localization(mas acho que não)
+% ^- Communication adicionado no .draw
+%TODO: Colocar funções diferentes na capability Sonar sensor. Funções mais "importantes", vide RA-4.
 \begin{figure}[ht!]
  \centering
- \includegraphics[scale=.3]{./RA-2/capabilityDiagram.png}
- \caption{Capabilites}
+ \includegraphics[scale=.42]{./RA-2/capabilityDiagram.png}
+ \caption{Capabilities}
  \label{fig:capabilities}
 \end{figure}
 
@@ -152,7 +155,7 @@ Figure \ref{fig:capabilities}: The diagram shows the identified capabilities, wi
 \subsection{Rationalize Capabilities}
 After identifying the capabilities, they must be analyzed to decide whether they will become services. Capabilities might also join other capabilities to form a service if they are too simple. They might also form more than one service if they are too complex. Table 2.3 shows the analysis of each capability and if they became one or more services or not at all.
 
-\begin{table}[h]
+\begin{table}[ht]
 	\centering
 	\begin{tabular}{| l | p{3.2cm} | p{3.2cm} | c |}
 % \begin{tabular*}{\textwidth}{@{\extracolsep{\fill} } | r | l | l | c | }
