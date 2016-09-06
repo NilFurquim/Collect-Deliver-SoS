@@ -22,7 +22,7 @@ Instace of actuator driver. This service is responsible for configuring and cont
 Instance of support service. This service is responsible for gathering images from the camera sensor and process it to provide meaninful information, such as the guide lines positions and crossings.
 \\Related Requirements:
 
-\subsubsection*{Mapping}
+\subsubsection*{MapInformation}
 This service is responsible for keeping a map of the grid, represented as a graph. The map will also keep the localization of the other robots, that will be dynamicaly updated.
 \\Related Requirements:
 
@@ -61,7 +61,8 @@ This service is the application itself. It provides a communication between the 
 \subsection{Robotic Services Modeling}
 %Contrato, interface e protocolo
 %TODO: Check all CPI to see if handler is dealing with all cases.
-\subsubsection{Camera Sensor} %CPI-IMAGE: Done
+\subsubsection{Camera Sensor} %CIP-IMAGE: Done
+Figure \ref{fig:camerasensor_cip} describes camera sensor service's contract, interface and protocol. The camera sensor service provides two funcionalities, getImage and subscribe. The functionality getImage provides the image captured by the camera in that instant. The functionality subscribe provides images periodically, which requires the implementation of a camerasensorhandler to handle the periodical image updates.
 \begin{figure}[ht!]
  \centering
  \includegraphics[scale=.43]{./RA-3/cameraSensor_CIP.png}
@@ -69,7 +70,8 @@ This service is the application itself. It provides a communication between the 
  \label{fig:camerasensor_cip}
 \end{figure}
 
-\subsubsection{Sonar Sensor} %CPI-IMAGE: Done
+\subsubsection{Sonar Sensor} %CIP-IMAGE: Done
+Figure \ref{fig:sonarsensor_cip} describes sonar sensor service's contract, interface and protocol. The sonar sensor service provides two functionalities, getDistance and subscribe. The functionality getDistance gives the distances captured by each sonar unity in that instant. The functionality subscribe provides the distances of each sonar unity updated periodically, requires the implementation of sonarSensorHandler to deal with the periodical updates.
 \begin{figure}[ht!]
  \centering
  \includegraphics[scale=.43]{./RA-3/sonarSensor_CIP.png}
@@ -77,7 +79,8 @@ This service is the application itself. It provides a communication between the 
  \label{fig:sonarsensor_cip}
 \end{figure}
 
-\subsubsection{Fork Lift Actuator} %CPI-IMAGE: Done
+\subsubsection{Fork Lift Actuator} %CIP-IMAGE: Done
+Figure \ref{fig:forkliftactuator_cip} describes fork lift actuator service's contract, interface and protocol. The fork lift actuator service provides four functionalities, lower, raise, stop and raise. The functionalities lower and raise are responsible for moving the fork down and up, respectively, requiring the distance to be moved and returning the success of the action. The functionality stop stops any action occuring. The functionality report reports the actual position of the fork.
 \begin{figure}[ht!]
  \centering
  \includegraphics[scale=.48]{./RA-3/forkLiftActuator_CIP.png}
@@ -85,7 +88,8 @@ This service is the application itself. It provides a communication between the 
  \label{fig:forkliftactuator_cip}
 \end{figure}
 
-\subsubsection{Drive Actuator} %CPI-IMAGE: Done
+\subsubsection{Drive Actuator} %CIP-IMAGE: Done
+Figure \ref{fig:driveactuator_cip} describes drive actuator service's contract, interface and protocol. The drive actuator service provides two functionalities, drive and report. The functionality drive moves the wheels according to the linear and angular velocity provided. The functionality report reports the position of the wheel at that instant.
 \begin{figure}[ht!]
  \centering
  \includegraphics[scale=.48]{./RA-3/driveActuator_CIP.png}
@@ -93,7 +97,8 @@ This service is the application itself. It provides a communication between the 
  \label{fig:driveactuator_cip}
 \end{figure}
 
-\subsubsection{Image Processing} %CPI-IMAGE: Done* parameters for handleProcessedImage() missing
+\subsubsection{Image Processing} %CIP-IMAGE: Done* parameters for handleProcessedImage() missing
+Figure \ref{fig:imageprocessing_cip} describes image processing service's contract, interface and protocol. The image processing service provides two funcionalities, identifyGuideLines and subscribe. The functionality identifyGuideLines takes an image and returns the guide lines identified at that instant. The funcionality subscribe provides processed images periodically, requires a imageProcessingHandler to deal with the periodical processed images updates. 
 \begin{figure}[ht!]
  \centering
  \includegraphics[scale=.43]{./RA-3/imageProcessing_CIP.png}
@@ -101,15 +106,16 @@ This service is the application itself. It provides a communication between the 
  \label{fig:imageprocessing_cip}
 \end{figure}
 
-% \subsubsection{Mapping} %CPI-IMAGE: * TODO: Change to Map information(?)
+\subsubsection{MapInformation} %CIP-IMAGE: nope
 % \begin{figure}[ht!]
 %  \centering
-%  \includegraphics[scale=.43]{./RA-3/mapping_CIP.png}
+%  \includegraphics[scale=.43]{./RA-3/mapInformation_CIP.png}
 %  \caption{Mapping}
-%  \label{fig:mapping_CIP}
+%  \label{fig:mapinformation_CIP}
 % \end{figure}
 
-\subsubsection{Localization} %CPI-IMAGE: Done* missing return for getPosition()
+\subsubsection{Localization} %CIP-IMAGE: Done* missing return for getPosition()
+Figure \ref{fig:localization_cip} describes localization service's contract, interface and protocol. The localization service provides two functionalites, getPosition and subscribe. The functionality getPosition returns the position of the robot in that instant. The functionality subscribe returns the position of the robot peridically, requires a handleLocalizationChange that will be notified by LocalizationProvider.
 \begin{figure}[ht!]
  \centering
  \includegraphics[scale=.43]{./RA-3/localization_CIP.png}
@@ -117,7 +123,8 @@ This service is the application itself. It provides a communication between the 
  \label{fig:localization_cip}
 \end{figure}
 
-\subsubsection{Navigation} %CPI-IMAGE: Done* missing parameters and returns. Needs some tweaks.
+\subsubsection{Navigation} %CIP-IMAGE: Done* missing parameters and returns. Needs some tweaks.
+Figure \ref{fig:navigation_cip} describes navigation service's contract, interface and protocol. The navigation service provides three functionalities driveTo, executePath and stop. The funcionality driveTo has the robot drive to a position. The functionality executePath executes a path going to specific positions on the map. The functionality stop stops whatever navigation action it is doing.
 \begin{figure}[ht!]
  \centering
  \includegraphics[scale=.43]{./RA-3/navigation_CIP.png}
@@ -125,7 +132,8 @@ This service is the application itself. It provides a communication between the 
  \label{fig:navigation_cip}
 \end{figure}
 
-\subsubsection{Path Planning} %CPI-IMAGE: Done* missing parameters and returns.
+\subsubsection{Path Planning} %CIP-IMAGE: Done* missing parameters and returns.
+Figure \ref{fig:pathplanning_cip} describes navigation service's contract, interface and protocol. The navigation service provides two functionalities, definePath and calculateDistance. The definePath funcionality defines the best path to a product area considering the position of other robots using the dijkstra algorithm requires the implementation of executePath. The functionality calculateDistance calculates the Manhattan distance to a certain product area.
 \begin{figure}[ht!]
  \centering
  \includegraphics[scale=.43]{./RA-3/pathPlanning_CIP.png}
@@ -133,7 +141,8 @@ This service is the application itself. It provides a communication between the 
  \label{fig:pathplanning_cip}
 \end{figure}
 
-\subsubsection{Object Manipulation} %CPI-IMAGE: Done* missing parameters and returns.
+\subsubsection{Object Manipulation} %CIP-IMAGE: Done* missing parameters and returns.
+Figure \ref{fig:objectmanipulation_cip} describes object manipulation sevice's contract, interface and protocol. The object manipulation service provides two functionalities pickUp and release. The functionality pickUp positions the robot to pick up the product and requires the handlePickUpResult. The functionality release releases the product on the ground and requires the handleReleaseResult. 
 \begin{figure}[ht!]
  \centering
  \includegraphics[scale=.43]{./RA-3/objectManipulation_CIP.png}
@@ -141,7 +150,7 @@ This service is the application itself. It provides a communication between the 
  \label{fig:objectmanipulation_cip}
 \end{figure}
 
-\subsubsection{Communication} %CPI-IMAGE: Nope TODO: Rethink communication capabilities connections
+\subsubsection{Communication} %CIP-IMAGE: Nope TODO: Rethink communication capabilities connections
 % \begin{figure}[ht!]
 %  \centering
 %  \includegraphics[scale=.43]{./RA-3/communication_CIP.png}
@@ -149,7 +158,7 @@ This service is the application itself. It provides a communication between the 
 %  \label{fig:communication_cip}
 % \end{figure}
 
-\subsubsection{Control} %CPI-IMAGE: Done* TODO: Rethink Control functionalities, missing parameters and returns.
+\subsubsection{Control} %CIP-IMAGE: Done* TODO: Rethink Control functionalities, missing parameters and returns.
 \begin{figure}[ht!]
  \centering
  \includegraphics[scale=.43]{./RA-3/control_CIP.png}
@@ -157,7 +166,7 @@ This service is the application itself. It provides a communication between the 
  \label{fig:control_cip}
 \end{figure}
 
-\subsubsection{Robotic Agent} %CPI-IMAGE: Done* missing parameters and returns.
+\subsubsection{Robotic Agent} %CIP-IMAGE: Done* missing parameters and returns.
 \begin{figure}[ht!]
  \centering
  \includegraphics[scale=.43]{./RA-3/roboticAgent_CIP.png}
@@ -165,7 +174,7 @@ This service is the application itself. It provides a communication between the 
  \label{fig:roboticagent_cip}
 \end{figure}
 
-\subsubsection{Application} %CPI-IMAGE: Nope
+\subsubsection{Application} %CIP-IMAGE: Nope
 % \begin{figure}[ht!]
 %  \centering
 %  \includegraphics[scale=.43]{./RA-3/application_CIP.png}
