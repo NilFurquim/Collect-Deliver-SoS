@@ -2,71 +2,56 @@
 \subsection{Robotic Services Specification}
 %Descição do que o serviço faz
 \subsubsection*{Camera Sensor}
-Instance of sensor driver service. This service is responsible for configuring the camera and capturing images. Images can be captured given an instant or periodicaly.
+Instance of sensor driver service. This service is responsible for configuring the camera and capturing images. Images can be captured given an instant or periodically.
 %TODO: camera model and specifics. Since it is simulated the camera is yet to be chosen.
-\\Related Requirements:
 
 \subsubsection*{Sonar Sensor}
-Instance of sensor driver service. This service is responsible for configuring the sonar sensors and get the distances gathered by the sensors. Distances can be gathered given an instant or periodicaly.
-\\Related Requirements:
+Instance of sensor driver service. This service is responsible for configuring the sonar sensors and get the distances gathered by the sensors. Distances can be gathered given an instant or periodically.
 
 \subsubsection*{Fork Lift Actuator}
 Instance of actuator driver. This service is responsible for configuring and raising and lowering the fork lift.
-\\Related Requirements:
 
 \subsubsection*{Drive Actuator}
-Instace of actuator driver. This service is responsible for configuring and controlling differential drive.
-\\Related Requirements:
+Instance of actuator driver. This service is responsible for configuring and controlling differential drive.
 
 \subsubsection*{Image Processing}
-Instance of support service. This service is responsible for gathering images from the camera sensor and process it to provide meaninful information, such as the guide lines positions and crossings.
-\\Related Requirements:
+Instance of support service. This service is responsible for gathering images from the camera sensor and process it to provide meaningful information, such as the guide lines positions and crossings.
 
 \subsubsection*{MapInformation}
-This service is responsible for keeping a map of the grid, represented as a graph. The map will also keep the localization of the other robots, that will be dynamicaly updated.
-\\Related Requirements:
+This service is responsible for keeping a map of the grid, represented as a graph. The map will also keep the localization of the other robots, that will be dynamically updated.
 
 \subsubsection*{Localization}
 This service is responsible for keeping the current location of the robot in the map. 
-\\Related Requirements:
 
 \subsubsection*{Navigation}
 This service is responsible for navigating the map and following the guide lines of the grid. 
-\\Related Requirements:
 
 \subsubsection*{Path Planning}
-This service is responsible for calculating paths using two algorithms, Manhatan Distance and Dijkstra. 
-\\Related Requirements:
+This service is responsible for calculating paths using two algorithms, Manhattan Distance and Dijkstra. 
 
 \subsubsection*{Object Manipulation}
-Abstraction of object manipulation. This service is responsible for getting the robot to the right position and picking up and realeasing the product.
-\\Related Requirements:
+Abstraction of object manipulation. This service is responsible for getting the robot to the right position and picking up and releasing the product.
 
-\subsubsection*{Communication}
-This service is responsible for communicating with other robots, sending and receving messages.
-\\Related Requirements:
+% \subsubsection*{Communication}
+% This service is responsible for communicating with other robots, sending and receiving messages.
 
 \subsubsection*{Operation}
 This service is responsible for controlling the robot manually, providing an interface to the operator.
-\\Related Requirements:
 
 \subsubsection*{Control}
 This service is responsible for taking logical decision of the robots in a broad view.
-\\Related Requirements:
 
 \subsubsection*{Robotic Agent}
-Abstraction of the robots' functionalities. This service is responsible for providing abstraction to all robots functionalities, such as transporting a product.%TODO: Checkar capability diagram.
-\\Related Requirements:
+Abstraction of the robots' functionalities. This service is responsible for providing abstraction to all robots functionalities, such as transporting a product.%TODO: Checar capability diagram.
 
 \subsubsection*{Application}
 This service is the application itself. It provides a communication between the operator and the robots to do the task of transporting products.
-\\Related Requirements:
 
 \subsection{Robotic Services Modeling}
 %Contrato, interface e protocolo
 %TODO: Check all CPI to see if handler is dealing with all cases.
 \subsubsection{Camera Sensor} %CIP-IMAGE: Done
-Figure \ref{fig:camerasensor_cip} describes camera sensor service's contract, interface, and protocol. The camera sensor service provides two funcionalities, getImage, and subscribe. The functionality getImage provides the image captured by the camera in that instant. The functionality subscribe provides images periodically, which requires the implementation of a camerasensorhandler to handle the periodical image updates.
+Figure \ref{fig:camerasensor_cip} describes camera sensor service's contract, interface, and protocol. The camera sensor service provides two functionalities, getImage, and subscribe. The functionality getImage provides the image captured by the camera in that instant. The functionality subscribe provides images periodically, which requires the implementation of a camerasensorhandler to handle the periodical image updates.
 \begin{figure}[ht!]
  \centering
  \includegraphics[scale=.43]{./RA-3/cameraSensor_CIP.png}
@@ -102,7 +87,7 @@ Figure \ref{fig:driveactuator_cip} describes drive actuator service's contract, 
 \end{figure}
 
 \subsubsection{Image Processing} %CIP-IMAGE: Done* parameters for handleProcessedImage() missing
-Figure \ref{fig:imageprocessing_cip} describes image processing service's contract, interface, and protocol. The image processing service provides two funcionalities, identifyGuideLines, and subscribe. The functionality identifyGuideLines takes an image and returns the guide lines identified at that instant. The funcionality subscribe provides processed images periodically, requires a imageProcessingHandler to deal with the periodical processed images updates. 
+Figure \ref{fig:imageprocessing_cip} describes image processing service's contract, interface, and protocol. The image processing service provides two functionalist, identifyGuideLines, and subscribe. The functionality identifyGuideLines takes an image and returns the guide lines identified at that instant. The functionality subscribe provides processed images periodically, requires a imageProcessingHandler to deal with the periodical processed images updates. 
 \begin{figure}[ht!]
  \centering
  \includegraphics[scale=.43]{./RA-3/imageProcessing_CIP.png}
@@ -120,7 +105,7 @@ Figure \ref{fig:mapinformation_CIP} describes map information service's contract
 \end{figure}
 
 \subsubsection{Localization} %CIP-IMAGE: Done* missing return for getPosition()
-Figure \ref{fig:localization_cip} describes localization service's contract, interface, and protocol. The localization service provides two functionalites, getPosition, and subscribe. The functionality getPosition returns the position of the robot in that instant. The functionality subscribe returns the position of the robot peridically, requires a handleLocalizationChange that will be notified by LocalizationProvider.
+Figure \ref{fig:localization_cip} describes localization service's contract, interface, and protocol. The localization service provides two functionalities, getPosition, and subscribe. The functionality getPosition returns the position of the robot in that instant. The functionality subscribe returns the position of the robot periodically, requires a handleLocalizationChange that will be notified by LocalizationProvider.
 \begin{figure}[ht!]
  \centering
  \includegraphics[scale=.43]{./RA-3/localization_CIP.png}
@@ -129,7 +114,7 @@ Figure \ref{fig:localization_cip} describes localization service's contract, int
 \end{figure}
 
 \subsubsection{Navigation} %CIP-IMAGE: Done* missing parameters and returns. Needs some tweaks.
-Figure \ref{fig:navigation_cip} describes navigation service's contract, interface, and protocol. The navigation service provides three functionalities driveTo, executePath, and stop. The funcionality driveTo has the robot drive to a position. The functionality executePath executes a path going to specific positions on the map. The functionality stop stops whatever navigation action it is doing.
+Figure \ref{fig:navigation_cip} describes navigation service's contract, interface, and protocol. The navigation service provides three functionalities driveTo, executePath, and stop. The functionality driveTo has the robot drive to a position. The functionality executePath executes a path going to specific positions on the map. The functionality stop stops whatever navigation action it is doing.
 \begin{figure}[ht!]
  \centering
  \includegraphics[scale=.43]{./RA-3/navigation_CIP.png}
@@ -138,7 +123,7 @@ Figure \ref{fig:navigation_cip} describes navigation service's contract, interfa
 \end{figure}
 
 \subsubsection{Path Planning} %CIP-IMAGE: Done* missing parameters and returns.
-Figure \ref{fig:pathplanning_cip} describes navigation service's contract, interface, and protocol. The navigation service provides two functionalities, definePath, and calculateDistance. The definePath funcionality defines the best path to a product area considering the position of other robots using the dijkstra algorithm requires the implementation of executePath. The functionality calculateDistance calculates the Manhattan distance to a certain product area.
+Figure \ref{fig:pathplanning_cip} describes navigation service's contract, interface, and protocol. The navigation service provides two functionalities, definePath, and calculateDistance. The definePath functionality defines the best path to a product area considering the position of other robots using the dijkstra algorithm requires the implementation of executePath. The functionality calculateDistance calculates the Manhattan distance to a certain product area.
 \begin{figure}[ht!]
  \centering
  \includegraphics[scale=.43]{./RA-3/pathPlanning_CIP.png}
@@ -147,7 +132,7 @@ Figure \ref{fig:pathplanning_cip} describes navigation service's contract, inter
 \end{figure}
 
 \subsubsection{Object Manipulation} %CIP-IMAGE: Done* missing parameters and returns.
-Figure \ref{fig:objectmanipulation_cip} describes object manipulation sevice's contract, interface, and protocol. The object manipulation sdervice provides two functionalities pickUp and release. The functionality pickUp positions the robot to pick up the product and requires the handlePickUpResult. The functionality release releases the product on the ground and requires the handleReleaseResult. 
+Figure \ref{fig:objectmanipulation_cip} describes object manipulation service's contract, interface, and protocol. The object manipulation service provides two functionalities pickUp and release. The functionality pickUp positions the robot to pick up the product and requires the handlePickUpResult. The functionality release releases the product on the ground and requires the handleReleaseResult. 
 \begin{figure}[ht!]
  \centering
  \includegraphics[scale=.43]{./RA-3/objectManipulation_CIP.png}
@@ -155,14 +140,14 @@ Figure \ref{fig:objectmanipulation_cip} describes object manipulation sevice's c
  \label{fig:objectmanipulation_cip}
 \end{figure}
 
-\subsubsection{Communication} %CIP-IMAGE: Nope TODO: Rethink communication capabilities connections
-Figure \ref{fig:communication_cip} describes communication service's contract, interface, and protocol. The communication service provides four functionalities, getMessage, processMessage, broadcast, and subscribe. The functionality getMessage waits until a message is recieved and delivers the raw bytes of the message. The functionality process message takes raw bytes and processes it returning the message. The functionality broadcast broadcasts a message. The functionality subscribe requires a receiveMessage that receives all messages captured by the service and delivers them processed.
-\begin{figure}[ht!]
- \centering
- \includegraphics[scale=.43]{./RA-3/communication_CIP.png}
- \caption{Communication}
- \label{fig:communication_cip}
-\end{figure}
+% \subsubsection{Communication} %CIP-IMAGE: Nope TODO: Rethink communication capabilities connections
+% Figure \ref{fig:communication_cip} describes communication service's contract, interface, and protocol. The communication service provides four functionalities, getMessage, processMessage, broadcast, and subscribe. The functionality getMessage waits until a message is recieved and delivers the raw bytes of the message. The functionality process message takes raw bytes and processes it returning the message. The functionality broadcast broadcasts a message. The functionality subscribe requires a receiveMessage that receives all messages captured by the service and delivers them processed.
+% \begin{figure}[ht!]
+%  \centering
+%  \includegraphics[scale=.43]{./RA-3/communication_CIP.png}
+%  \caption{Communication}
+%  \label{fig:communication_cip}
+% \end{figure}
 
 \subsubsection{Operation} %CIP-IMAGE: Done
 Figure \ref{fig:operation_cip} describes operation service's contract, interface, and protocol. The operation service provides one functionality driveRobot. The functionality driveRobot provides the interface for a operator to drive a robot manually.

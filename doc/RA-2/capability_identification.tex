@@ -1,9 +1,9 @@
 \section{Step RA-2: Capability Identification}
-In this step the flows of different views of the system are modeled using BPMN diagrams. Then capabilities are identified by mapping these functional requirements with RefSORS requirements and analyzing the each flow. Finally these capabilities are assessed based on their functionalities to decide which are going to be exposed as services and which are going to be provided as components that support these services.
+In this step the flows of different views of the system are modeled using BPMN diagrams. Then capabilities are identified by mapping these functional requirements with RefSORS requirements and analyzing each flow. Finally these capabilities are assessed based on their functionalities to decide which are going to be exposed as services and which are going to be provided as components that support these services.
 
 \subsection{System Flow Model}
-From functional requirements and concepts from the reference architecture BPMN diagrams were modeled to represent the application flow. The modeled application flow was divided in six BPMN diagrams and seven polls shown in order of occurrence, each lane represents a possible capability and tasks are inspired by the robotic system required functionalities.
-Figure 1 shows the most abstract flow, the flow of the broadest system. Each robot initializes and requests the map to the master, that delivers it. Then they determine their own positions. After they know their own positions, the master can process the product transport request. It asks the distance of the robots from the product, chooses the closest one, and continues to wait for other requests.
+From functional requirements and concepts from the reference architecture BPMN diagrams were modeled to represent the application flow. The modeled application flow was divided in six BPMN diagrams and seven pools shown in order of occurrence, each lane represents a possible capability and tasks are inspired by the robotic system required functionalities.
+Figure 1 shows the most abstract flow, the flow of the broadest system. First of all every robot must subscribe to their sensors. Second they wait for a product request. The product request requires the robots to decide which is closest to the product to be delivered. The closest robot then transports the product and waits for another request.
 
 %Broad System Flow
 \begin{figure}[ht!]
@@ -13,7 +13,7 @@ Figure 1 shows the most abstract flow, the flow of the broadest system. Each rob
  \label{fig:broadsystemflow}
 \end{figure}
 
-Figure \ref{fig:broadsystemflow}: This BPMN diagram shows how the individual robots decide wether to answer to a transport request or not.
+Figure \ref{fig:broadsystemflow}: This BPMN diagram shows how the individual robots decide whether to answer to a transport request or not.
 
 The robot receives a transport request. After the request is received, it gets the product's position and it's own position in the map then calculates the Manhattan distance between them and broadcasts it. The distance calculated by it is compared to the distances calculated by other robots, if the former is smaller it broadcasts a message saying that it will take the request. If there is any robot closer to the product it waits for another request.
 
@@ -26,7 +26,7 @@ The robot receives a transport request. After the request is received, it gets t
 \end{figure}
 Figure \ref{fig:movetodestination}: This BPMN diagram shows how the robot moves to a destination.
 
-Upon a need to navigate to a destination on the map, the robot needs it's own position and the other robots positions. When this positions needed are aquired, it calculates the best path using a dijkstra algorithm but removing the pathways blocked by other robots. Then while a path recalculation triggering event is waited the last calculated path is executed. The execution of the path is done by following the guide line until a crossing is found, then it chooses wether to go straigth, turn left or turn right based on the calculated path. Everytime the robot goes by a crossing it broadcasts it's location.
+Upon a need to navigate to a destination on the map, the robot needs it's own position and the other robots positions. Once the positions needed are acquired, it calculates the best path using a dijkstra algorithm but removing the pathways blocked by other robots. Then while a path recalculation triggering event is waited the last calculated path is executed. The execution of the path is done by following the guide line until a crossing is found, then it chooses whether to go straight, turn left or turn right based on the calculated path. Every time the robot goes by a crossing it broadcasts it's new location on the grid.
 
 %Pick Up Product Flow
 \begin{figure}[ht!]
@@ -38,7 +38,7 @@ Upon a need to navigate to a destination on the map, the robot needs it's own po
 
 Figure \ref{fig:pickup}: This BPMN diagram shows how the robot picks up a product.
 
-When the robot reaches the product's position, meaning the product is close by, the fork is moved to predetermined height and the sonars are used to find where the product is. Then the robot moves to position the fork under the product. It repeates the sensing and moving process until the fork is in a satisfying place when it lifts the product.
+When the robot reaches the product's position, meaning the product is close by, the fork is moved to predetermined height and the sonars are used to find where the product is more specifically. Then the robot moves to position the fork under the product. It repeats the sensing and moving process until the fork is in a satisfying place when it lifts the product.
 
 %Release Product
 \begin{figure}[ht!]
@@ -50,7 +50,7 @@ When the robot reaches the product's position, meaning the product is close by, 
 
 Figure \ref{fig:release}: This BPMN diagram shows the process of releasing the product on the ground.
 
-Once the product reaches destination the robot stops and starts the product drop off. The fork is lower until product reaches the ground and the robot moves straight backward until the fork is far away enough from the product so it can move it to navigation position.
+Once the product reaches destination the robot stops and starts the product drop off. The fork is lowered until the product reaches the ground and the robot moves straight backward until the fork is far away enough from the product so it can lift the fork back up.
 
 %Subscribe to Sensors Flow
 \begin{figure}[ht!]
@@ -62,7 +62,7 @@ Once the product reaches destination the robot stops and starts the product drop
 
 Figure \ref{fig:subscribeSensors}: This BPMN diagram shows the generic flow of subscribing to sensors and handling their data.
 
-This flow happens during the robot's initialization. After subscribing to sonars topic the distances are get and handled, simultaneously the distances are updated. The same thing happens to the camera, but instead of distances images are handled.
+This flow happens during the robot's initialization. After subscribing to sonars topic the distances are handled, simultaneously the distances are updated. The same thing happens to the camera, but instead of distances images are handled.
 
 %Follow Guide Line Flow
 \begin{figure}[ht!]
@@ -74,11 +74,11 @@ This flow happens during the robot's initialization. After subscribing to sonars
 
 Figure \ref{fig:followline}: This BPMN diagram shows how the robot follows the guide line.
 
-To follow the guide line the robot uses the camera, it gets the image and processes it. If the line is facing right or is translated to the right it turns right, if the line is facing forward and is at the center it goes straingth else if the line is facing left or translated to the left it turns left. If the line is facing one orientation and translated to the other it takes the decision based on the translation.
+To follow the guide line the robot uses the camera, it gets the image and processes it. If the line is facing right or is translated to the right it turns right, if the line is facing forward and is at the center it goes straight else if the line is facing left or translated to the left it turns left. If the line is facing one orientation and translated to the other it takes the decision based on the translation.
 
 \subsection{Decompose Robot Application}
 
-The BPMN diagrams are used to indentify capabilities. The process of analysing the BPMN diagrams to identify capabilities entails in comparing the BPMN to the functional requirements and RefSORS requirements. Due to how the system was modeled using the diagrams, most BPMN lanes are potential capabilities. Then the potential capabilities are compared to functional requirements and RefSORS requirements, if they fulfill at least part of a functional or RefSORS requirement they go to the next step. They next step is compare them to the domain concepts and RefSORS capabilities, if they are related they become capabilities.
+The BPMN diagrams are used to identify capabilities. The process of analyzing the BPMN diagrams to identify capabilities entails in comparing the BPMN to the functional requirements and RefSORS requirements. Due to how the system was modeled using the diagrams, all BPMN lanes are potential capabilities. Then the potential capabilities are compared to functional requirements and RefSORS requirements, if they fulfill at least part of a functional or RefSORS requirement they go to the next step. They next step is compare them to the domain concepts and RefSORS capabilities, if they are related they become capabilities.
 
 %Robotic Application: 1..9 | 1 2 3 4 5 6 7 8 9
 %Robotic Agent: 6..9 | 6 7 8 9
@@ -87,8 +87,9 @@ The BPMN diagrams are used to indentify capabilities. The process of analysing t
 %Device Driver: 24..30 | 24 25 26 27 28 29 30
 %General: 31 32
 \begin{table}
+	\footnotesize
 	\centering
-	\begin{tabular}{| r | p{2cm} | c | c |}
+	\begin{tabular}{| r | p{1.8cm} | c | c |}
 		\hline
 		Functional Requirement & RefSORS Requirement & Domain Concept & Capability \\ 
 		\hline
@@ -116,7 +117,7 @@ The BPMN diagrams are used to indentify capabilities. The process of analysing t
 		%& RR18 & Mapping \\
 		FR10, FR14 				& RR19 & 	  & Image Processing \\ %Image Processing = support or Path Planning or Mapping or Localization 	\\
 		\hline
-		FR13 & RR20 & Knowledge & MapInformation \\
+		FR13 & RR20 & Knowledge & Map Information \\
 		%& RR21 & Robotic Agent or Application or Knowledge or Path Planning or Mapping or Localization 	 \\
 		%& RR22 & Knowledge \\
 		%& RR23 & Knowledge \\
@@ -150,9 +151,10 @@ The BPMN diagrams are used to indentify capabilities. The process of analysing t
 Figure \ref{fig:capabilities}: The diagram shows the identified capabilities, with their functionalities and relationships with each other.
 
 \subsection{Rationalize Capabilities}
-After identifying the capabilities, they must be analyzed to decide whether they will become services. Capabilities might also join other capabilities to form a service if they are too simple. They might also form more than one service if they are too complex. Table 2 shows the analysis of each capability and if they became one or more services or not at all.
+After identifying the capabilities, they must be analyzed to decide whether they will become services. Capabilities might also join other capabilities to form a service if they are too simple. They might also form more than one service if they are too complex. Table 2 shows the analysis of each capability and if they became one or more services or not at all. 
 
 \begin{table}[ht]
+	\footnotesize
 	\centering
 	\begin{tabular}{| l | p{3.2cm} | p{3.2cm} | c |}
 		\hline
@@ -166,19 +168,19 @@ After identifying the capabilities, they must be analyzed to decide whether they
 		\hline
 		Drive Actuator 		& No, deals with drive actuator specifics. & No, deals with drive actuator specifics. & yes\\
 		\hline
-		Image Processing 	& No, processess images generated by the camera. & No, cohesive. & yes\\
+		Image Processing 	& No, processes images generated by the camera. & No, cohesive. & yes\\
 		\hline
 		MapInformation		& No, deals with map representation. & No, cohesive. & yes \\
 		\hline
 		Localization 		& No, defines the actual position of the robot analyzing as it goes by crossings. & No, cohesive. & yes\\ %(maybe too simple, join with Navigation?, analyze scalability. Possible to create more complex localization?)
 		\hline
-		Navigation 			& No, more abstract movimentation of the robot & No, cohesive. & yes\\
+		Navigation 			& No, more abstract movement of the robot & No, cohesive. & yes\\
 		\hline
 		Path Planning 		& No, calculates shortest path using two different algorithms. & No, cohesive. & yes\\
 		\hline
 		Object Manipulation & No, abstracts picking and releasing of product. & No, cohesive. & yes\\
 		\hline
-		Interaction 		& No, logic to communicate with other robots. & No, cohesive. & yes\\
+		Communication 		& No, logic to communicate with other robots. & No, cohesive. & yes\\
 		\hline
 		Operation	 		& No, controls the robot manually. & No, cohesive. & yes\\
 		\hline
@@ -191,3 +193,5 @@ After identifying the capabilities, they must be analyzed to decide whether they
 	\end{tabular}
 	\caption{Capabilities rationalization table}
 \end{table}
+
+The interaction will be abstracted into the other capabilities in the project.
