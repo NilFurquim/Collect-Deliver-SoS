@@ -48,11 +48,25 @@ The application service is the interface with the operator to request a new tran
 \subsection{Deployment}
 The Deployment subsection describes where where the services will be physically running, either in the robots or in the back-end server. 
 
-\subsubsection{Back-End Server}
-The operation service provides an interface for an operator to control the robot remotely. 
-The application service provides an interface for adding new product transport requests.
-The map information service will use the back-end server to keep map redundancy and coherent.
+\subsubsection{Back-end Server}
+\begin{itemize}
+	\item The operation service provides an interface for an operator to control the robot remotely, thus the operation service takes input from a back-end server and communicates the robot. 
+	\item The application service provides an interface for adding new product transport requests, then the service must be located remotely from the robots.
+	\item The map information service will use the back-end server for map redundancy and coherence among the robots. The server will be located centrally to the industrial shop floor to reduce communication delays.
+\end{itemize}
 
 \subsubsection{Robots}
-Every device driver and actuator must control devices as quickly as possible, therefore stay operate in the robot.
-The path planning and image processing services run often and perform core operations for the robots' navigation, therefor also require to be implemented in the robot.
+\begin{itemize}
+	\item Every device driver and actuator must control devices as quickly as possible, at real-time if possible, therefore operate inside the robot.
+	\item The path planning and image processing services run often and perform core operations for the robots' navigation, therefore also require to be implemented in the robot. Although they perform the most complex operations in the robot the operations are not complex enough that the robot cannot handle them in time.
+	\item The control service and robot agent service are core services to coordinate and take logical decisions, although not heavily used, the failure to perform it's functionalities would cause severe negative impact. Also the implementation outside the robot could cause a long delay to perform determined tasks and possibly delaying or obstructing a path for a long period of time troubling other robots' navigations. Consequently the service must be implemented in the robot.
+	\item The object manipulation service is heavily used during product pick up and release, requiring quick awareness and handling of the data acquired through sonar sensor service, moving the robot using driver actuator service, and lifting and lowering the product using fork lift service. Consequently the object manipulation service must be located in the robot.
+	\item The navigation service might be the most requested service of all services. It is heavily active at almost all times to ask for a new path, using the image processing service and driver actuator service to move the robot effectively and follow the guide lines. Implementing the navigation service outside the robot could cause it to move uninterruptedly for long periods of time due to delay of communication causing the robot to miss the guidelines and possibly colliding against other robots.
+	\item The map information service is shown in both back-end server and the robot in the deployment diagram because although the map is shared between robots in a central server the robots need a copy of the map for quick analysis to calculate the path to destiny.
+\end{itemize}
+\begin{figure}[ht!]
+ \centering
+ \includegraphics[scale=.43]{./RA-4/deployment_diagram.png}
+ \caption{Deployment Diagram}
+ \label{fig:deployment_diagram}
+\end{figure}

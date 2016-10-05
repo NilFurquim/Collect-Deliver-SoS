@@ -48,6 +48,7 @@ Abstraction of the robots' functionalities. This service is responsible for prov
 This service is the application itself. It provides a communication between the operator and the robots to do the task of transporting products.
 
 \subsection{Robotic Services Modeling}
+\label{ssec:services_modeling}
 %Contrato, interface e protocolo
 %TODO: Check all CPI to see if handler is dealing with all cases.
 \subsubsection{Camera Sensor} %CIP-IMAGE: Done
@@ -186,4 +187,10 @@ Figure \ref{fig:application_cip} describes application service's contract, inter
 \end{figure}
 
 \subsection{Robotic Service Composition}
-%TODO: Service Architecture
+Figure \ref{fig:service_achitecture} describes the role of each service according to the contracts defined in the section \ref{ssec:services_modeling}.
+\begin{figure}[ht!]
+ \centering
+ \includegraphics[scale=.43]{./RA-3/service_architecture.png}
+ \caption{Service Architecture}
+ \label{fig:service_achitecture}
+\end{figure}
