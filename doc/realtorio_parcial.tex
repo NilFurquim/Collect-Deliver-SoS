@@ -1,0 +1,89 @@
+\documentclass{article}
+
+% \usepackage[portuguese]{babel}
+
+\title{Relatório Parcial de Bolsa de Iniciação Científica}
+\date{October 2016}
+\author{Nilson Furquim da Silva}
+
+\begin{document}
+\maketitle
+\chapter{Atividades Realizadas e em Desenvolvimento}
+Nesta seção são apresentadas as atividades realizadas durante o período de 5 de maio de 2016 até 5 de outubro de 2016, além de mostrar o conhecimento adquirido e os artefatos gerados. Nesta seção também são apresentadas as atividades sendo executadas nesses momento. Todas as atividades estão de acordo com o cronograma presente na apresentação do projeto e na seção X desse documento.   
+\section{Estudo de conceitos relacionados à robótica e do ambiente ROS}
+Para a realização do projeto foi necessário realizar estudos sobre conceitos de robótica e do ambiente ROS, além desses tópicos também foi realizado um estudo sobre o Gazebo. Sobre os estudos sobre robótica, primeiramente foram estudados tópicos gerais. Como a definição de um robô, como ele se relaciona com o ambiente e como é controlado. Então foram realizados estudos sobre conceitos mais específicos que foram utilizados até agora e ainda serão utilizados nas próximas fases de desenvolvimento desse projeto. Os principais topicos foram planejamento de rotas, navegação, manipulação de objetos e o funcionamento de alguns tipos de sensores. Sobre os estudos do mbiente ROS foi necessário entender como o ROS funciona e como utilizar suas funcionalidades de forma eficiente, já que será utilizado na fase de implementação do projeto. Assim como o ROS o Gazebo também será utilizado na fase de implementação do projeto, portanto um estudo sobre ele também foi realizado junto com o ROS pois ambos os sistemas estarão estreitamente conectados na concretização do sistema a ser desenvolvido.\\
+Um robô pode ser definido como um agente não orgânico que realiza uma tarefa. Robôs são tipicamente formado por sensores, atuadores e um ou mais controladores. Sensores fazem algum tipo de medição do ambiente e transformam em algum dado que pode ser reconhecido pelo robô. Os atuadores atuam sobre 
+partes do robô, movendo-as ou as ativando se for algum atuador específico. Os controladores interpretam os dados adquiridos pelos sensores, os processam e tomam decisões lógicas para agir utilizando os atuadores. Esses controladores são implementados, normalmente, em placas reprogramáveis podendo ser alto ou baixo poder de processamento dependendo da necessidade. Exemplos de sensores são sonares, infravermelhos e bumpers. Exemplos de atuadores são motores associados a rodas e a braços mecânicos. Exemplos de hardwares onde se podem ser implementados controladores são o Arduino UNO Rev3 e o Raspberry Pi.\\
+Internamente ao controlador, com o auxílio de sensores e atuadores, muitas tarefas podem ser realizadas, como mapeamento, planejamento de rotas, localização, navegação, interação e manipulação de objetos, que serão brevemente descritos a baixo.\\
+
+Mapeamento é o reconhecimento do ambiente em que o robô está presente. O robô utiliza de um ou mais sensores para ver o formato e a distância de cada objeto, possívelmente movendo-se para cobrir uma maior área, e produzir um mapa que pode ser reconhecido pelo robô. Existem diversar formas de mapear um ambiente, com diversos tipo de sensores. Duas delas são a medição de distancia de vários pontos utilizando um laser 360 e criando um mapa bidimensional e a medição de distancia utilizando um sonar com o robô movendo-se e atualizando o mapa com cada nova distância percebida, onde também é criando um mapa bidimensional.\\ 
+
+Planejamento de rotas é o uso de mapas entendiveis pelos robôs para planejar um caminho, normalmente muito eficiente, para mover-se até o local. Planejamento de rotas faz frequentemente uso de algoritmos da disciplina de grafos. Alguns algoritmos utilizados são o dijkstra, o a*, o best-first, entre outros. O algoritmo de planejamento de rotas está ligado intimamente com a escolha de representação do mapa e o poder computacional embarcado. Por exempo, o dijkstra é extramente custoso computacionamente para grafos muito grandes, no entanto pode se mostrar viável com uma representação de mapa com poucos nós. Já o A* requer uma função heurística que pode ser muito difícil de definir dado uma representação de mapa que não representa distâncias físicas entre os nós.\\
+
+Localização é como o robô determina sua posição espacial. Existem duas formas de uma robô se localizar: probabilistica e não probabilistica. A abordagem probabilistica toma os dados adquiridos dos sensores e comparam com uma base de dados e de acordo com a semelhança determina o locais mais possíveis dele estar. A abordagem não probabilistica determina posição local ou global utilizando sensores específicos como um GPS.\\
+
+Navegação é a movimentação do robô pelo ambiente. A navegação pode ser tanto muito simples como extremamente complexa. O robô pode mover-se para frente até encontrar um obstáculo, sentido por um bumper, por exemplo, e então mudar de direção até que atinja outro obtásculo novamente como é implementado no iRoomba "R".  Um exemplo mais complexo pode necessitar de um mapa e utilizar algoritmos de cálculo de rotas para achar o menor caminho possível até o destino.\\
+
+Interação é como o robô se comunica com outros robôs e o ser humano. A interação pode ser através de áudio, vídeo, infravermelho, ondas de rádio, além de outras formas. A interação entre robôs é extremamente importante principalmente em ambientes com muitos robôs para garantir uma navegação eficiente e evitar colisões.\\
+
+Manipulação de objetos faz uso de atuadores para agir sobre um objeto de forma alterar seu estado. Exemplos de manipulação são dobrar roupas, abrir portas ou mover objetos de um lugar para outro. A manipulação pode ser feita utilizando diversas formas de pegadores, garfos e pás. \\ \\
+
+Para controlar o sistema robótico o ROS será utilizado. O ROS é um ambiente de desenvolvimento robótico open source, que possui diversas ferramentas e abstrações para lidar com os robôs e diversas máquinas. As principais funcionalidades que o ROS provê são os topicos, os serviços e as mensagens, descritos abaixo.\\
+	Mensagens são dados estruturados de forma que possam ser transmitidos e entendidos facilmente. Dois exemplos de mensagens são int32, que representa um inteiro com 32 bits e geometryTwist que possui velocidade angular e velocidade linear armazenados em dois vetores fixos de três posições. O ROS garante que a comunicação utilizando mensagens poderão ser reconhecidas independemente das especificidades da máquina que envia e da máquina que recebe a mensagem. Consequentemente fica mais fácil comunicar utilizando os tópicos e serviços descritos a seguir.\\
+	
+	Pode-se escrever em tópicos e inscrever-se a tópicos. Quando um "serviço" inscreve-se a um topico, esse serviço passa a receber todas as mensagens escritas nesse tópico. Quando um "serviço" escreve em um topico, esse "serviço" manda a mensagem que escreveu para todos os "serviços" que se inscreveram a esse tópico. Tópicos são fundamentais para lidar com sensores que disponibilizam grandes quantidades de dados periodicamente que serão utilizados por outros "serviços". Para "serviços" que implementam um systema reativo o topico é fundamental pois os "serviços" devem ficar constantemente recebendo informações sobre o ambiente para tomar decisões. Como por exemplo um sonar, a distância dever ser periodicamente (de preferencial e tempo real) avaliada para evitar colisões.\\
+
+	Serviços do ROS realizam uma operação ou funcionalidade e podem retornar algum valor. Serviços são utilizados para ações síncronas e dados que são necessários para a continuação do atual fluxo de programa. O fluxo apenas continuará com o retorno do serviço.\\
+
+	O ros master realiza a sincronização e communicação de todos os serviços que estão rodando. O ros master deve ser iniciado antes de qualquer outro "serviços", pois apenas com ele eles conseguem comunicar entre si.\\
+O ros permite que a implementação seja feita em python e/ou c++. No caso desse projeto a implementação (estapa x) será relizada utilizando c++ devido ao seu desempenho.\\
+
+Além dos estudos sobre o ROS, vale dizer que foram realizados estudos sobre o gazebo. O gazebo é um ambiente de simulão física para simulações robóticas. O simulador provê uma forma de simular como os robôs interagiriam num ambiente real, com massa, gravidade, atrito, centro de inércia, etc. Além disso o gazebo provê uma simulação de modelos de sensores realmente existentes, e sobre eles, simulações e ruídos. Ao criar um projeto no ROS e simulando utilizando gazebo, se os sensores e os modelos dos robôs reais forem os mesmos utilizados para a simulação ele funcionará de forma semelhante no simulador e código para controlar ambos a simulação e o robô real é o mesmo.\\
+
+\section{Estudo de conceitos relacionados à SOA e das linguagens de modelagem UML e SoaML}
+Primeiramente é importante definir brevemente o que é uma arquitetura. Uma arquitetura de software define quais são os grandes módulos de funcionalidade e como se comunicam entre si. No caso a SOA é um estilo arquitetural, é um modelo geral de como definir esses grandes módulos funcionais e como se comunicarão.\\
+Uma aquitetura seguindo o estilo arquitetural SOA é definida em serviços. Serviços são módulos que realizam uma ou mais funcionalidades. Eles podem ser de dois tipos básicos, serviços produtores e serviços consumidores.\\ 
+	Serviços produtores geram dados e os proveêm a outros serviços; e\\ "Exemplo"
+	Serviços consumidores processam dados providos por outros serviços;\\ "Exemplo"
+Além disso é possível compor dois ou mais serviços de ambos os tipos para criar serviços compostos que podem realizar funcionalidades mais complexas. "Exemplo"
+Para definir o sistema robótico foi realizado estudos das linguagens de modelagem UML e SoaML. Linguagens de modelagem determinam, para cada diagrama, formas e ligações com design específico para definir sistemas sem ambiguidade. Dos diagramas que a UML define, alguns dos mais importantes para esse projeto foram listados a seguir.\\
+	Diagrama de Classes descreve as classes que utilizadas e a relação entre elas.\\
+	Diagrama de Sequência descreve a ordem e quais ações são realizadas de uma ou mais instâncias.\\
+	Diagrama de Implantação descreve onde cada classe será fisicamente implantada.\\
+O diagrama de serquência e o diagrama de implantação foram diretamente aplicados ao projetos. O diagrama de classes serviou como base para o entendimento de alguns diagramas do SoaML. O SoaML define modelos de diagramas específicos para descrever uma SOA. Dos modelos estudados estão listados abaixo os mais importantes.\\
+	BPMN (Business Process Model and Notation) descreve o fluxo das atividades que acontecem em que acontecem cada uma dos serviços.\\
+	Diagrama de capacidades descreve as capacidades que devem ser realizadas pelo sistema e como essas capacidades se relacionam.\\
+	A inteface de serviço, o protocolo de comunicação e o contrato de operação descrevem o que deve ser feito para implementar aquele serviço e, se for um serviço produtor, o serviço consumidor deve implementar para consumir os dados produzidos.\\
+	Arquitetura de serviço descrevem qual o papel de cada serviço relacionando-se com os contratos de operação.\\
+Os diagramas foram fundamentais para definir a divisão de serviços e comunicação entre eles para o desenvolvimento robótico.\\
+
+\section{Estudo dos conceitos relacionados ao desenvolvimento de SoS}
+Sistema-de-Sistemas são uma solução para desenvolver sistemas maiores e mais complexos de forma mais simples. Para realizar atividades complexas centralizar as atividades se houver problemas os sistema todo falha, e o sistema nunca funciona sem que toda parte esteja funcionando. Dessa forma um Sistema-de-Sistemas resolve esse problema por dividir o grande sistemas em pequenos sistemas independentes. Cada sistema funciona independentemente dos outros funcionarem. Mas quando todos funcionam um outro sistema mais complexo emerge podendo realizar tarefas bem mais complexas, maiores que a soma de todas funcionalidades de cada sistema.
+
+\section{Investigação do RefSORS e da ArchSORS}
+A instanciação da arquitetura foi realizada utilizando o processo de definido na ArchSORS (Architectural Design of Service-Oriented Robotic System) utilizando como referência a RefSORS (Reference Architecture for Service-Oriented Robotic Systems). O processo de instanciação definido pela ArchSORS foi dividido em cinco fases.\\
+	No passo RSA-1 a aplicação como um todo é caracterizada. O objetivos e atividades são definidos assim como caracteristicas gerais e restrições do sistema. Além de uma descrição geral são levantados os requisitos funcionais e de qualidade do sistema.\\
+	No passo RSA-2 os requisitos levantados no passo RSA-1 são utilizados os para modelar o fluxo da aplicação com diagramas BPMN, então ambos os requisitos e os diagramas BPMN são utilizados para identificar as capacidades do sistema e fazer o diagrama de capacidades. Como último passo os diagramas e os requisitos são analisados para decidir quais capacidades se tornarão serviços, quais se unirão formando um serviços mais complexos e quais se dividirão em serviços menores.\\
+	No passo RSA-3 uma arquitetura funcional é modelada e a descrição cada serviço é refinada. Nessa fase também são feitos os contratos, as interfaces e os protocolos de cada serviço. Por último modela-se todo o sistema e o papel de cada uma nas comunicações entre serviços utilizando o diagrama de arquitetura de serviços.\\
+	No passo RSA-4 os serviços são tecnicamente descritos. Os hardwares e as tecnologias a ser utilizados por cada serviço são definidos são fisicamente descritos assim como  e é definido onde os serviços serão fisicamente implementados, representado com um diagrama de implantação.\\
+	No passo RSA-5 a arquitetura gerada é avaliada utilizando métodos de análises arquiteturais.\\
+A RefSORS possui artefatos de referência para auxiliar e agilizar o processo de desenvolvimento dos passos RSA-2 ao passo RSA-4. Para o passo RSA-2 
+\section{Identificação e modelagem da arquitetura de software da aplicação robótica para o contexto de SoS utilizando o RefSORS e a ArchSORS}\label{identificacao}
+
+\section{Avaliação da arquitetura de software projetada para o sistema robótico}
+Avaliação constante durante a etapa \ref{identificacao}
+O que foi avaliado?
+Mudanças realizadas?
+
+\section{Documentação da arquitetura de software e dos possíveis pontos de evolução identificados no RefSORS e na ArchSORS}
+Seguindo o RefSORS e ArchSORS
+documento em anexo
+
+\section{Redação do relatório parcial}
+Redação desse relatório
+
+\section{Implementação do sistema robótico no ambiente de desenvolvimento ROS}
+\section{Avaliação do sistema robótico no ambiente virtual Gazebo e análise dos resultados}
+\section{Elaboração de relatórios técnicos e artigos a serem submetidos a conferências e periódicos}
+\section{Redação do relatório final}
+\end{document}
