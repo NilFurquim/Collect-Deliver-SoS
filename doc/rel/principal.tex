@@ -1,0 +1,194 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% In English:
+%    This is a Latex template for São Paulo Research Foudation (FAPESP)
+%         reports (anual or final).
+%    This is the modified version of the original Latex template from
+%         following website.
+%    Original Source: http://www.howtotex.com
+%    For information about FAPESP, check http://www.fapesp.br/en
+%    This template targets mainly on reports in Portuguese language.
+%
+% In Portuguese:
+%    Este é um modelo Latex para relatórios (anual ou final) da Fundação 
+%         de Amparo à pesquisa do Estado de São Paulo (FAPESP).
+%    Esta é uma versão modificada do modelo Latex do site 
+%         supra mencionado.
+%    Para informações sobre a FAPESP, verifique http://www.fapesp.br
+%    Esse modelo foca principalmente nos relatórios escritos em Português.
+%
+% Author/Autor: André Leon Sampaio Gradvohl, Dr.
+% Email:        andre.gradvohl@gmail.com
+% Lattes CV:    http://lattes.cnpq.br/9343261628675642
+% 
+% Last update/Última versão: 11/Sep/2016
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[12pt]{report}
+\usepackage[a4paper]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[english,portuguese]{babel}
+\usepackage[myheadings]{fullpage}
+\usepackage[T1]{fontenc}
+\usepackage{fancyhdr}
+\usepackage{graphicx, setspace}
+\usepackage{sectsty}
+\usepackage{url}
+\usepackage{setspace}
+\usepackage{enumerate}
+
+\input{comandos}
+\universidade{Universidade de São Paulo}
+\faculdade{Instituição de Ciências Matemáticas e de Computação}
+\titulo{Desenvolvimento de um Sistema Robótico Orientado a Serviços no Contexto de Sistemas-de-Sistemas}
+\tipoRelatorio{Parcial}
+\autor{Bolsista: Nilson Furquim da Silva\\Orientadora: Profa. Dra. Elisa Yumi Nakagawa}
+\numFAPESP{2015/26955-2}
+\periodoVigencia{10/maio/2016 a 10/maio/2017}
+\periodoRelatorio{10/maio/2016 a 10/setembro/2017}
+\cidade{São Carlos}
+\begin{document}
+%
+% Define a numeração em romanos.
+\pagenumbering{roman}
+\geraTitulo
+\folhaDeRosto
+\Resumo{
+	Relatório científico parcial apresentado à Fundação de Amparo à Pesquisa do Estado de São Paulo (FAPESP) com o objetivo de descrever as atividades realizadas pelo bolsista Nilson Furquim da Silva durante o primeiro semestre de vigência da bolsa de iniciação científica referente ao Processo N. 2015/25955-2. O período relativo ao primeiro semstre de bolsa se deu entre os meses de maio de 2015 e setembro de 2015. Neste relatório, são apresentadas também as atividades que estão em andamento e as que serão realizadas durante o restante do projeto, que possui vigência até maio de 2017.
+  }
+\tableofcontents
+\clearpage
+% Define a numeração em arábicos.
+\pagenumbering{arabic}
+
+%-----
+% Formatação do título da seção
+%-----
+\sectionfont{\scshape}
+\chapter{Resumo do Plano Inicial}
+%robotica
+Nos últimos anos, tanto a academia quanto a indústria têm tido um grande interesse pela área de robótica e também presenciado sua crescente evolução. Diversos especialistas vêm apontado essa área de pesquisa como uma das mais promissoras e importantes do século~21~\cite{Tomatis2011}. De fato, os crescentes avanços nas tecnologias de hardware e software associadas à robótica têm permitido a utilização de robôs em uma ampla gama de aplicações, muitas delas, essenciais para a sociedade. Atualmente, robôs são utilizados não somente para desempenhar atividades repetitivas em ambientes controlados de fábricas, mas também para apoiar atividades diárias em casas~\cite{iRobot2014}, lugares públicos~\cite{Shiomi06IHR} e também em ambientes críticos, tais como em minas com risco de desabamento~\cite{Thrun04AEAM} e áreas que precisam de proteção e vigilância~\cite{Beard06DCAS}. Como consequência, os sistemas robóticos utilizados para controlar tais robôs estão se tornando cada vez maiores e inevitavelmente mais complexos. 
+
+%robotica e SoS
+O desafio de se projetar sistemas robóticos com qualidade é ainda maior quando há a necessidade de integrar robôs a outros tipos de sistemas. Grande parte dos sistemas robóticos ainda é desenvolvida para operar de forma isolada, realizando missões específicas, o que dificulta sua utilização como parte integrante de sistemas maiores, mais completos e dinâmicos, tais como os Sistemas-de-Sistemas (do inglês, \textit{Systems-of-Systems - SoS})~\cite{Dagli06SoSA}. SoS são sistemas de software grandes e complexos nos quais um conjunto de sistemas independentes colaboraram entre si de forma a prover novas funcionalidades por meio de comportamento emergente (ou seja, prover funcionalidades únicas que não poderiam ser oferecidas por sistemas constituintes funcionando isoladamente)~\cite{Dagli06SoSA}. Dentre as principais características dos SoS, é possível destacar a independência operacional e gerencial, a distribuição  dos sistemas constituintes, o comportamento emergente e o desenvolvimento evolucionário (ou seja, os sistemas constituites evoluem e o SoS precisa se reorganizar)~\cite{Maier98APSoS}. 
+
+
+Para que sistemas robóticos possam ser mais facilmente desenvolvidos e integrados ao contexto de SoS, contribuições por parte da Engenharia de Software são necessárias. Nesse contexto, arquiteturas de software possuem especial importância, uma vez que são consideradas como parte fundamental do projeto de sistemas de software, principalmente para sistemas grandes e complexos como os SoS~\cite{Clements02ESAR}. Diversos autores ressaltam a importância da arquitetura de software no desenvolvimento de SoS e na promoção das características essenciais a esses sistemas, tais como o desenvolvimento evolucionário, comportamento emergente e distribuição~\cite{Jamshidi08SoSE,Maier98APSoS}. Dentre os principais estilos arquiteturais utilizados na construção de arquitetura de software para SoS é possível destacar a Arquitetura Orientada a Serviços (do inglês, \textit{Service-Oriented Architecture - SOA})~\cite{Papazoglou07VLDB}, por essa estar fortemente associada ao desenvolvimento de sistemas integráveis, fracamente acoplados e distribuídos. Atualmente, aproximadamente metade dos SoS disponíveis na literatura utiliza a SOA para integrar sistemas constituintes~\cite{Nakagawa13SAFP}.
+
+Em virtude dos benefícios da utilização da SOA, pode-se também encontrar um número crescente de sistemas robóticos desenvolvidos com base nesse estilo arquitetural, conhecidos como Sistemas Robóticos Orientados a Serviço (do inglês, \textit{Service-Oriented Robotic Systems - SORS})~\cite{Oliveira13SAC}. Muitos desses sistemas foram criados com o apoio de ambientes de desenvolvimento especialmente focados na SOA, como o \textit{Microsoft Robotic Developer Studio} (MSDN)~\cite{Jackson07MRDS} e o \textit{Robot Operating System} (ROS)~\cite{Straszheim11ROS}. Embora tecnologias e mecanismos de desenvolvimento estejam disponíveis para a criação de SORS, pouco tem se investigado a respeito do processo de construção da arquitetura desse tipo de sistema~\cite{Oliveira13SAC}. Uma grande parte dos SORS ainda é desenvolvida de forma \textit{ad~hoc}, o que dificulta a manutenção, o reúso e a integração desses sistemas. 
+
+Nessa perspectiva, foi proposto no grupo de pesquisa no qual este projeto se insere o processo ArchSORS (\textit{\underline{Arch}itectural Design of \underline{S}ervice-\underline{O}riented \underline{R}obotic \underline{S}ystem})~\cite{Oliveira14ECSA}, que provê um conjunto de métodos, atividades e tarefas para auxiliar na criação de arquiteturas de software para SORS. Esse processo é apoiado por uma taxonomia de serviços para SORS~\cite{Oliveira2014SEKE} e também por uma arquitetura de referência, chamada RefSORS (\textit{\underline{Ref}erence Architecture for \underline{S}ervice-\underline{O}riented \underline{R}obotic \underline{S}ystem})~\cite{OliveiraPhD}. A RefSORS engloba o conhecimento dos domínios de robótica e SOA com o objetivo de auxiliar na estruturação de arquiteturas de software dos SORS. 
+
+Embora o processo ArchSORS e a arquitetura de referência RefSORS facilitem e aprimorem o desenvolvimento de SORS, tais contribuições não foram concebidas para apoiar a construção de sistemas robóticos para o contexto de SoS. Por esse motivo, está sendo conduzido o projeto de pós-doutorado intitulado ``Projeto Arquitetural de Sistemas Robóticos no Contexto de Sistemas de Sistemas'' (FAPESP N. 14/24734-6), que visa evoluir o ArchSORS e a RefSORS para darem apoio ao desenvolvimento de SORS que possam ser integrados ao contexto de SoS ou projetados com um SoS. Uma das principais atividades a serem desenvolvidas durante esse projeto de pós-doutorado é a identificação dos pontos nos quais o ArchSORS e a RefSORS precisam ser evoluidos e como essa evolução deverá ser realizada. Para que isso possa ser feito, é bastante relevante observar o projeto e implementação de um SORS para o contexto de SoS.
+
+Dessa forma, a principal motivação para a condução deste projeto de iniciação científica é que o projeto e implementação de um SORS como um SoS, ou no contexto de um SoS, poderia oferecer importantes informações sobre como evoluir e aprimorar o ArchSORS e a RefSORS. Este projeto poderia contribuir para o desenvolvimento de diversos outros SORS a serem desenvolvidos para o contexto de SoS. Isso certamente impactaria nas  áreas da sociedade que já são assistidas por SoS e que poderiam ser também beneficiadas pelo uso de sistemas robóticos. 
+
+Vale ainda destacar que este projeto de iniciação científica será executada no contexto de dois projetos de pesquisa maiores, sendo que um deles intitulado ``SASoS: Supporting Development of Software Architectures for Software-intensive Systems-of-Systems'', financiado pela FAPESP (Processo N. 2014/02244-7, vigência de agosto de 2014 a julho de 2016) e o outro intitula-se ``Empirical Software Engineering for Critical Embedded Systems'' e é financiado pelo Capes/NUFFIC (Processo N. 034/2012, vigência de setembro de 2012 a agosto de 2016). Esses projetos em conjunto têm o objetivo de contribuir para o projeto de sistemas embarcados no contexto de SoS. É importante ressaltar que todo esse cenário pode dar subsídios à condução deste projeto de iniciação científica, uma vez que o grupo de pesquisa acumula importante conhecimento de como projetar, representar e implementar sistemas embarcados e SoS.
+%-----
+% Corpo do texto 
+%-----
+\chapter{Atividades Realizadas e em Desenvolvimento}
+Nesta seção são apresentadas as atividades realizadas durante o período de 5 de maio de 2016 até 5 de outubro de 2016, além de mostrar o conhecimento adquirido e os artefatos gerados. Nesta seção também são apresentadas as atividades sendo executadas nesses momento. Todas as atividades estão de acordo com o cronograma presente na apresentação do projeto.   
+
+\section{Estudo de conceitos relacionados à robótica e do ambiente ROS}
+Para a realização do projeto foi necessário realizar estudos sobre conceitos de robótica e do ambiente ROS, além desses tópicos também foi realizado um estudo sobre o Gazebo. Sobre os estudos sobre robótica, primeiramente foram estudados tópicos gerais, como definições básicas, o relacionamento do robô com o ambiente e seu controlado. Então foram realizados estudos sobre conceitos mais específicos que foram utilizados até agora e ainda serão utilizados nas próximas fases de desenvolvimento desse projeto. Sobre os estudos do ambiente ROS foi necessário entender como o ROS funciona e como utilizar suas funcionalidades de forma eficiente, já que será utilizado na fase de implementação do projeto (\ref{implementacao}). Assim como o ROS, o Gazebo também será utilizado na fase de implementação do projeto, portanto um estudo sobre ele também foi realizado pois ambos os sistemas estarão estreitamente conectados na concretização do sistema a ser desenvolvido.\\
+Robôs são tipicamente formado por sensores, atuadores e um ou mais controladores. Sensores fazem algum tipo de medição do ambiente e transformam em algum dado que pode ser reconhecido pelo robô. Exemplos de sensores são sonares, infravermelhos e bumpers. Os atuadores atuam sobre partes do robô, movendo-as ou as ativando se for algum atuador específico. Exemplos de atuadores são motores associados a rodas e a braços mecânicos. Os controladores interpretam os dados adquiridos pelos sensores, os processam e tomam decisões lógicas para agir utilizando os atuadores. Esses controladores são implementados em placas reprogramáveis podendo ser alto ou baixo poder de processamento dependendo da necessidade. Exemplos de hardwares onde se podem ser implementados controladores são o Arduino UNO Rev3 e o Raspberry Pi e as tarefas que executam são definidas a seguir.\\
+Internamente ao controlador, com o auxílio de sensores e atuadores, muitas tarefas podem ser realizadas, como mapeamento, planejamento de rotas, localização, navegação, interação e manipulação de objetos, que serão brevemente descritos a baixo.\\
+
+Mapeamento é o reconhecimento do ambiente em que o robô está presente. O robô utiliza de um ou mais sensores para ver o formato e a distância de cada objeto, possívelmente movendo-se para cobrir uma maior área, e produzir um mapa que pode ser reconhecido por ele. Existem diversas formas de mapear um ambiente, com diversos tipo de sensores. Duas delas são a medição de distância de vários pontos utilizando um laser 360 e criando um mapa bidimensional e a medição de distancia utilizando um sonar com o robô movendo-se e atualizando o mapa com cada nova distância percebida, onde também é criando um mapa bidimensional.\\ 
+
+Planejamento de rotas é o uso de mapas entendiveis pelos robôs para planejar um caminho para mover-se até o local de destino. Essa tarefa faz frequentemente uso de algoritmos da disciplina de grafos. Alguns algoritmos utilizados são o dijkstra, o a*, o best-first, entre outros. O algoritmo de planejamento de rotas está ligado intimamente com a escolha de representação do mapa e o poder computacional embarcado. Por exempo, o dijkstra é extramente custoso computacionamente para grafos muito grandes, no entanto pode se mostrar viável com uma representação de mapa com poucos nós. Já o A* requer uma função heurística que pode ser muito difícil de definir dado uma representação de mapa que não relação com as distâncias físicas entre os nós.\\
+
+Localização é como o robô determina sua posição espacial. Existem duas formas de uma robô se localizar: probabilistica e não probabilistica. A abordagem probabilistica toma os dados adquiridos dos sensores e comparam com uma base de dados e de acordo com a semelhança determina o locais mais possíveis dele estar. A abordagem não probabilistica determina posição local ou global utilizando sensores específicos como um GPS.\\
+
+Navegação é a movimentação do robô pelo ambiente. A navegação pode ser tanto muito simples como extremamente complexa. O robô pode mover-se para frente até encontrar um obstáculo, sentido por um bumper, por exemplo, e então mudar de direção até que atinja outro obtásculo sem qualquer tipo de processamento lógico mais complexo. Um exemplo mais complexo pode necessitar de um mapa e utilizar algoritmos de cálculo de rotas para achar o menor caminho possível até o destino.\\
+
+Interação é como o robô se comunica com outros robôs e o ser humano. A interação pode ser através de áudio, vídeo, infravermelho, ondas de rádio, além de muitas outras formas. Essa tarefa é extremamente importante principalmente em ambientes com muitos robôs para garantir uma navegação eficiente e evitar colisões, como aconcece com esse projeto.\\
+
+Manipulação de objetos faz uso de atuadores para agir sobre um objeto de forma alterar seu estado. Exemplos de manipulação são dobrar roupas, abrir portas ou mover objetos de um lugar para outro. A manipulação pode ser feita utilizando diversas formas de pegadores, garfos e pás. \\
+
+Para desenvolver o sistema robótico o ambiente ROS será utilizado. O ROS é um ambiente de desenvolvimento robótico open source, que possui diversas ferramentas e abstrações para lidar com os robôs. As principais funcionalidades que o ROS provê são os tópicos, os serviços e as mensagens, descritos abaixo.\\
+Mensagens são dados estruturados de forma que possam ser transmitidos e entendidos facilmente. Dois exemplos de mensagens são int32, que representa um inteiro com trinta e dois bits e geometryTwist, que possui velocidade angular e velocidade linear armazenados em dois vetores fixos de três posições. O ROS garante que a comunicação utilizando mensagens poderão ser reconhecidas independemente das especificidades da máquina que envia e da máquina que recebe a mensagem. Consequentemente fica mais fácil comunicar utilizando os tópicos e serviços descritos a seguir.\\
+	
+Tópcios são uma ferramenta de comunicação entre vários serviços. Pode-se escrever em tópicos e inscrever-se a tópicos. Quando um serviço inscreve-se a um tópico, esse serviço passa a receber todas as mensagens escritas nesse tópico. Quando um serviço escreve em um tópico, esse serviço manda a mensagem que escreveu para todos os serviços que se inscreveram a esse tópico. Tópicos são fundamentais para mandar mensagens que ocorrem em tempo irregular e mandar muitas mensagens periodicamente que requerem ação imediata. Por exemplo com sensores que disponibilizam grandes quantidades de dados periodicamente que requerem uma reação aos dados obtidos em tempo real.\\
+
+Serviços do ROS realizam uma operação ou funcionalidade e podem retornar algum valor. Serviços são utilizados para ações síncronas e dados que são necessários para a continuação do atual fluxo de programa. O fluxo apenas continua com o termino do serviço.\\
+
+Para coordenar todas comunicações entre serviços o ROS possui um mestre, o ros master. O ros master deve ser iniciado antes de qualquer outro serviços, pois apenas com ele os serviços conseguem comunicar entre si.\\
+
+Além dos estudos sobre o ROS, vale dizer que foram realizados estudos sobre o gazebo. O gazebo é um ambiente de simulção física para simulações robóticas. O simulador possui uma forma de simular como os robôs se comportariam num ambiente real, com massa, gravidade, atrito, centro de inércia, etc. Além disso o gazebo provê uma simulação de modelos de sensores realmente existentes, e sobre eles, simulação de ruídos. Ao criar um projeto no ROS e simulado utilizando gazebo, se os sensores e os modelos dos robôs reais forem os mesmos utilizados para a simulação ele funcionará de forma semelhante no simulador e o código para controlar ambos é o mesmo.\\
+
+\section{Estudo de conceitos relacionados à SOA e das linguagens de modelagem UML e SoaML}
+Primeiramente é importante definir brevemente o que é uma arquitetura. Uma arquitetura de software define quais são os grandes módulos de funcionalidade e como se comunicam entre si. No caso a SOA é um estilo arquitetural, é um modelo geral de como definir esses grandes módulos funcionais e como se comunicarão.\\
+Uma aquitetura seguindo o estilo arquitetural SOA é definida em serviços. Serviços são módulos que realizam uma ou mais funcionalidades. Eles podem ser de dois tipos básicos:\\ 
+Serviços produtores: que geram dados e os enviam a outros serviços, como por exemplo serviços que lidam diretamente com sensores e disponibilizam os dados coletados a outros serviços e\\
+Serviços consumidores: que processam dados recebidos de outros serviços, como por exemplo um serviço de navegação que utiliza dados de localização e planejamento de rotas para realizar a navegação.\\
+Além disso é possível compor dois ou mais serviços de ambos os tipos para criar serviços compostos que podem realizar funcionalidades mais complexas, um exemplo de serviço composto é um serviço que faz processamento de imagens o serviço recolhe informações de um serviço que lida diretamente com a camera, processa as imagens obtidas e às disponibiliza para serviços que necessitam da imagem processada.\\ 
+Para modelar o sistema robótico foram, também, realizados estudos das linguagens de modelagem UML e SoaML. Linguagens de modelagem determinam, para cada diagrama, formas e ligações com design específico para definir sistemas sem ambiguidade. Dos diagramas que a UML define, alguns dos mais importantes para esse projeto foram listados a seguir.
+\begin{itemize}
+\item O diagrama de classes apresenta as classes que estarão presentes no sistema e suas funcionalidades, além disso ele mostra a relação entre as classes.
+\item O diagrama de sequência descreve quais ações e em que ordem são realizadas entre uma ou mais instâncias, dado uma funcionalidade que deseja-se descrever mais detalhadamente.
+\item O diagrama de implantação descreve onde cada classe será fisicamente implantada.
+\item O diagrama de implantação foi diretamente aplicado ao projeto. Já o diagrama de classes serviu como base para melhorar o entendimento de alguns dos diagramas do SoaML. O SoaML define modelos de diagramas específicos para descrever uma SOA. Dos modelos estudados estão listados abaixo os mais importantes e que foram utilizados nesse projeto.
+\item O BPMN (Business Process Model and Notation) descreve o fluxo de execução entre os serviços de uma funcionalidade.
+\item O diagrama de capacidades descreve quais as capacidades presentes no sistema e como essas capacidades se relacionam.
+\item A inteface de serviço, o protocolo de comunicação e o contrato de operação descrevem o que deve ser feito para implementar aquele serviço e, se for um serviço produtor, o que o serviço consumidor deve implementar para consumir os dados produzidos.
+\item A arquitetura de serviço descreve qual o papel de cada serviço nos contratos de operação.
+Os diagramas foram fundamentais para o desenvolvimento do sistema.
+\end{itemize}
+\section{Estudo dos conceitos relacionados ao desenvolvimento de SoS}
+Sistema-de-Sistemas são uma solução para desenvolver sistemas maiores e mais complexos de forma mais simples. Sistemas centralizados possuem vários efeitos negativos. São extramente complexos e difíceis de serem desenvolvidos, além disso se houver problemas em alguma parte do sistema todo ele falha Dessa forma um Sistema-de-Sistemas resolve esse problema por dividir o grande sistemas em pequenos sistemas independentes de forma que juntos realizam uma função mais complexa do que as soma das funções de cada sistema. Para fazer desenvolver um SoS os grandes dois desafios são desenvolver sistemas independentes ou particionar um sistema maior já existente e realizar a função mais complexa com a soma dos sistemas.\\
+Desenvolver pequenos sistemas independentes é difícil pois o problema é único, logo a soluçnão mais intuitiva é um sistema também único. Outro problema é fazer com que todos os sistemas sejam independentes entre si, se um sistema falhar não aferá os outros e cada pequeno sistema continua realizando sua atividade. Então para particionar o sistema requere-se um grande estudo para quebrar o problema em partes menores. A partir daí possível desenvolver os sistemas independetes.\\
+O grande sistema deve resolver uma tarefa mais complexa de forma que seja maior que soma das tarefas realizadas por cada sistema individual. Portanto os sistemas independentes não podem ser explícitamente programados para realizar a tarefa mais complexa. Se eles fossem explícitamete programados para isso o sistema seria tão complexo quanto o sistema centralizado para desevolver. Então a solução do problema deve emergir naturalmente a partir de sistemas simples.\\
+\section{Investigação do RefSORS e da ArchSORS}
+A instanciação da arquitetura foi realizada utilizando o processo definido na ArchSORS (Architectural Design of Service-Oriented Robotic System) utilizando como referência a RefSORS (Reference Architecture for Service-Oriented Robotic Systems). O processo de instanciação definido pela ArchSORS é dividido em cinco fases.\\
+Na fase RSA-1 a aplicação como um todo é caracterizada. O objetivos e atividades são definidos assim como características gerais e restrições do sistema. Além de uma descrição geral são levantados os requisitos funcionais e de qualidade do sistema.
+\begin{itemize}
+\item Na fase RSA-2 os requisitos levantados na fase RSA-1 são utilizados os para modelar o fluxo da aplicação com diagramas BPMN, então ambos os requisitos e os diagramas são usados para identificar as capacidades do sistema e fazer o diagrama de capacidades. Como última fase os diagramas e os requisitos são analisados para decidir quais capacidades se tornarão serviços, quais se unirão formando serviços mais complexos e quais se dividirão em serviços menores.
+\item Na fase RSA-3 uma arquitetura funcional é modelada e a descrição cada serviço é refinada. Nessa fase também são feitos os contratos, as interfaces e os protocolos de cada serviço. Por último modela-se todo o sistema e o papel de cada um dos serviços nas comunicações com outros serviços utilizando o diagrama de arquitetura de serviços.
+\item Na fase RSA-4 os serviços são tecnicamente descritos. Os hardwares e as tecnologias a ser utilizados por cada serviço são definidos assim como é também definido onde os serviços serão fisicamente implementados, representado com um diagrama de implantação.
+\item Na fase RSA-5 a arquitetura gerada é avaliada utilizando métodos de análises arquiteturais. O objetivo da avaliação é analisar a conformidade com resquisitos, eliminar possíveis defeitos e inconsistências. Após a análise o processo algumas fases podem se repetir até que a arquitetura esteja num estado satisfatório.
+\end{itemize}
+A RefSORS possui artefatos de referência para auxiliar e agilizar o processo de desenvolvimento da fase RSA-2 à fase RSA-4.\\
+\begin{itemize}
+\item Para o fase RSA-2 são disponibilizados os requisitos arquiteturais funcionais de domínios robóticos, que são requisitos que quase sempre estão presentes em todos os sistemas robóticos terrestres de ambientes fechados. É possível relacionar os requisitos de referência com requisitos funcionais elicitados na fase RSA-1, assim podemos classificar imediatamente as capacidadas nos domínios robóticos para SOA apropriados, que é um fase fundamental para determinar quais capacidades se tornarão serviços. Além disso há um diagrama de capacidades com catorze tipos de serviço. As capacidades identificadas anteriormente são facilmente classificadas dentro dos catorze tipos definidos pela RefSORS pois apenas alguns requisitos de referência se relacionam com vários tipos de serviço.
+\item Para a fase RSA-3 a RefSORS possui um diagrama informal geral com todos os conceitos do domínio e como se comunicam. Além disso há vários diagramas de contrato, serviço e protocolo cada um dos tipos de serviços em conjunto com uma descrição mais detalhada de cada tipo de serviço. Nessa fase há também um diagrama de arquitetura de serviço que possui todos os catorze tipos de serviço e quais contratos serão utilizados entre cada par de serviços que se relacionam, além do papel de cada um no contrato.
+\item Para a fase RSA-4 há um diagrama de implantação onde há refências dos possíveis casos da localização dos tipos serviços, distribuidos entre estar presente no robô ou em um servidor back-end. São descritos também quais serviços devem obrigatóriamente ser implementados no robô.  
+\end{itemize}
+\section{Identificação e modelagem da arquitetura de software da aplicação robótica para o contexto de SoS utilizando o RefSORS e a ArchSORS}\label{identificacao}
+Utilizando todos os conhecimentos adquiridos como mostrado nos itens anteriores foi instanciada uma arquitetura para o contexto de SoS utilizando o RefSORS e a ArchSORS. Específicamente para o conceito de SoS os robôs são completamente independentes, se um dos robôs falharem outros robôs não falharão devido a primeira falha. Além disso o único serviço físicamente implantado no servidor back-end utilizado pelo robô é o map information service, que está presente por redundância e coerência. Se o servidor parar de funcionar os robôs, mesmo que de forma menos eficiente cosegurm realizar suas tarefas. Cada robô realiza simples movimentações e manipulações de objetos, no entanto, como um único sistema fazem movimentações complexas e a manipulação de vários objetos simultaneamente. 
+
+\section{Avaliação da arquitetura de software projetada para o sistema robótico}
+A avaliação da arquitetura foi realizada em conjunto com a etapa \ref{identificacao}. O documento resultante anexado a este relatório já é o resultado de várias iterações de avaliação da arquitetura. Onde em cada processo foi avaliado os problemas presentes e na resolvidos. Alguns dos problemas encontrados foram a classificação de capacidades, a presença de serviços desnecessários, a presensa de comunicações desnecessárias entre serviços e falta de algumas funcionalidades em serviços.  
+
+\section{Documentação da arquitetura de software e dos possíveis pontos de evolução identificados no RefSORS e na ArchSORS}
+A documentação da arquitetura está em anexo à este relatório.
+
+\section{Redação do relatório parcial}
+Como previsto no planejamento houve um período determinado para a redação desse relatório.
+
+\chapter{Atividades a serem desenvolvidas}
+Esta seção apresenta quais as atividades ainda estão para ser desenvolvidas até término do projeto durante a vigência da bolsa da iniciação científica.
+
+\section{Implementação do sistema robótico no ambiente de desenvolvimento ROS}\label{implementacao}
+A próxima tarefa a ser realizada é a implementação do sistema robótico no ambiente ROS. A implementação do projeto será feita em C++ utilizando todas as ferramentas do ROS.
+
+\section{Avaliação do sistema robótico no ambiente virtual Gazebo e análise dos resultados}
+Mais a diante o sistema robótico deverá ser avaliado no ambiente virtual Gazebo para simular os robôs, seus sensores e o sistema em funcionamento. Além disso serão realizadas análises sobre as simulações para validar o sistema.
+
+\section{Elaboração de relatórios técnicos e artigos a serem submetidos a conferências e periódicos}
+Relatórios técnicos e artigos serão redigidos para a submissão em conferências e periódicos durante essa etapa de desenvolvimento. As conferências e periódicos ainda estão para ser decididos.
+
+\section{Redação do relatório final}
+Nesta fase será feito o relatório final apresentando as atividades realizadas sobre os doze meses de vigência da bolsa.
+
+
+%-----
+% Referências bibliográficas
+%-----
+\addcontentsline{toc}{chapter}{\bibname}
+\bibliography{referencias}
+\bibliographystyle{abntex2-num}
+
+%-----
+% Fim do documento
+%-----
+\end{document}

@@ -1,0 +1,130 @@
+\newcommand{\HRule}[1]{\rule{\linewidth}{#1}}
+\onehalfspacing
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{3}
+
+\newcommand{\titulo}[1]{\def\meuTitulo{#1}}
+\newcommand{\tituloIngles}[1]{\def\meuTituloIngles{#1}}
+\newcommand{\numFAPESP}[1]{\def\numFAP{#1}}
+\newcommand{\tipoRelatorio}[1]{\def\tipoRelat{#1 }} %o espaço depois do #1 é importante
+\newcommand{\autor}[1]{\def\nomeAutor{#1}}
+\newcommand{\cidade}[1]{\def\nomeCidade{#1}}
+\newcommand{\universidade}[1]{\def\nomeUniversidade{#1}}
+\newcommand{\faculdade}[1]{\def\nomeFaculdade{#1}}
+\newcommand{\periodoVigencia}[1]{\def\periodVig{#1}}
+\newcommand{\periodoRelatorio}[1]{\def\periodRelat{#1}}
+\author{}
+\date{}
+
+\newcommand{\Figure}[1]{Figura~\ref{fig:#1}}
+\newcommand{\Table}[1] {Tabela~\ref{#1}}
+\newcommand{\Equation}[1] {Equa\c{c}\~ao~\ref{#1}}
+\newcommand{\addFigure}[3] { %Parametros scale, fig_name, caption 
+    \begin{figure}[!hbt]
+      \centering
+      \includegraphics[scale=#1]{figures/#2}
+      \caption{#3}\label{fig:#2}
+    \end{figure}
+}
+
+\newcommand{\geraTitulo}{
+\clearpage
+\begin{titlepage}
+  \begin{center}
+      \vspace*{-3cm}
+      { \setstretch{.5} 
+        \textsc{\nomeUniversidade} \\
+        \HRule{.2pt}\\
+        \textsc{\nomeFaculdade}
+      }
+
+      \vspace{5.5cm}
+
+      \Large \textbf{\textsc{\meuTitulo}}
+	  \HRule{1.5pt} \\ [0.5cm]
+      \linespread{1}
+      \large Relatório \tipoRelat de Iniciação Científica, fomentado pela Fundação de Amparo à Pesquisa do Estado de São Paulo. \\ 
+  	   \HRule{1.5pt} \\ [0.5cm]
+       Projeto FAPESP \texttt{\#\numFAP}
+       \\ [0.1cm]
+       \nomeAutor
+       
+       \vfill
+       
+       {\normalsize  \nomeCidade, \today}
+\end{center}
+\end{titlepage}
+}
+
+\usepackage{titlesec}
+\titleformat{\chapter}{\normalfont\LARGE\bfseries}{\thechapter}{1em}{}
+\titlespacing*{\chapter}{0pt}{3.5ex plus 1ex minus .2ex}{2.3ex plus .2ex}
+
+%----------------------------------------------------------------------
+% HEADER & FOOTER
+%----------------------------------------------------------------------
+\pagestyle{fancy}
+\fancyhf{} % Limpa todos os campos de header and footer fields
+%\setlength\headheight{15pt}
+\renewcommand{\headrulewidth}{0pt}
+%\fancyhead[R]{Anglia Ruskin University} 
+\fancyfoot[R]{\thepage}%of \pageref{LastPage}}
+
+\addto\captionsportuguese{\renewcommand{\contentsname}{Sumário}}
+\addto\captionsportuguese{\renewcommand{\bibname}{Referências bibliográficas}}
+
+%------
+% Resumo e Abstract
+%------
+\newcommand{\Resumo}[1]{
+   \begin{otherlanguage}{portuguese}
+       \addcontentsline{toc}{chapter}{Resumo}
+       \begin{abstract} \thispagestyle{plain} \setcounter{page}{2}
+          #1
+        \end{abstract}
+   \end{otherlanguage} 
+} %end \Resumo
+
+\newcommand{\Abstract}[1]{
+   \begin{otherlanguage}{english}
+      \addcontentsline{toc}{chapter}{Abstract}
+      \begin{abstract} \thispagestyle{plain} \setcounter{page}{3}
+       #1
+      \end{abstract}    
+    \end{otherlanguage} 
+} %end \abstract
+
+%------
+% Folha de rosto
+%------
+\newcommand{\folhaDeRosto}{
+   \chapter*{Informações Gerais do Projeto}
+   \addcontentsline{toc}{chapter}{Informações Gerais do Projeto}
+   \begin{itemize}
+      \item Título do projeto: 
+            \begin{itemize}\item[] \textbf{\meuTitulo} \end{itemize}
+      \item Nome do bolsista e do orientador: 
+            \begin{itemize}\item[]\textbf{\nomeAutor}\end{itemize}
+      \item Instituição sede do projeto: 
+            \begin{itemize}
+               \item[]\textbf{\nomeFaculdade \ da \nomeUniversidade} 
+            \end{itemize}
+      \item Equipe de pesquisa:
+            \begin{itemize}
+               \item[]\textbf{\nomeAutor} 
+            \end{itemize}
+       \item Número do projeto de pesquisa:
+            \begin{itemize}
+               \item[]\textbf{\numFAP} 
+            \end{itemize}
+       \item Período de vigência:
+            \begin{itemize}
+               \item[]\textbf{\periodRelat} 
+            \end{itemize}
+       \item Período coberto por este relatório científico:
+            \begin{itemize}
+               \item[]\textbf{\periodVig} 
+            \end{itemize}
+   \end{itemize}
+   \clearpage
+}
