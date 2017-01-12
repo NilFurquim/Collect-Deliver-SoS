@@ -1,0 +1,147 @@
+<?xml version="1.0"?>
+<robot>
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+        <robotNamespace>/pioneer</robotNamespace>
+    </plugin>
+  </gazebo>
+  <!--  <gazebo>
+    <plugin filename="libgazebo_ros_joint_pose_trajectory.so" name="joint_pose_controller">
+    <robotNamespace>/pioneer</robotNamespace>
+    <joints>fork_moving_base_joint</joints>
+    </plugin>
+  </gazebo> -->
+  <!-- Differencial Drive -->
+  <gazebo>
+    <plugin filename="libgazebo_ros_diff_drive.so" name="differential_drive_controller">
+      <alwaysOn>true</alwaysOn>
+      <updateRate>100</updateRate>
+      <leftJoint>base_left_wheel_joint</leftJoint>
+      <rightJoint>base_right_wheel_joint</rightJoint>
+      <torque>5</torque>
+      <wheelSeparation>0.39</wheelSeparation>
+      <wheelDiameter>0.15</wheelDiameter>
+      <commandTopic>pioneer/cmd_vel</commandTopic>
+      <odometryTopic>odom</odometryTopic>
+      <odometryFrame>odom</odometryFrame>
+      <robotBaseFrame>base_link</robotBaseFrame>
+      <publishWheelTF>true</publishWheelTF>
+      <publishWheelJointState>true</publishWheelJointState>
+      <wheelAcceleration>0</wheelAcceleration>
+      <wheelTorque>5</wheelTorque>
+      <rosDebugLevel>na</rosDebugLevel>
+    </plugin>
+  </gazebo>
+
+  <!-- Chassis -->
+	<gazebo reference="chassis">
+		<material value="Gazebo/Red"/>
+	</gazebo>
+	
+	<!-- Top -->
+	<gazebo reference="top_plate">
+		<material value="Gazebo/Black"/>
+	</gazebo>
+	
+	<!-- Swivel -->
+	<gazebo reference="swivel">
+		<material value="Gazebo/Grey"/>
+	</gazebo>
+
+  <!-- Center Wheel + Hubcap -->
+	<gazebo reference="center_hubcap">
+		<material value="Gazebo/Grey"/>
+	</gazebo>
+	
+	<gazebo reference="center_wheel">
+		<material value="Gazebo/Black"/>
+	</gazebo>
+	
+	<gazebo reference="left_hub">
+		<material value="Gazebo/Yellow"/>
+	</gazebo>
+	
+	<gazebo reference="left_wheel">
+		<material value="Gazebo/Black"/>
+	</gazebo>
+	
+	<gazebo reference="right_hub">
+		<material value="Gazebo/Yellow"/>
+	</gazebo>
+	
+	<gazebo reference="right_wheel">
+		<material value="Gazebo/Black"/>
+	</gazebo>
+
+  <!-- Front + Back Sonar -->
+	<gazebo reference="front_sonar">
+		<material value="Gazebo/Yellow"/>
+	</gazebo>
+
+	<gazebo reference="back_sonar">
+		<material value="Gazebo/Yellow"/>
+	</gazebo>
+
+  <!-- camera_link -->
+  <gazebo reference="camera_link">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <material value="Gazebo/Green"/>
+  </gazebo>
+
+  <!-- camera -->
+  <gazebo reference="camera_link">
+    <sensor type="camera" name="camera">
+      <update_rate>30.0</update_rate>
+      <camera name="head">
+        <horizontal_fov>1.3962634</horizontal_fov>
+        <image>
+          <width>800</width>
+          <height>800</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.02</near>
+          <far>300</far>
+        </clip>
+        <noise type="gaussian">
+          <!-- Noise is sampled independently per pixel on each frame.  
+               That pixel's noise value is added to each of its color
+               channels, which at that point lie in the range [0,1]. -->
+          <mean>0.0</mean>
+          <stddev>0.007</stddev>
+        </noise>
+      </camera>
+      <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>0.0</updateRate>
+        <cameraName>camera</cameraName>
+        <imageTopicName>image_raw</imageTopicName>
+        <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+        <frameName>camera_link</frameName>
+        <hackBaseline>0.07</hackBaseline>
+        <distortionK1>0.0</distortionK1>
+        <distortionK2>0.0</distortionK2>
+        <distortionK3>0.0</distortionK3>
+        <distortionT1>0.0</distortionT1>
+        <distortionT2>0.0</distortionT2>
+      </plugin>
+    </sensor>
+  </gazebo>  
+
+	<gazebo reference="fork_vertical_base">
+		<material value="Gazebo/Yellow"/>
+	</gazebo>
+	<gazebo reference="fork_horizontal_base">
+		<material value="Gazebo/Yellow"/>
+	</gazebo>
+	<gazebo reference="fork_moving_base">
+		<material value="Gazebo/Yellow"/>
+	</gazebo>
+	<gazebo reference="left_fork">
+		<material value="Gazebo/Yellow"/>
+	</gazebo>
+	<gazebo reference="right_fork">
+		<material value="Gazebo/Yellow"/>
+	</gazebo>
+</robot>
