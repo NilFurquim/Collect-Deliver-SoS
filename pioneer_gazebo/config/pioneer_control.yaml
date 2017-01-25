@@ -1,0 +1,23 @@
+#joint_pose_controller:
+#  type: "effort_controllers/JointTrajectoryController"
+#  joints:
+#    - twister_joint
+#
+#  constraints:
+#    goal_time: 0.5                   # Override default
+#    stopped_velocity_tolerance: 0.02 # Override default
+#    twister_joint:
+#      trajectory: 0.05               # Not enforced if unspecified
+#      goal: 0.02                     # Not enforced if unspecified
+#
+#  gains: # Required because we're controlling an effort interface
+#    twister_joint: {p: 100,  d: 1, i: 1, i_clamp: 1}
+#
+#  state_publish_rate:  25            # Override default
+#  action_monitor_rate: 30            # Override default
+#  stop_trajectory_duration: 0        # Override default
+
+joint_position_controller:
+                type: effort_controllers/JointPositionController
+                joint: fork_moving_base_joint
+                pid: {p: 100.0, i: 0.01, d: 10.0}
