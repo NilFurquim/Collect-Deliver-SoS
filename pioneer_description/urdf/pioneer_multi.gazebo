@@ -1,11 +1,6 @@
 <?xml version="1.0"?>
 <robot>
-  <gazebo>
-    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
-        <robotNamespace>/pioneer</robotNamespace>
-    </plugin>
-  </gazebo>
-  <!--  <gazebo>
+ <!--  <gazebo>
     <plugin filename="libgazebo_ros_joint_pose_trajectory.so" name="joint_pose_controller">
     <robotNamespace>/pioneer</robotNamespace>
     <joints>fork_moving_base_joint</joints>

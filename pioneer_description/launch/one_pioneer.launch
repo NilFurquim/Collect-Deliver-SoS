@@ -4,17 +4,21 @@
   <arg name="init_pose"/>
 
   <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
+  <!--  <param name="robot_description" command="$(find xacro)/xacro.py '$(find pioneer_description)/urdf/pioneer3dx_multi.xacro' robot_name:=pioneer1"/> -->
   <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
 	args="$(arg init_pose) -urdf -model $(arg robot_name) -param /robot_description"/>
 
-  <!-- send fake joint values -->
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" ns="/$(arg robot_name)" args="joint_state_controller fork_lift_controller"/>
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen">
+	  <remap from="/joint_states" to="/$(arg robot_name)/joint_states"/>
+  </node>
+  <!-- send fake joint values 
   <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" >
     <param name="use_gui" value="FALSE"/>
     <remap from="robot_description" to="/robot_description"/>
   </node>
 
-  <!-- Combine joint values -->
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher"/>
-  <!-- The odometry estimator, throttling, fake laser etc. go here -->
+   The odometry estimator, throttling, fake laser etc. go here -->
   <!-- All the stuff as from usual robot launch file -->  
 </launch>
