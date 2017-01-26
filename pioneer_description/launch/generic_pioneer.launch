@@ -4,6 +4,7 @@
   <arg name="pose"/>
   <param name="robot_description" command="$(find xacro)/xacro.py '$(find pioneer_description)/urdf/pioneer3dx_multi.xacro' robot_name:=$(arg name)"/>
   <group ns="$(arg name)">
+    <rosparam file="$(find pioneer_control)/config/pioneer_control.yaml" command="load"/>
     <param name="tf_prefix" value="$(arg name)" />
     <include file="$(find pioneer_description)/launch/one_pioneer.launch" >
       <arg name="robot_name"  value="$(arg name)" />
