@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+	<group ns="pioneer1">
+		<node name="ForkLiftActuator" pkg="ForkLiftActuator" type="ForkLiftActuator"/>
+	</group>
+</launch>

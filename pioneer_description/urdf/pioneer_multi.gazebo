@@ -16,7 +16,7 @@
       <torque>5</torque>
       <wheelSeparation>0.39</wheelSeparation>
       <wheelDiameter>0.15</wheelDiameter>
-      <commandTopic>diff_drive/cmd_vel</commandTopic>
+      <commandTopic>diff_drive/command</commandTopic>
       <odometryTopic>diff_drive/odom</odometryTopic>
       <odometryFrame>diff_drive/odom</odometryFrame>
       <robotBaseFrame>base_link</robotBaseFrame>

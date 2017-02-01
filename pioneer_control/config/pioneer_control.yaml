@@ -6,4 +6,3 @@ fork_lift_controller:
   type: effort_controllers/JointPositionController
   joint: fork_moving_base_joint
   pid: {p: 100.0, i: 0.01, d: 10.0}
-
