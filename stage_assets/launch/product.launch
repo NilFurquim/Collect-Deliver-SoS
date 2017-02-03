@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<launch>
+	<param name="product_description" command="$(find xacro)/xacro '$(find stage_assets)/assets/product.xacro'" />
+	<node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen" args="-x -2 -y -2 -z 0 -Y 3 -urdf -model product -param product_description"/>
+</launch>

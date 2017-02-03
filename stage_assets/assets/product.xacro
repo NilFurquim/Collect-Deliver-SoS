@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="product">
+<link name="base_link"/>
+<joint name="base_link_joint" type="fixed">
+  <origin xyz="0 0 0" rpy="0 0 0"/>
+  <parent link="base_link"/>
+  <child link="base"/>
+</joint>
+
+<xacro:property name="base_length" value="0.007"/>
+<xacro:property name="base_radius" value="0.08"/>
+<xacro:property name="base_mass" value="0.2"/>
+
+<xacro:property name="pick_up_length" value="0.04"/>
+<xacro:property name="pick_up_radius" value="0.035"/>
+<xacro:property name="pick_up_mass" value="0.05"/>
+
+<xacro:property name="product_length" value="0.35"/>
+<xacro:property name="product_radius" value="0.09"/>
+<xacro:property name="product_mass" value="0.2"/>
+
+<link name="base">
+  <visual>
+    <geometry>
+      <cylinder length="${base_length}" radius="${base_radius}"/>
+    </geometry>
+  </visual>
+  <collision>
+    <geometry>
+      <cylinder length="${base_length}" radius="${base_radius}"/>
+    </geometry>
+  </collision>
+  <inertial>
+    <mass value="${base_mass}"/>
+    <origin xyz="0 0 0"/>
+    <inertia ixx="${(3*base_radius*base_radius+base_length*base_length)*base_mass/12}" ixy="0" ixz="0" iyy="${(3*base_radius*base_radius+base_length*base_length)*base_mass/12}" iyz="0" izz="${base_mass*base_radius*base_radius/2}" />
+  </inertial>
+</link>
+
+<joint name="base_joint" type="fixed">
+  <origin xyz="0 0 ${(base_length+pick_up_length)/2}" rpy="0 0 0"/>
+  <parent link="base"/>
+  <child link="pick_up_section"/>
+</joint>
+<link name="pick_up_section">
+  <visual>
+    <geometry>
+    <cylinder length="${pick_up_length}" radius="${pick_up_radius}"/>
+    </geometry>
+  </visual>
+  <collision>
+    <geometry>
+    <cylinder length="${pick_up_length}" radius="${pick_up_radius}"/>
+    </geometry>
+  </collision>
+  <inertial>
+    <mass value="${pick_up_mass}"/>
+    <origin xyz="0 0 0"/>
+    <inertia ixx="${(3*pick_up_radius*pick_up_radius+pick_up_length*pick_up_length)*pick_up_mass/12}" ixy="0" ixz="0" iyy="${(3*pick_up_radius*pick_up_radius+pick_up_length*pick_up_length)*pick_up_mass/12}" iyz="0" izz="${pick_up_mass*pick_up_radius*pick_up_radius/2}" />
+  </inertial>
+</link>
+
+<joint name="pick_up_joint" type="fixed">
+  <origin xyz="0 0 ${(pick_up_length+product_length)/2}" rpy="0 0 0"/>
+  <parent link="pick_up_section"/>
+  <child link="product"/>
+</joint>
+<link name="product">
+  <visual>
+    <geometry>
+    <cylinder length="${product_length}" radius="${product_radius}"/>
+    </geometry>
+  </visual>
+  <collision>
+    <geometry>
+    <cylinder length="${product_length}" radius="${product_radius}"/>
+    </geometry>
+  </collision>
+  <inertial>
+    <mass value="${product_mass}"/>
+    <origin xyz="0 0 0"/>
+    <inertia ixx="${(3*product_radius*product_radius+product_length*product_length)*product_mass/12}" ixy="0" ixz="0" iyy="${(3*product_radius*product_radius+product_length*product_length)*product_mass/12}" iyz="0" izz="${product_mass*product_radius*product_radius/2}" />
+  </inertial>
+  </link>
+</robot>

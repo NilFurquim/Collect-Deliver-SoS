@@ -47,25 +47,25 @@ int main(int argc, char **argv)
 			//forward
 			case 'w':
 				//ROS_INFO("w");
-				twist_msg.linear.x = 0.3;
+				twist_msg.linear.x = 0.2;
 				driveRobot_pub.publish(twist_msg);
 				break;
 			//left
 			case 'a':
 				//ROS_INFO("a");
-				twist_msg.angular.z = -0.4;
+				twist_msg.angular.z = -0.2;
 				driveRobot_pub.publish(twist_msg);
 				break;
 			//break/backward
 			case 's':
 				//ROS_INFO("s");
-				twist_msg.linear.x = -0.3;
+				twist_msg.linear.x = -0.2;
 				driveRobot_pub.publish(twist_msg);
 				break;
 			//right
 			case 'd':
 				//ROS_INFO("d");
-				twist_msg.angular.z = 0.4;
+				twist_msg.angular.z = 0.2;
 				driveRobot_pub.publish(twist_msg);
 				break;
 			//break

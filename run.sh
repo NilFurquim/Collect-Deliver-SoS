@@ -21,12 +21,17 @@ roslaunch pioneer_description robot_description.launch &
 
 sleep 5s
 echo "Launching Pioneer 1..."
-roslaunch pioneer_description generic_pioneer.launch name:=pioneer1 pose:="-x 0 -y 0 -Y 1.57" &
+roslaunch pioneer_description generic_pioneer.launch name:=pioneer1 pose:="-x 1 -y 1 -Y 1.57" &
 pid="$pid $!"
 
-sleep 5s
-echo "Launching Pioneer 2..."
-roslaunch pioneer_description generic_pioneer.launch name:=pioneer2 pose:="-x 2 -y 0 -Y 1.57" &
+#sleep 5s
+#echo "Launching Pioneer 2..."
+#roslaunch pioneer_description generic_pioneer.launch name:=pioneer2 pose:="-x 2 -y 0 -Y 1.57" &
+#pid="$pid $!"
+
+sleep 2s
+echo "Launching product spawner..."
+roslaunch stage_assets product.launch&
 pid="$pid $!"
 
 trap "echo Killing all processes.; kill -2 TERM $pid; exit" SIGINT SIGTERM
