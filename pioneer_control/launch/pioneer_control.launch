@@ -7,7 +7,7 @@
   <!-- load the controllers -->
 <!--  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" ns="/pioneer" args="differential_drive_controller left_wheel_position_controller right_wheel_position_controller joint_state_controller fork_lift_controller"/>
 -->
-  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" ns="/$(arg name)" args="joint_state_controller fork_lift_controller"/>
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" ns="/$(arg name)" args="gazebo_ros_range joint_state_controller forklift_controller"/>
   <!-- convert joint states to TF transforms for rviz, etc -->
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
     respawn="false" output="screen">

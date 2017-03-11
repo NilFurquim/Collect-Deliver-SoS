@@ -344,7 +344,7 @@
 	</joint>
   
   <joint name="camera_joint" type="fixed">
-    <origin xyz="0.18 0 -0.12" rpy="0 1 0"/>
+    <origin xyz="0.21 0 -0.13" rpy="0 1.55 0"/>
     <parent link="top_plate"/>
     <child link="camera_link"/>
   </joint>
@@ -354,14 +354,14 @@
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-	      <box size="0.05 0.07 0.10"/>
+	      <box size="0.05 0.07 0.07"/>
       </geometry>
     </collision>
 
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-      	<box size="0.05 0.07 0.10"/>
+      	<box size="0.05 0.07 0.07"/>
       </geometry>
       <material name="CameraGreen"/>
     </visual>
@@ -376,24 +376,23 @@
 <!-- Fork Vertical Base -->
   <joint name="fork_vertical_base_joint" type="fixed">
     <axis xyz="0 1 0"/>
-    <limit effort="1000.0" lower="-0.5" upper="0.5" velocity="1.0"/> 
-    <origin xyz="0.2 0 0.01" rpy="0 0 0"/>
+    <origin xyz="0.245 0 0.124" rpy="0 -0.01 0"/>
     <parent link="top_plate"/>
     <child link="fork_vertical_base"/>
   </joint>
   
   <link name="fork_vertical_base">
     <collision>
-       <origin xyz="0.02 0 0.11" rpy="0 0 0"/>
+       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-	      <box size="0.018 0.05 0.25"/>
+	      <box size="0.04 0.05 0.25"/>
       </geometry>
    </collision>
 
     <visual>
-      <origin xyz="0.02 0 0.11" rpy="0 0 0"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-	      <box size="0.018 0.05 0.25"/>
+	      <box size="0.04 0.05 0.25"/>
       </geometry>
      <material name="CameraGreen"/>
     </visual>
@@ -408,22 +407,22 @@
 <!-- Fork Vertical Moving Base -->
   <joint name="fork_moving_base_joint" type="prismatic">
     <axis xyz="0 0 1"/>
-    <limit effort="1000.0" lower="-0.15" upper="0.2" velocity="1.0"/> 
-    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <limit effort="1000.0" lower="-0.15" upper="0.2" velocity="0.3"/> 
+    <origin xyz="0.028 0 -0.02" rpy="0 0 0"/>
     <parent link="fork_vertical_base"/>
     <child link="fork_moving_base"/>
   </joint>
   
   <link name="fork_moving_base">
     <collision>
-       <origin xyz="0.03 0 0.08" rpy="0 0 0"/>
+       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-	      <box size="0.018 0.03 0.3"/>
+        <box size="0.018 0.03 0.3"/>
       </geometry>
    </collision>
 
     <visual>
-      <origin xyz="0.03 0 0.08" rpy="0 0 0"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
 	      <box size="0.018 0.03 0.3"/>
       </geometry>
@@ -441,18 +440,19 @@
   <joint name="fork_horizontal_base" type="fixed">
     <parent link="fork_moving_base"/>
     <child link="fork_horizontal_base"/>
+     <origin xyz="0.002 0 -0.175" rpy="0 0 0"/>
   </joint>
   
   <link name="fork_horizontal_base">
     <collision>
-       <origin xyz="0.036 0 -0.08" rpy="0 0 0"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
 	      <box size="0.018 0.2 0.05"/>
       </geometry>
    </collision>
 
     <visual>
-      <origin xyz="0.036 0 -0.08" rpy="0 0 0"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
 	      <box size="0.018 0.2 0.05"/>
       </geometry>
@@ -471,18 +471,19 @@
   <joint name="left_fork_joint" type="fixed">
     <parent link="fork_horizontal_base"/>
     <child link="left_fork"/>
+    <origin xyz="0.095 0.075 -0.023" rpy="0 -0.035 0"/>
   </joint>
   
   <link name="left_fork">
   <collision>
-       <origin xyz="0.13 0.075 -0.096" rpy="0 -0.05 0"/>
+       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
 	      <box size="0.20 0.05 0.01"/>
       </geometry>
    </collision>
 
     <visual>
-      <origin xyz="0.13 0.075 -0.096" rpy="0 -0.05 0"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
 	      <box size="0.20 0.05 0.01"/>
       </geometry>
@@ -500,20 +501,21 @@
   <joint name="right_fork_joint" type="fixed">
     <parent link="fork_horizontal_base"/>
     <child link="right_fork"/>
+    <origin xyz="0.095 -0.075 -0.023" rpy="0 -0.035 0"/>
   </joint>
   
   <link name="right_fork">
     <collision>
-      <origin xyz="0.13 -0.075 -0.096" rpy="0 -0.05 0"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
 	      <box size="0.20 0.05 0.01"/>
       </geometry>
    </collision>
 
     <visual>
-      <origin xyz="0.13 -0.075 -0.096" rpy="0 -0.05 0"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-	      <box size="0.20 0.05 0.01"/>
+	      <box size="0.2 0.05 0.01"/>
       </geometry>
       <material name="CameraGreen"/>
     </visual>
@@ -526,10 +528,11 @@
   </link>
 
 <!-- Counterweight -->
+<!-- inside the chassis over the swivel for stability-->
   <joint name="counterweight_joint" type="fixed">
-    <origin xyz="-0.18 0 -0.025" rpy="0 0 0"/>
     <parent link="chassis"/>
     <child link="counterweight_base"/>
+    <origin xyz="-0.05 0 -0.025" rpy="0 0 0"/>
   </joint>
   
   <link name="counterweight_base">
@@ -548,7 +551,7 @@
     </visual>
 
     <inertial>
-      <mass value="5" />
+      <mass value="4" />
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0" />
     </inertial>

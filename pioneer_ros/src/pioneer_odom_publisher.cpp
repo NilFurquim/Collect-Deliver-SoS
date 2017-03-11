@@ -15,7 +15,15 @@ int main(int argc, char **argv)
       
   ros::Publisher pub = n1.advertise<nav_msgs::Odometry>("odom", 50) ;
   
-  std::string modelName = (std::string)"pioneer" ;
+  std::string modelName;
+  if(!n1.getParam("model_name", modelName))
+  {
+    if(!n2.getParam("model_name", modelName))
+    {
+      ROS_INFO("Argument model_name note provided");
+      return 0;
+    }
+  }
   std::string relativeEntityName = (std::string)"world" ;
 
   gazebo_msgs::GetModelState getModelState ;

@@ -15,5 +15,7 @@
     <arg name="use_sim_time" value="$(arg use_sim_time)"/>
     <arg name="headless" value="$(arg headless)"/>
   </include>
+  <param name="tape" textfile="$(find stage_assets)/assets/shop_floor_tape.sdf" />
+  <node name="spawn_tape" pkg="gazebo_ros" type="spawn_model" args="-sdf -param tape  -x 0 -y 0 -z 0.00005 -R 0 -P 0 -Y 0 -model tape" respawn="false" output="screen" />
 </launch>
 

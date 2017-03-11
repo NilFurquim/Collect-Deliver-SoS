@@ -22,6 +22,8 @@ roslaunch pioneer_description robot_description.launch &
 sleep 5s
 echo "Launching Pioneer 1..."
 roslaunch pioneer_description generic_pioneer.launch name:=pioneer1 pose:="-x 1 -y 1 -Y 1.57" &
+rosrun pioneer_ros pioneer_tf_broadcaster model_name:=pioneer1
+rosrun pioneer_ros pioneer_odom_publisher model_name:=pioneer1
 pid="$pid $!"
 
 #sleep 5s

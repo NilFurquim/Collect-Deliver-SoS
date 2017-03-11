@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+	<group ns="pioneer1">
+		<node name="forklift_actuator" pkg="pioneer_control" type="forklift_actuator"/>
+	</group>
+</launch>

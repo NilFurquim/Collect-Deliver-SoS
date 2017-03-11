@@ -1,14 +1,60 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(pioneer_control)
 
+
 find_package(catkin REQUIRED COMPONENTS
+	roscpp
+	rospy
+	sensor_msgs
+	std_msgs
+	image_transport
+	message_generation
+	genmsg
+	actionlib
 )
 
-catkin_package()
+## Declare ROS messages, services and actions ##
+## Generate messages in the 'msg' folder
+# add_message_files(
+#   FILES
+#   Message1.msg
+#   Message2.msg
+# )
+ add_service_files(
+   FILES
+   ForkliftLift.srv
+   ForkliftLower.srv
+   ForkliftMoveTo.srv
+ )
+## Generate actions in the 'action' folder
+add_action_files(
+   FILES
+   NavigationDriveTo.action
+)
+generate_messages(
+	DEPENDENCIES
+	std_msgs
+	actionlib_msgs
+)
+catkin_package(
+	INCLUDE_DIRS include
+	CATKIN_DEPENDS message_runtime
+)
 
 include_directories(
   ${catkin_INCLUDE_DIRS}
+  include
 )
+
+macro(add_exec_dep_and_link name)
+	add_executable(${name} src/${name}.cpp)
+	add_dependencies(${name} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+	target_link_libraries(${name} ${catkin_LIBRARIES})
+endmacro()
+
+add_exec_dep_and_link(navigation)
+add_exec_dep_and_link(forklift_actuator)
+add_exec_dep_and_link(image_processing)
 
 install(DIRECTORY config
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})

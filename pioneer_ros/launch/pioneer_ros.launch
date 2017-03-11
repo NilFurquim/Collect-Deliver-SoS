@@ -1,7 +1,12 @@
 <?xml version="1.0"?>
 <launch>
+  <arg name="model_name"/>
   <!-- REDUNDANT LAUNCH FILE: Transforms are already handled by Gazebo -->
-  <node name="pioneer_tf_broadcaster" pkg="pioneer_ros" type="pioneer_tf_broadcaster"/>
+  <node name="pioneer_tf_broadcaster" pkg="pioneer_ros" type="pioneer_tf_broadcaster" output="screen">
+	  <param name="model_name" type="string" value="pioneer1"/>
+  </node>
   
-  <node name="pioneer_odom_publisher" pkg="pioneer_ros" type="pioneer_odom_publisher"/>
+  <node name="pioneer_odom_publisher" pkg="pioneer_ros" type="pioneer_odom_publisher" output="screen">
+	  <param name="model_name" type="string" value="pioneer1"/>
+  </node>
 </launch>

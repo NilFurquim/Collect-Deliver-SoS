@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
 	<group ns="pioneer1">
-		<node name="ForkLiftActuator" pkg="ForkLiftActuator" type="ForkLiftActuator" respawn="true" output="screen"/>
+		<node name="forklift_actuator" pkg="pioneer_control" type="forklift_actuator" respawn="true" output="screen"/>
 		<node name="operation_1" pkg="manual_navigation" type="operation" respawn="true" output="screen"/>
 	</group>
 </launch>

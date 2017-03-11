@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<launch>
+	<arg name="ns"/>
+	<arg name="name"/>
+	<group ns="$(arg ns)">
+		<node name="$(arg name)" pkg="pioneer_control" type="$(arg name)" output="screen"/>
+	</group>
+</launch>

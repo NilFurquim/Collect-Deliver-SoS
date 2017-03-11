@@ -7,15 +7,19 @@
 int main(int argc, char** argv)
 {
     ros::init(argc, argv, "pioneer_tf_broadcaster") ;
-    ros::NodeHandle n ;
+    ros::NodeHandle n;
     ros::Rate loop_rate(10);
     ros::ServiceClient client ;
     
     static tf::TransformBroadcaster br ;
   
     tf::Transform transform ;
-
-    std::string modelName = (std::string)"pioneer" ;
+    std::string modelName;
+    if(!n.getParam("model_name", modelName))
+    {
+	    ROS_INFO("Argument model_name note provided");
+	    return 0;
+    }
     std::string relativeEntityName = (std::string)"world" ;
 
     gazebo_msgs::GetModelState getModelState ;

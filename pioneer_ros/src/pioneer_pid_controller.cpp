@@ -41,10 +41,10 @@ int main(int argc, char** argv)
     angular_gains[2] = temp_gain;
     
     ros::NodeHandle nHandpub ;
-    pub = nHandpub.advertise<geometry_msgs::Twist>("pioneer/cmd_vel", 10) ;
+    pub = nHandpub.advertise<geometry_msgs::Twist>("pioneer1/command", 10) ;
     
     ros::NodeHandle nHandsub ;  
-    ros::Subscriber sub = nHandsub.subscribe("cmd_vel", 10, &cmd_velCallback) ;
+    ros::Subscriber sub = nHandsub.subscribe("commad", 10, &cmd_velCallback) ;
     
     ros::spin() ;
     return 0;

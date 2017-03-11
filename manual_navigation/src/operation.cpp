@@ -3,6 +3,8 @@
 #include <ncurses.h>
 #include "geometry_msgs/Twist.h"
 #include "std_msgs/Float64.h"
+#include "pioneer_control/ForkliftLift.h"
+#include "pioneer_control/ForkliftLower.h"
 
 #define DRIVE_ROBOT_TOPIC "diff_drive/command"
 #define DRIVE_MAX_LINEAR 0.7
@@ -25,9 +27,10 @@ int main(int argc, char **argv)
 	std_msgs::Float64 fork_msg;
 
 	driveRobot_pub = n.advertise<geometry_msgs::Twist>(DRIVE_ROBOT_TOPIC, 1000);
-	fork_lift = n.advertise<std_msgs::Float64>("ForkLiftActuator/lift", 1000);
-	fork_lower = n.advertise<std_msgs::Float64>("ForkLiftActuator/lower", 1000);
-
+	ros::ServiceClient fork_lift_client = n.serviceClient<pioneer_control::ForkliftLift>("ForkliftLift");
+	ros::ServiceClient fork_lower_client = n.serviceClient<pioneer_control::ForkliftLower>("ForkliftLower");
+	pioneer_control::ForkliftLift fork_lift_srv;
+	pioneer_control::ForkliftLower fork_lower_srv;
 
 	twist_msg.linear.x = 0;
 	twist_msg.linear.y = 0;
@@ -35,7 +38,8 @@ int main(int argc, char **argv)
 	twist_msg.angular.x = 0;
 	twist_msg.angular.y = 0;
 	twist_msg.angular.z = 0;
-	fork_msg.data = 0.1;
+	fork_lift_srv.request.percentage = 0.1;
+	fork_lower_srv.request.percentage = 0.1;
 
 	char input = 'q';
 	while(ros::ok())
@@ -77,11 +81,11 @@ int main(int argc, char **argv)
 				break;
 			//lower fork
 			case 'j':
-				fork_lower.publish(fork_msg);
+				fork_lift_client.call(fork_lift_srv);
 				break;
 			//lift fork
 			case 'k':
-				fork_lift.publish(fork_msg);
+				fork_lower_client.call(fork_lower_srv);
 				break;
 			default:
 				//ROS_INFO("default");
