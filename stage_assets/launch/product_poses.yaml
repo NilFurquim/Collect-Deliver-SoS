@@ -1,0 +1,20 @@
+product1:
+  x: -6.0
+  y: -7.5
+  a: 0.0
+product2:
+  x: -3.0
+  y: -7.5
+  a: 0.0
+product3:
+  x: 0.0
+  y: -7.5
+  a: 0.0
+product4:
+  x: 3.0
+  y: -7.5
+  a: 0.0
+product5:
+  x: 6.0
+  y: -7.5
+  a: 0.0

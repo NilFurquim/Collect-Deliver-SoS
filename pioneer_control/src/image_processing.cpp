@@ -10,16 +10,16 @@
 ImageProcessing::ImageProcessing(ros::NodeHandle n)
 {
 	node = n;
-	handle_image_pub = n.advertise<std_msgs::Int16MultiArray>(IMAGE_PROCESSED_TOPIC, 100);
+	handleImagePub = n.advertise<std_msgs::Int16MultiArray>(IMAGE_PROCESSED_TOPIC, 1);
 }
 
 int ImageProcessing::handleImage_recursive(
 		const sensor_msgs::ImageConstPtr& image, 
 		int x, int y, int height, int width, 
-		int chunk_amount, int size_threshold,
-		float reduction_factor)
+		int chuckAmount, int sizeThreshold,
+		float reductionFactor)
 {
-	if(height <= size_threshold || width <= size_threshold)
+	if(height <= sizeThreshold || width <= sizeThreshold)
 	{
 		int mid = (y + height/2) * image->step + (x + width/2)*3;
 		uint8_t mid_red = image->data[mid];
@@ -31,26 +31,26 @@ int ImageProcessing::handleImage_recursive(
 		return 0;
 	}
 
-	int desl_x, desl_y;
-	int chunk_height = height/chunk_amount;
-	int chunk_width = width/chunk_amount;
-	int is_black = 0;
+	int deslx, desly;
+	int chunkHeight = height/chuckAmount;
+	int chunkWidth = width/chuckAmount;
+	int isBlack = 0;
 	int count = 0;
 
-	int reduction_size = chunk_amount/reduction_factor;
+	int reduction_size = chuckAmount/reductionFactor;
 	for(int i = 0; i < reduction_size; i++)
 	{
 		for(int j = 0; j < reduction_size; j++)
 		{
-			desl_y = chunk_height*(i + (chunk_amount - reduction_size)/2);
-			desl_x = chunk_width*(j + (chunk_amount - reduction_size)/2);
-			is_black = handleImage_recursive(image, 
-					x + desl_x, y + desl_y,
-					chunk_height, chunk_width,
+			desly = chunkHeight*(i + (chuckAmount - reduction_size)/2);
+			deslx = chunkWidth*(j + (chuckAmount - reduction_size)/2);
+			isBlack = handleImage_recursive(image, 
+					x + deslx, y + desly,
+					chunkHeight, chunkWidth,
 					CHUNK_AMOUNT,
 					IDENTIFY_BLACK_SIZE_THRESHOLD,
-					reduction_factor);
-			if(is_black) return 1;
+					reductionFactor);
+			if(isBlack) return 1;
 		}
 	}
 	return 0;
@@ -66,24 +66,24 @@ void ImageProcessing::handleImage(const sensor_msgs::ImageConstPtr& image)
 	}
 
 	int matrix[CHUNK_AMOUNT][CHUNK_AMOUNT];
-	int desl_x, desl_y;
-	int is_black;
-	int chunk_height = image->height/CHUNK_AMOUNT;
-	int chunk_width = image->width/CHUNK_AMOUNT;
+	int deslx, desly;
+	int isBlack;
+	int chunkHeight = image->height/CHUNK_AMOUNT;
+	int chunkWidth = image->width/CHUNK_AMOUNT;
 	for(int i = 0; i < CHUNK_AMOUNT; i++)
 	{
 		for(int j = 0; j < CHUNK_AMOUNT; j++)
 		{
-			desl_x = chunk_width*j;
-			desl_y = chunk_height*i;
-			is_black = handleImage_recursive(image, 
-					desl_x, desl_y, 
-					chunk_height, chunk_width, 
+			deslx = chunkWidth*j;
+			desly = chunkHeight*i;
+			isBlack = handleImage_recursive(image, 
+					deslx, desly, 
+					chunkHeight, chunkWidth, 
 					CHUNK_AMOUNT, 
 					IDENTIFY_BLACK_SIZE_THRESHOLD,
 					IDENTIFY_BLACK_REDUCTION_FACTOR);
 
-			if(is_black) 	matrix[i][j] = 1;
+			if(isBlack) 	matrix[i][j] = 1;
 			else 		matrix[i][j] = 0;
 		}
 	}
@@ -106,7 +106,7 @@ void ImageProcessing::handleImage(const sensor_msgs::ImageConstPtr& image)
 		}
 	}
 
-	handle_image_pub.publish(msg);
+	handleImagePub.publish(msg);
 }
 
 int main(int argc, char **argv)
@@ -114,7 +114,7 @@ int main(int argc, char **argv)
 	ros::init(argc, argv, "image_processing");
         ros::NodeHandle nh;
 	ImageProcessing imageProcessing(nh);
-	ros::Subscriber sub = nh.subscribe<sensor_msgs::Image>("camera/image_raw",1000, &ImageProcessing::handleImage, &imageProcessing);
+	ros::Subscriber sub = nh.subscribe<sensor_msgs::Image>("camera/image_raw",1, &ImageProcessing::handleImage, &imageProcessing);
 
         ros::spin();
         printf("Im out! No error.");

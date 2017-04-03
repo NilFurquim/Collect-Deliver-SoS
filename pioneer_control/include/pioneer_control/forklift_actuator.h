@@ -33,19 +33,19 @@ class ForkLiftActuator
 	ForkLiftActuator(ros::NodeHandle n);
 
 	private:
-	ros::ServiceServer lift_service;
-	ros::ServiceServer lower_service;
-	ros::ServiceServer moveTo_service;
+	ros::ServiceServer liftService;
+	ros::ServiceServer lowerService;
+	ros::ServiceServer moveToService;
 	ros::NodeHandle node;
 	float maxHeight;
 	float minHeight;
 	control_msgs::JointControllerState state;
 	float command;
-	std_msgs::Float64 command_msg;
+	std_msgs::Float64 commMsg;
 
 	ros::Publisher commander;
 	ros::Subscriber subscriber;
 
-	float fork_position_interpolation(float t);
+	float forkPositionInterpolation(float t);
 };
 #endif

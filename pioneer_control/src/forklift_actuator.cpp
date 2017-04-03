@@ -21,9 +21,9 @@ bool ForkLiftActuator::moveToServ(pioneer_control::ForkliftMoveTo::Request &req,
 ForkLiftActuator::ForkLiftActuator(ros::NodeHandle n)
 {
 	node = n;
-	lift_service = n.advertiseService(FORKLIFT_LIFT_SERV, &ForkLiftActuator::liftServ, this);
-	lower_service = n.advertiseService(FORKLIFT_LOWER_SERV, &ForkLiftActuator::lowerServ, this);
-	moveTo_service = n.advertiseService(FORKLIFT_MOVETO_SERV, &ForkLiftActuator::moveToServ, this);
+	liftService = n.advertiseService(FORKLIFT_LIFT_SERV, &ForkLiftActuator::liftServ, this);
+	lowerService = n.advertiseService(FORKLIFT_LOWER_SERV, &ForkLiftActuator::lowerServ, this);
+	moveToService = n.advertiseService(FORKLIFT_MOVETO_SERV, &ForkLiftActuator::moveToServ, this);
 	commander = node.advertise<std_msgs::Float64>("forklift_controller/command",1000);
 	minHeight = FORKLIFT_MIN_HEIGHT;
 	maxHeight = FORKLIFT_MAX_HEIGHT;
@@ -40,8 +40,8 @@ int ForkLiftActuator::lift(float amount)
 		ret = FORKLIFT_SUCCESS;
 		command += amount;
 	}
-	command_msg.data = fork_position_interpolation(command);
-	commander.publish(command_msg);
+	commMsg.data = forkPositionInterpolation(command);
+	commander.publish(commMsg);
 	return ret;
 }
 
@@ -56,8 +56,8 @@ int ForkLiftActuator::lower(float amount)
 		ret = FORKLIFT_SUCCESS;
 		command -= amount;
 	}
-	command_msg.data = fork_position_interpolation(command);
-	commander.publish(command_msg);
+	commMsg.data = forkPositionInterpolation(command);
+	commander.publish(commMsg);
 	return ret;
 }
 
@@ -74,14 +74,14 @@ int ForkLiftActuator::moveTo(float position)
 		position = minHeight;
 		ret = FORKLIFT_ERROR_MIN;
 	}
-	command_msg.data = position;
-	commander.publish(command_msg);
+	commMsg.data = position;
+	commander.publish(commMsg);
 	return ret;
 }
 
 control_msgs::JointControllerState report()
 {	ROS_INFO("ForkLiftActuator::report() not implemented");	}
 
-float ForkLiftActuator::fork_position_interpolation(float t)
+float ForkLiftActuator::forkPositionInterpolation(float t)
 {	return (1 - t) * minHeight + t * maxHeight;}
 

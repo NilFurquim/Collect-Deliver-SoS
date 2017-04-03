@@ -12,14 +12,14 @@ class ImageProcessing
 	public:
 		ImageProcessing(ros::NodeHandle node);
 		void handleImage(const sensor_msgs::ImageConstPtr& image);
-		ros::Publisher handle_image_pub;
+		ros::Publisher handleImagePub;
 	private:
 		ros::NodeHandle node;
 		int handleImage_recursive(
 				const sensor_msgs::ImageConstPtr& image, 
 				int x, int y, 
 				int height, int width, 
-				int chunk_amount, int size_threshold,
-				float reduction_factor);
+				int chunkAmount, int sizeThreshold,
+				float reductionFactor);
 };
 #endif

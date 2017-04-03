@@ -1,0 +1,5 @@
+uint32 robotId
+uint32 x
+uint32 y
+---
+int8 status

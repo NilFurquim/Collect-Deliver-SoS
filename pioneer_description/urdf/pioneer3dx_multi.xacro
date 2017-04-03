@@ -407,7 +407,7 @@
 <!-- Fork Vertical Moving Base -->
   <joint name="fork_moving_base_joint" type="prismatic">
     <axis xyz="0 0 1"/>
-    <limit effort="1000.0" lower="-0.15" upper="0.2" velocity="0.3"/> 
+    <limit effort="1000.0" lower="-0.1" upper="0.2" velocity="0.01"/> 
     <origin xyz="0.028 0 -0.02" rpy="0 0 0"/>
     <parent link="fork_vertical_base"/>
     <child link="fork_moving_base"/>

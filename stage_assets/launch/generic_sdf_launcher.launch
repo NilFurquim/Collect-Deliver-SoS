@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+	<arg name="file"/>
+	<arg name="name"/>
+
+	<param name="$(arg name)" textfile="$(find stage_assets)/assets/$(arg file)" />
+	<node name="spawn_tape" pkg="gazebo_ros" type="spawn_model" args="-sdf -param $(arg name)  -x 0 -y 0 -z 0.0005 -R 0 -P 0 -Y 0 -model $(arg name)" respawn="false" output="screen" />
+</launch>
+
