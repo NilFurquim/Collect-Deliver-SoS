@@ -7,6 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
 	rospy
 	sensor_msgs
 	std_msgs
+	geometry_msgs
 	image_transport
 	message_generation
 	genmsg
@@ -15,27 +16,35 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## Declare ROS messages, services and actions ##
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+add_message_files(
+   FILES
+   Vec2i32.msg
+)
+
  add_service_files(
    FILES
    ForkliftLift.srv
    ForkliftLower.srv
    ForkliftMoveTo.srv
+   MapInformationGetMap.srv
+   MapInformationUpdateMap.srv
+   PathPlanningDefinePath.srv
+   PathPlanningCalculateDistance.srv
  )
 ## Generate actions in the 'action' folder
 add_action_files(
    FILES
    NavigationDriveTo.action
+   NavigationExecutePath.action
 )
+
 generate_messages(
 	DEPENDENCIES
 	std_msgs
+	geometry_msgs
 	actionlib_msgs
 )
+
 catkin_package(
 	INCLUDE_DIRS include
 	CATKIN_DEPENDS message_runtime
@@ -55,6 +64,10 @@ endmacro()
 add_exec_dep_and_link(navigation)
 add_exec_dep_and_link(forklift_actuator)
 add_exec_dep_and_link(image_processing)
+add_exec_dep_and_link(localization)
+add_exec_dep_and_link(control)
+add_exec_dep_and_link(map_information)
+add_exec_dep_and_link(path_planning)
 
 install(DIRECTORY config
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})

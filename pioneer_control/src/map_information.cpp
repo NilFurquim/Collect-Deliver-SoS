@@ -3,6 +3,7 @@
 #include "pioneer_control/map.h"
 #include "pioneer_control/MapInformationUpdateMap.h"
 #include "pioneer_control/MapInformationGetMap.h"
+#include "pioneer_control/Vec2.h"
 
 
 //updateMap()
@@ -14,6 +15,7 @@
 
 #define MAP_INFORMATION_GET_MAP_SERV "/get_map"
 #define MAP_INFORMATION_UPDATE_MAP_SERV "/update_map"
+#define MAP_INFORMATION_POS_CHANGE_TOPIC "/pos_change"
 
 class MapInformation
 {
@@ -27,12 +29,13 @@ class MapInformation
 		class RobotPosition {
 			public:
 				RobotPosition(unsigned id, unsigned x, unsigned y);
-				unsigned x, y;
-				unsigned robotId;
+				Vec2i pos;
+				unsigned id;
 		};
+		void printMap();
 		std::vector<RobotPosition> robotPositions;
-		static int const width = 14;
-		static int const height = 14;
+		static int const width = 13;
+		static int const height = 13;
 		static int matrix[height][width];
 
 		bool updateMap(pioneer_control::MapInformationUpdateMap::Request& req,
@@ -42,7 +45,7 @@ class MapInformation
 };
 
 MapInformation::RobotPosition::RobotPosition(unsigned id, unsigned x, unsigned y)
-	: robotId(id), x(x), y(y) {}
+	: id(id), pos(x, y) {}
 
 // -1 = NO GUIDE LINE
 // < -1 = GUIDE LINE OCUPIED -(weight+1)
@@ -64,6 +67,21 @@ int MapInformation::matrix[height][width] = {
 		{-1, -1,  3, -1,  3, -1,  3, -1,  3, -1,  3, -1, -1}, 
 		{-1, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, -1}
 	};
+char const mapString[2*13*2*13+13+2*13+1] = {
+"      .     .     .     .     .      \n\
+      .     .     .     .     .      \n\
+.  .  .  .  .  .  .  .  .  .  .  .  .\n\
+      .     .     .     .     .      \n\
+.  .  .  .  .  .  .  .  .  .  .  .  .\n\
+      .     .     .     .     .      \n\
+.  .  .  .  .  .  .  .  .  .  .  .  .\n\
+      .     .     .     .     .      \n\
+.  .  .  .  .  .  .  .  .  .  .  .  .\n\
+      .     .     .     .     .      \n\
+.  .  .  .  .  .  .  .  .  .  .  .  .\n\
+      .     .     .     .     .      \n\
+      .     .     .     .     .      \n"
+};
 
 bool MapInformation::updateMap(pioneer_control::MapInformationUpdateMap::Request& req,
 		pioneer_control::MapInformationUpdateMap::Response& res)
@@ -82,16 +100,15 @@ bool MapInformation::updateMap(pioneer_control::MapInformationUpdateMap::Request
 
 #define _ABS(var) ((var>0)?var:-var)
 	int robotFound = false;
-	int prevx, prevy;
+	Vec2i prev;
 
 	for (int i = 0; i < robotPositions.size(); i++)
 	{
-		if (robotPositions[i].robotId == req.robotId)
+		if (robotPositions[i].id == req.robotId)
 		{
-			prevx = robotPositions[i].x;
-			prevy = robotPositions[i].y;
-			robotPositions[i].x = req.x;
-			robotPositions[i].y = req.y;
+			prev = robotPositions[i].pos;
+			robotPositions[i].pos.x = req.x;
+			robotPositions[i].pos.y = req.y;
 			matrix[req.y][req.x] = -_ABS(matrix[req.y][req.x]);
 			robotFound = true;
 		}
@@ -102,12 +119,12 @@ bool MapInformation::updateMap(pioneer_control::MapInformationUpdateMap::Request
 	{
 		for (int i = 0; i < robotPositions.size(); i++)
 		{
-			if (robotPositions[i].x == prevx && robotPositions[i].y == prevy)
+			if (robotPositions[i].pos == prev)
 			{
 				robotsAtPos++;
 			}
 		}
-		if (robotsAtPos == 0) matrix[prevy][prevx] = matrix[prevy][prevx] * (-1);
+		if (robotsAtPos == 0) matrix[prev.y][prev.x] *= (-1);
 		res.status = 0;
 		return true;
 	}
@@ -121,6 +138,13 @@ bool MapInformation::updateMap(pioneer_control::MapInformationUpdateMap::Request
 
 
 
+}
+
+void MapInformation::printMap()
+{
+	for (int i = 0; i < robotPositions.size(); i++)
+	{
+	}
 }
 
 bool MapInformation::getMap(pioneer_control::MapInformationGetMap::Request& req,
@@ -150,6 +174,7 @@ MapInformation::MapInformation(ros::NodeHandle n)
 	node = n;
 	updateMapService = node.advertiseService(MAP_INFORMATION_UPDATE_MAP_SERV, &MapInformation::updateMap, this);
 	getMapService = node.advertiseService(MAP_INFORMATION_GET_MAP_SERV, &MapInformation::getMap, this);
+	//posChangePub = node.advertise(MAP_INFORMATION_POS_CHANGE_TOPIC); 
 	
 }
 int main(int argc, char **argv)

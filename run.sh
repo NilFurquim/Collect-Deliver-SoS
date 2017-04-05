@@ -22,6 +22,12 @@ roslaunch stage_assets product_description.launch &
 roslaunch stage_assets generic_sdf_launcher.launch file:=5by5_out.sdf name:=5by5
 
 sleep 5s
+echo "Launching MapInformation 1..."
+rosrun pioneer_control map_information &
+pid="$pid $!"
+
+
+sleep 5s
 echo "Launching Pioneer 1..."
 roslaunch pioneer_description generic_pioneer.launch name:=pioneer1 pose:="-x $(rosparam get /pioneer1/x) -y $(rosparam get /pioneer1/y) -Y $(rosparam get /pioneer1/a)" &
 #rosrun pioneer_ros pioneer_tf_broadcaster model_name:=pioneer1

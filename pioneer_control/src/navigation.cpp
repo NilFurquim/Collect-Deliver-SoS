@@ -8,9 +8,11 @@
 #include "actionlib/client/simple_action_client.h"
 #include "actionlib/client/terminal_state.h"
 #include "pioneer_control/DriveActuatorAPI.h"
+#include "geometry_msgs/Pose2D.h"
 #include "std_msgs/Int32.h"
 #include <deque>
-#define LOCALIZATION_TOPIC "next_node"
+#include "pioneer_control/Vec2.h"
+#define LOCALIZATION_TOPIC "map_position"
 
 #define ABS(var) ((var<0)? -var : var)
 #define PRINT_M for(int i = 0; i < height; i++)\
@@ -57,13 +59,13 @@ class Navigation
 		double identifyCrossingThreshold, stopTurningThreshold;
 		std::deque<Action> directions;
 		std::deque<Action> executedDirections;
-		int localization;
+		Vec2i local;
 		bool localizationLock;
 		
 		void testExecutePath();
 		void waitForLocalizationChange();
 		bool checkPath();
-		void handleLocalizationChange(const std_msgs::Int32ConstPtr& localization);
+		void handleLocalizationChange(const geometry_msgs::Pose2D localization);
 		void handleProcessedImage(const std_msgs::Int16MultiArrayConstPtr& processed);
 		bool hasLineOnTheSides(const std_msgs::Int16MultiArrayConstPtr& processed, int height, int width);
 		Action nextPathAction();
@@ -213,6 +215,10 @@ void Navigation::testExecutePath()
 
 void Navigation::driveToAction(const pioneer_control::NavigationDriveToGoalConstPtr& goal)
 {
+	//calcular path
+	//transformar em directions
+	//chamar execute path action
+	//forward to feedback
 }
 
 void Navigation::waitForLocalizationChange()
@@ -221,11 +227,12 @@ void Navigation::waitForLocalizationChange()
 	while(!localizationLock);
 }
 
-void Navigation::handleLocalizationChange(const std_msgs::Int32ConstPtr& localization)
+void Navigation::handleLocalizationChange(const geometry_msgs::Pose2D localization)
 {
 	if(!localizationLock)
 	{
-		this->localization = localization->data;
+		local.x = localization.x;
+		local.y = localization.y;
 		localizationLock = false;
 	}
 }
@@ -273,7 +280,7 @@ Navigation::Navigation(ros::NodeHandle n) :
 {
 	node = n;
 	processedImageSub = node.subscribe<std_msgs::Int16MultiArray>(IMAGE_PROCESSED_TOPIC, 1,  &Navigation::handleProcessedImage, this);
-	localizationSub = node.subscribe<std_msgs::Int32>(LOCALIZATION_TOPIC, 10, &Navigation::handleLocalizationChange, this);
+	localizationSub = node.subscribe<geometry_msgs::Pose2D>(LOCALIZATION_TOPIC, 10, &Navigation::handleLocalizationChange, this);
 	navDriveToServer.start();
 	//percentage covered in black
 	identifyCrossingThreshold = 0.6;
