@@ -9,3 +9,24 @@
 *.sublime-project
 *.sublime-workspace
 *.swp
+controller_types.txt
+doc/Change Log (10.9)
+doc/rel/principal.bbl
+doc/rel/principal.blg
+doc/rel/principal.dvi
+doc/rel/principal.toc
+manual_navigation/src/ex_listener.cpp
+manual_navigation/src/ex_talker.cpp
+pioneer3dx_mod_temp.xacro
+pioneer_control/include/pioneer_control/map.h
+pioneer_control/include/pioneer_control/map2.h
+pioneer_description/urdf/head.urdf.xacro
+pioneer_description/urdf/range.gazebo.xacro
+pioneer_description/urdf/range.urdf.xacro
+stage_assets/assets/5by5
+stage_assets/assets/generate_tape_sdf.py
+stage_assets/assets/shop_floor_7by7_even
+stage_assets/assets/shop_floor_7by7_even.txt
+stage_assets/assets/shop_floor_7by7_even_out.sdf
+stage_assets/assets/shop_floor_tape.xacro
+test_map_information.sh
