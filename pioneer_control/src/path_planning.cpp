@@ -5,10 +5,12 @@
 #include "pioneer_control/PathPlanningDefinePath.h"
 #include "pioneer_control/PathPlanningCalculateDistance.h"
 #include "pioneer_control/Vec2.h"
+#include <queue>
+#include <utility>
+#include "pioneer_control/AStar.h"
 
 #define PATH_PLANNING_DEFINE_PATH_SERVICE "define_path"
-#define PATH_PLANNING_CALCULATE_DISTANCE_SERVICE "calculate_distance"
-
+#define PATH_PLANNING_CALCULATE_DISTANCE_SERVICE "calculate_distance" 
 class PathPlanning
 {
 	public:
@@ -24,8 +26,7 @@ class PathPlanning
 		pioneer_control::MapInformationGetMap getMapService;
 		void getMap();
 
-		std::vector<Vec2i> Dijkstra(Vec2i origin, Vec2i goal);
-		std::vector<Vec2i> aStar(Vec2i origin, Vec2i goal);
+		int distance(Vec2i origin, Vec2i goal);
 
 		ros::ServiceServer calculateDistanceService;
 		bool calculateDistance(pioneer_control::PathPlanningCalculateDistance::Request& req, 
@@ -41,6 +42,8 @@ PathPlanning::PathPlanning(ros::NodeHandle n)
 	node = n;
 	definePathService = node.advertiseService(PATH_PLANNING_DEFINE_PATH_SERVICE, &PathPlanning::definePath, this);
 	calculateDistanceService = node.advertiseService(PATH_PLANNING_CALCULATE_DISTANCE_SERVICE, &PathPlanning::calculateDistance, this);
+	getMapClient = node.serviceClient<pioneer_control::MapInformationGetMap>("/get_map");
+	getMap();
 }
 
 void PathPlanning::getMap()
@@ -85,31 +88,31 @@ bool PathPlanning::definePath(pioneer_control::PathPlanningDefinePath::Request& 
 	Vec2i origin(req.origin.x, req.origin.y);
 	Vec2i goal(req.goal.x, req.goal.y);
 	//std::vector<Vec2i> path = Dijkstra(origin, goal);
-	//std::vector<Vec2i> path = aStar(origin, goal);
+	AStar aStar(map, mapHeight, mapWidth);
+	std::vector<Vec2i> path = aStar.findPath(origin, goal);
+	pioneer_control::Vec2i32 vec2i32_msg;
+	for(std::vector<Vec2i>::iterator it = path.begin(); it < path.end(); it++)
+	{
+		vec2i32_msg.x = (*it).x;
+		vec2i32_msg.y = (*it).y;
+		res.path.push_back(vec2i32_msg);
+		printf("%d, %d\n", (*it).x, (*it).y);
+	}
 	
 	return true;
 }
 
 #define ABS(var) ((var>0)?var:-var)
+int PathPlanning::distance(Vec2i origin, Vec2i goal)
+{
+	Vec2i result = origin - goal;
+	return ABS(result.x) + ABS(result.y);
+}
+
 bool PathPlanning::calculateDistance(pioneer_control::PathPlanningCalculateDistance::Request& req, pioneer_control::PathPlanningCalculateDistance::Response& res)
 {
-	if (map[req.origin.y][req.origin.x] == 0 && map[req.goal.y][req.goal.x] == 0)
-	{
-		res.distance = ABS(req.origin.x - req.goal.x) + ABS(req.origin.y - req.goal.y);
-		res.distance /= 2;
-		if(req.origin.x == req.goal.x) {
-			if(req.origin.x == 0 || req.origin.x == mapWidth-1)
-				res.distance += 2;
-		} else if(req.origin.y == req.goal.y) {
-			if(req.origin.y == 0 || req.origin.y == mapHeight-1)
-				res.distance += 2;
-		}
-return true;
-	}
-	else
-	{
-		ROS_INFO("Not in a corssing!");
-	}
+	res.distance = distance(Vec2i(req.origin.x,req.origin.y), Vec2i(req.goal.x, req.goal.y));
+	return true;
 }
 
 int main(int argc, char** argv)

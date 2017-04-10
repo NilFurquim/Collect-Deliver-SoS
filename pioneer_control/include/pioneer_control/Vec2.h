@@ -17,10 +17,10 @@ class Vec2
 			return *this;
 		};
 		
-		Vec2 operator-(Vec2& v)
+		Vec2 operator-(const Vec2& v)
 		{ return Vec2(x - v.x, y - v.y); };
 
-		Vec2 operator+(Vec2& v)
+		Vec2 operator+(const Vec2& v)
 		{ return Vec2(x + v.x, y + v.y); };
 
 		Vec2 &operator+=(const Vec2& v)
@@ -36,8 +36,25 @@ class Vec2
 			y -= v.y;
 			return *this;
 		};
-		bool operator==(Vec2& v)
+
+		bool operator<=(const Vec2& v)
+		{ return (x <= v.x && y <= v.y); }
+
+		bool operator<(const Vec2& v)
+		{ return (x < v.x && y < v.y); }
+
+		bool operator>=(const Vec2& v)
+		{ return (x >= v.x && y >= v.y); }
+
+		bool operator>(const Vec2& v)
+		{ return (x > v.x && y > v.y); }
+
+		bool operator==(const Vec2& v) const
 		{ return (x == v.x && y == v.y); }
+
+		bool operator!=(const Vec2& v)
+		{ return (x != v.x && y != v.y); }
+
 };
 
 typedef Vec2<int> Vec2i;

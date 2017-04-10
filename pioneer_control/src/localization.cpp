@@ -56,14 +56,14 @@ int mapMatrix[13][13] = {
 
 void print_map(int x, int y)
 {
-	for(int i = 0; i < 13; i++)
+	for(int i = 0; i < 5; i++)
 	{
 		printf("| ");
-		for(int j = 0; j < 13; j++)
+		for(int j = 0; j < 5; j++)
 		{
-			if(mapMatrix[i][j] < 0)
-				printf("  ");
-			else if(y == i && x == j)
+			///if(mapMatrix[i][j] < 0)
+			//	printf("  ");
+			/*else*/ if(y == i && x == j)
 				printf("@ ");
 			else printf(". ");
 		}
@@ -88,7 +88,7 @@ Localization::Localization(ros::NodeHandle n)
 	//getMap();
 
 	localizationPub = node.advertise<geometry_msgs::Pose2D>(LOCALIZATION_TOPIC, 1); 
-	pos = Vec2i(2, 1);
+	pos = Vec2i(0, 0);
 	actualdir = 3;
 
 	isCrossing = isFollowing = isInit = false;
@@ -193,12 +193,13 @@ void Localization::handleProcessedImage(const std_msgs::Int16MultiArrayConstPtr&
 	{
 		printf("Is crossing\n");
 		isCrossing = true;
-		pos += dirs[actualdir];
-		localizationPubMsg.x = pos.x;
-		localizationPubMsg.y = pos.y;
-		ROS_INFO("(%d, %d)", pos.x, pos.y);
-		print_map(pos.x, pos.y);
-		localizationPub.publish(localizationPubMsg);
+		//Updating position
+		//pos += dirs[actualdir];
+		//localizationPubMsg.x = pos.x;
+		//localizationPubMsg.y = pos.y;
+		//ROS_INFO("(%d, %d)", pos.x, pos.y);
+		//print_map(pos.x, pos.y);
+		//localizationPub.publish(localizationPubMsg);
 		angularTotal = 0;
 		linearTotal = 0;
 	}

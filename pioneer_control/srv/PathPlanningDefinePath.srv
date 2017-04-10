@@ -1,4 +1,4 @@
 pioneer_control/Vec2i32 origin
 pioneer_control/Vec2i32 goal
 ---
-int8 status
+pioneer_control/Vec2i32[] path

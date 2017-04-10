@@ -5,13 +5,13 @@
 #include "pioneer_control/NavigationDriveToAction.h"
 #include "pioneer_control/NavigationExecutePathAction.h"
 #include "actionlib/server/simple_action_server.h"
-#include "actionlib/client/simple_action_client.h"
 #include "actionlib/client/terminal_state.h"
 #include "pioneer_control/DriveActuatorAPI.h"
 #include "geometry_msgs/Pose2D.h"
 #include "std_msgs/Int32.h"
 #include <deque>
 #include "pioneer_control/Vec2.h"
+#include "pioneer_control/PathPlanningDefinePath.h"
 #define LOCALIZATION_TOPIC "map_position"
 
 #define ABS(var) ((var<0)? -var : var)
@@ -42,7 +42,6 @@
 
 typedef actionlib::SimpleActionServer<pioneer_control::NavigationDriveToAction> NavigationDriveToServer;
 typedef actionlib::SimpleActionServer<pioneer_control::NavigationExecutePathAction> NavigationExecutePathServer;
-typedef actionlib::SimpleActionClient<pioneer_control::NavigationExecutePathAction> NavigationExecutePathClient;
 
 class Navigation
 {
@@ -70,9 +69,11 @@ class Navigation
 		bool hasLineOnTheSides(const std_msgs::Int16MultiArrayConstPtr& processed, int height, int width);
 		Action nextPathAction();
 
+		ros::ServiceClient definePathClient;
+		pioneer_control::PathPlanningDefinePath definePathService;
+
 		void driveToAction(const pioneer_control::NavigationDriveToGoalConstPtr& goal);
 		NavigationExecutePathServer navExecutePathServer;
-		//NavigationExecutePathClient navExecutePathClient;
 		pioneer_control::NavigationExecutePathFeedback navExecutePathFeedback;
 		pioneer_control::NavigationExecutePathResult navExecutePathResult;
 
@@ -80,6 +81,8 @@ class Navigation
 		NavigationDriveToServer navDriveToServer;
 		pioneer_control::NavigationDriveToFeedback navDriveToFeedback;
 		pioneer_control::NavigationDriveToResult navDriveToResult;
+
+
 };
 
 Navigation::Action Navigation::nextPathAction()
@@ -215,6 +218,26 @@ void Navigation::testExecutePath()
 
 void Navigation::driveToAction(const pioneer_control::NavigationDriveToGoalConstPtr& goal)
 {
+	//definePathService.request.origin = local;
+	definePathService.request.goal = goal->pos;
+	if(!definePathClient.call(definePathService))
+	{
+		ROS_INFO("Not Able to get path from path planning service");
+		//TODO: INSERT ACTION ERROR
+		return;
+	}
+	typedef std::vector<pioneer_control::Vec2i32> vectorVec2i32msg;
+	vectorVec2i32msg nodePath = definePathService.response.path;
+	
+	std::vector<Action> directions;
+	Vec2i dir;
+	for(vectorVec2i32msg::iterator it = nodePath.begin()+1; it < nodePath.end(); it++)
+	{
+		//dir.x = (*(it)).x - (*(it-1)).x;
+		//dir.y = (*(it)).y - (*(it-1)).y;
+		//directions.push_back(dir); 
+	}
+
 	//calcular path
 	//transformar em directions
 	//chamar execute path action

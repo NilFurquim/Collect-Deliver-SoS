@@ -34,8 +34,11 @@ class MapInformation
 		};
 		void printMap();
 		std::vector<RobotPosition> robotPositions;
-		static int const width = 13;
-		static int const height = 13;
+		static int const width = 5;
+		static int const height = 5;
+		
+		//static int const width = 13;
+		//static int const height = 13;
 		static int matrix[height][width];
 
 		bool updateMap(pioneer_control::MapInformationUpdateMap::Request& req,
@@ -52,21 +55,30 @@ MapInformation::RobotPosition::RobotPosition(unsigned id, unsigned x, unsigned y
 // 0 = crossing
 // > 0 weight of node
 
+//int MapInformation::matrix[height][width] = {
+//		{-1, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, -1}, 
+//		{-1, -1,  3, -1,  3, -1,  3, -1,  3, -1,  3, -1, -1}, 
+//		{ 0,  3,  0,  3,  0,  3,  0,  3,  0,  3,  0,  3,  0}, 
+//		{-1, -1,  3, -1,  3, -1,  3, -1,  3, -1,  3, -1, -1}, 
+//		{ 0,  3,  0,  3,  0,  3,  0,  3,  0,  3,  0,  3,  0}, 
+//		{-1, -1,  3, -1,  3, -1,  3, -1,  3, -1,  3, -1, -1}, 
+//		{ 0,  3,  0,  3,  0,  3,  0,  3,  0,  3,  0,  3,  0}, 
+//		{-1, -1,  3, -1,  3, -1,  3, -1,  3, -1,  3, -1, -1}, 
+//		{ 0,  3,  0,  3,  0,  3,  0,  3,  0,  3,  0,  3,  0}, 
+//		{-1, -1,  3, -1,  3, -1,  3, -1,  3, -1,  3, -1, -1}, 
+//		{ 0,  3,  0,  3,  0,  3,  0,  3,  0,  3,  0,  3,  0}, 
+//		{-1, -1,  3, -1,  3, -1,  3, -1,  3, -1,  3, -1, -1}, 
+//		{-1, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, -1}
+//	};
+
 int MapInformation::matrix[height][width] = {
-		{-1, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, -1}, 
-		{-1, -1,  3, -1,  3, -1,  3, -1,  3, -1,  3, -1, -1}, 
-		{ 0,  3,  0,  3,  0,  3,  0,  3,  0,  3,  0,  3,  0}, 
-		{-1, -1,  3, -1,  3, -1,  3, -1,  3, -1,  3, -1, -1}, 
-		{ 0,  3,  0,  3,  0,  3,  0,  3,  0,  3,  0,  3,  0}, 
-		{-1, -1,  3, -1,  3, -1,  3, -1,  3, -1,  3, -1, -1}, 
-		{ 0,  3,  0,  3,  0,  3,  0,  3,  0,  3,  0,  3,  0}, 
-		{-1, -1,  3, -1,  3, -1,  3, -1,  3, -1,  3, -1, -1}, 
-		{ 0,  3,  0,  3,  0,  3,  0,  3,  0,  3,  0,  3,  0}, 
-		{-1, -1,  3, -1,  3, -1,  3, -1,  3, -1,  3, -1, -1}, 
-		{ 0,  3,  0,  3,  0,  3,  0,  3,  0,  3,  0,  3,  0}, 
-		{-1, -1,  3, -1,  3, -1,  3, -1,  3, -1,  3, -1, -1}, 
-		{-1, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, -1}
-	};
+	{1, 1, 1, 1, 1},
+	{1, 1, 1, 1, 1},
+	{1, 1, 1, 1, 1},
+	{1, 1, 1, 1, 1},
+	{1, 1, 1, 1, 1}
+};
+
 char const mapString[2*13*2*13+13+2*13+1] = {
 "      .     .     .     .     .      \n\
       .     .     .     .     .      \n\
@@ -154,7 +166,7 @@ bool MapInformation::getMap(pioneer_control::MapInformationGetMap::Request& req,
 	res.map.layout.data_offset = 0;
 	res.map.layout.dim[0].label = "height";
 	res.map.layout.dim[0].size = height;
-	res.map.layout.dim[0].stride = 14;
+	res.map.layout.dim[0].stride = height;
 	res.map.layout.dim.push_back(std_msgs::MultiArrayDimension());
 	res.map.layout.dim[1].label = "width";
 	res.map.layout.dim[1].size = width;
