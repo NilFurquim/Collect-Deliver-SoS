@@ -186,28 +186,25 @@ std::vector<Vec2i> AStar::findPath(Vec2i origin, Vec2i goal)
 	while (!open.empty())
 	{
 		current = open.popMinScore();
-		printf("FROM (%d, %d):\n",  current->pos.x, current->pos.y);
+		//printf("FROM (%d, %d):\n",  current->pos.x, current->pos.y);
 		current_m(current->pos);
 		if (current->pos == goal)
 		{
 			printf("RESULT FOUND\n");
 			response.clear();
-			printf("\t(%d, %d)\n", current->pos.x, current->pos.y);
-			while (current->parent != NULL)
+			while (current != NULL)
 			{
 				response.push_back(current->pos);
-				current = current->parent;
 				printf("\t(%d, %d)\n", current->pos.x, current->pos.y);
+				current = current->parent;
 			}
 			printf("DONE!\n");
 
 			std::reverse(response.begin(), response.end());
-			printf("DONE! again...\n");
 
 			reset_m();
 			open.clear();
 			closed.clear();
-			printf("DONE! again... again...\n");
 			return response;
 		}
 
@@ -215,12 +212,12 @@ std::vector<Vec2i> AStar::findPath(Vec2i origin, Vec2i goal)
 		for(int i = 0; i < 4; i++)
 		{
 			Vec2i nextPos = current->pos + dirs[i];
-			printf("(%d, %d)", nextPos.x, nextPos.y);
+			//printf("(%d, %d)", nextPos.x, nextPos.y);
 			if(detectCollision(nextPos))
-				{  printf(" collision\n"); continue; }
+				{ /*printf(" collision\n");*/ continue; }
 
 			if(closed.findNodeWithPos(nextPos)) 
-				{ printf(" is in closed set\n"); continue; }
+				{ /*printf(" is in closed set\n");*/ continue; }
 
 			//finge que não viu essa atrocidade
 			//corrigirei se tiver tempo
@@ -231,19 +228,19 @@ std::vector<Vec2i> AStar::findPath(Vec2i origin, Vec2i goal)
 			{
 				open.push(new Node(nextPos, current->g + 1,
 							distance(nextPos, goal), current)); 
-				printf("OPEN\n");
+				//printf("OPEN\n");
 				open_m(nextPos);
 			} else if(node->getScore() < this_g + this_h)
 			{
 				node->g = this_g;
 				node->h = this_h;
 				node->parent = current;
-				printf("REPLACE\n");
+				//printf("REPLACE\n");
 			}
-			printf("BETTER IN OPEN SET\n");
+			//printf("BETTER IN OPEN SET\n");
 
 		}
-		printmap();
+		//printmap();
 	}
 	reset_m();
 
@@ -253,7 +250,6 @@ std::vector<Vec2i> AStar::findPath(Vec2i origin, Vec2i goal)
 	printf("\nERROR\n");
 	std::vector<Vec2i> error;
 	error.clear();
-	error.push_back(Vec2i(-1, -1));
 	return error;
 }
 

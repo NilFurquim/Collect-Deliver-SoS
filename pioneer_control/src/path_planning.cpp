@@ -96,7 +96,7 @@ bool PathPlanning::definePath(pioneer_control::PathPlanningDefinePath::Request& 
 		vec2i32_msg.x = (*it).x;
 		vec2i32_msg.y = (*it).y;
 		res.path.push_back(vec2i32_msg);
-		printf("%d, %d\n", (*it).x, (*it).y);
+		//printf("%d, %d\n", (*it).x, (*it).y);
 	}
 	
 	return true;

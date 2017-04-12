@@ -6,9 +6,12 @@
 #include "pioneer_control/MapInformationGetMap.h"
 #include "geometry_msgs/Pose2D.h"
 #include "pioneer_control/Vec2.h"
+#include "pioneer_control/Vec2i32.h"
+#include "pioneer_control/PoseGrid.h"
 
 #define LOCALIZATION_TOPIC "map_position"
 
+//TODO: Init localization service: init pos, direction, but assert first
 class Localization
 {
 	public:
@@ -19,7 +22,7 @@ class Localization
 		ros::Subscriber odometrySub;
 
 		ros::Publisher localizationPub;
-		geometry_msgs::Pose2D localizationPubMsg;
+		pioneer_control::PoseGrid localizationPubMsg;
 
 		ros::ServiceClient getMapClient;
 		pioneer_control::MapInformationGetMap getMapService;
@@ -27,7 +30,7 @@ class Localization
 		Vec2i static const dirs[4];
 		Vec2i pos;
 
-		int actualdir;
+		int currentDirection;
 		int** map;
 		int mapWidth, mapHeight;
 		void getMap();
@@ -84,12 +87,10 @@ Localization::Localization(ros::NodeHandle n)
 	processedImageSub = node.subscribe<std_msgs::Int16MultiArray>(IMAGE_PROCESSED_TOPIC, 1,  &Localization::handleProcessedImage, this);
 	odometrySub = node.subscribe<nav_msgs::Odometry>("diff_drive/odom", 1,  &Localization::handleOdometry, this);
 	getMapClient = node.serviceClient<pioneer_control::MapInformationGetMap>("/get_map");
-	ROS_INFO("Before get map");
-	//getMap();
 
-	localizationPub = node.advertise<geometry_msgs::Pose2D>(LOCALIZATION_TOPIC, 1); 
+	localizationPub = node.advertise<pioneer_control::PoseGrid>(LOCALIZATION_TOPIC, 1); 
 	pos = Vec2i(0, 0);
-	actualdir = 3;
+	currentDirection = 3;
 
 	isCrossing = isFollowing = isInit = false;
 	angularTotal = linearTotal = 0;
@@ -156,19 +157,21 @@ void Localization::handleOdometry(const nav_msgs::OdometryConstPtr& odom)
 		if(angularTotal > 3.1415/4)
 		{
 			//printf("Turned left\n");
-			actualdir =  (4 + actualdir+1)%4;
+			currentDirection =  (4 + currentDirection+1)%4;
 
 		}
 		else if(angularTotal < -3.1415/4)
 		{
-			actualdir = (4 + actualdir-1)%4;
+			currentDirection = (4 + currentDirection-1)%4;
 			//printf("Turned right\n");
 		}
-		pos += dirs[actualdir];
-		localizationPubMsg.x = pos.x;
-		localizationPubMsg.y = pos.y;
-		ROS_INFO("pos: (%d, %d) dir[%d](%d, %d)", pos.x, pos.y, actualdir, dirs[actualdir].x, dirs[actualdir].y);
-		print_map(pos.x, pos.y);
+		pos += dirs[currentDirection];
+		localizationPubMsg.pos.x = pos.x;
+		localizationPubMsg.pos.y = pos.y;
+		localizationPubMsg.dir.x = dirs[currentDirection].x;
+		localizationPubMsg.dir.y = dirs[currentDirection].y;
+		printf("pos: (%d, %d) dir[%d](%d, %d)\n", pos.x, pos.y, currentDirection, dirs[currentDirection].x, dirs[currentDirection].y);
+		//print_map(pos.x, pos.y);
 		localizationPub.publish(localizationPubMsg);
 		isCrossing = false;
 	}
@@ -191,10 +194,10 @@ void Localization::handleProcessedImage(const std_msgs::Int16MultiArrayConstPtr&
 
 	if(totalSum >= 40 && isCrossing==false)
 	{
-		printf("Is crossing\n");
+		//printf("Is crossing\n");
 		isCrossing = true;
 		//Updating position
-		//pos += dirs[actualdir];
+		//pos += dirs[currentDirection];
 		//localizationPubMsg.x = pos.x;
 		//localizationPubMsg.y = pos.y;
 		//ROS_INFO("(%d, %d)", pos.x, pos.y);

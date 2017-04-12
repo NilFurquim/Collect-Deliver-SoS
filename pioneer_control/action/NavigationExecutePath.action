@@ -1,4 +1,4 @@
-int8[] path
+pioneer_control/Vec2i32[] directions
 ---
 int8 status
 ---

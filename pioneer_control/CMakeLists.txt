@@ -19,6 +19,8 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
    FILES
    Vec2i32.msg
+   Vec2i8.msg
+   PoseGrid.msg
 )
 
  add_service_files(

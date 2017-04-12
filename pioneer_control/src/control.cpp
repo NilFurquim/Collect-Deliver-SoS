@@ -1,10 +1,11 @@
 #include "ros/ros.h"
 #include "pioneer_control/NavigationExecutePathAction.h"
+#include "pioneer_control/NavigationDriveToAction.h"
 #include "actionlib/client/simple_action_client.h"
 #include "actionlib/client/terminal_state.h"
 
-enum Action {Action_stop, Action_turn_right, Action_turn_left, Action_go_straight, Action_follow_line};
 typedef actionlib::SimpleActionClient<pioneer_control::NavigationExecutePathAction> NavigationExecutePathClient;
+typedef actionlib::SimpleActionClient<pioneer_control::NavigationDriveToAction> NavigationDriveToClient;
 
 class Control
 {
@@ -18,27 +19,59 @@ Control::Control(ros::NodeHandle node)
 	//goPickUpProductService = node.advertise;
 }
 
-int main(int argc, char** argv)
+void executePath()
 {
-	ros::init(argc, argv, "control");
-	ros::NodeHandle node;
 	NavigationExecutePathClient navExecutePathClient("execute_path", true);
 	ROS_INFO("Waiting for server...");
 	navExecutePathClient.waitForServer();
 	pioneer_control::NavigationExecutePathGoal goal;
-	goal.path.push_back((int)Action_go_straight);
-	goal.path.push_back((int)Action_go_straight);
-	goal.path.push_back((int)Action_turn_left);
-	goal.path.push_back((int)Action_turn_left);
-	goal.path.push_back((int)Action_turn_right);
-	goal.path.push_back((int)Action_go_straight);
-	goal.path.push_back((int)Action_turn_right);
-	goal.path.push_back((int)Action_go_straight);
+	pioneer_control::Vec2i32 msg;
+	msg.x = 0; msg.y = 1; 
+	goal.directions.push_back(msg);
+	msg.x = 0; msg.y = 1; 
+	goal.directions.push_back(msg);
+	msg.x = 1; msg.y = 0; 
+	goal.directions.push_back(msg);
+	msg.x = 0; msg.y = -1; 
+	goal.directions.push_back(msg);
+	msg.x = 1; msg.y = 0; 
+	goal.directions.push_back(msg);
+	msg.x = 0; msg.y = 1; 
+	goal.directions.push_back(msg);
+	msg.x = 0; msg.y = 1; 
+	goal.directions.push_back(msg);
+	msg.x = -1; msg.y = 0; 
+	goal.directions.push_back(msg);
 	ROS_INFO("Sending goal...");
 	navExecutePathClient.sendGoal(goal);
 	ROS_INFO("Waiting for Result...");
 	navExecutePathClient.waitForResult();
 	ROS_INFO("DONE!");
+}
+
+void driveTo(int x, int y)
+{
+	NavigationDriveToClient navDriveToClient("drive_to", true);
+	ROS_INFO("Waiting for server...");
+	navDriveToClient.waitForServer();
+	pioneer_control::NavigationDriveToGoal goal;
+	pioneer_control::Vec2i32 msg;
+	msg.x = x; msg.y = y; 
+	goal.pos = msg;
+	ROS_INFO("Sending goal...");
+	navDriveToClient.sendGoal(goal);
+	ROS_INFO("Waiting for Result...");
+	navDriveToClient.waitForResult();
+	ROS_INFO("DONE!");
+}
+
+int main(int argc, char** argv)
+{
+	ros::init(argc, argv, "control");
+	ros::NodeHandle node;
+	driveTo(4, 4);
+	driveTo(4, 0);
+	driveTo(0, 0);
 	
 	ros::spin();
 	return 0;
