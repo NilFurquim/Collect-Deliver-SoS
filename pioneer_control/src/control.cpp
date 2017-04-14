@@ -69,9 +69,9 @@ int main(int argc, char** argv)
 {
 	ros::init(argc, argv, "control");
 	ros::NodeHandle node;
-	driveTo(4, 4);
-	driveTo(4, 0);
-	driveTo(0, 0);
+	driveTo(1, 5);
+	driveTo(1, 1);
+	driveTo(0, 2);
 	
 	ros::spin();
 	return 0;

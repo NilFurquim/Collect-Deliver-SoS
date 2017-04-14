@@ -91,12 +91,17 @@ class AStar
 		int** map;
 		int mapHeight, mapWidth;
 		bool detectCollision(Vec2i pos);
+		bool hasConnection(Vec2i pos, int dirIndex);
 		NodeList closed;
 		NodeList open;
 		int distance(Vec2i origin, Vec2i goal);
 		static const Vec2i dirs[4];
 };
 
+#define UP 2
+#define RIGHT 1
+#define DOWN 0
+#define LEFT 3
 const Vec2i AStar::dirs[4] = {Vec2i(0, 1), Vec2i(1, 0), Vec2i(0, -1), Vec2i(-1, 0)};
 
 #define ABS(var) ((var>0)?var:-var)
@@ -135,38 +140,60 @@ bool AStar::detectCollision(Vec2i pos)
 	return false;
 }
 
-int mapstring[5][5] = {
-	{0, 0, 0, 0, 0},
-	{0, 0, 0, 0, 0},
-	{0, 0, 0, 0, 0},
-	{0, 0, 0, 0, 0},
-	{0, 0, 0, 0, 0}
+bool AStar::hasConnection(Vec2i pos, int dirIndex)
+{
+	switch(dirIndex)
+	{
+		case UP:
+			return (map[pos.y][pos.x] & 1) >> 0; 
+		case RIGHT:
+			return (map[pos.y][pos.x] & 2) >> 1; 
+		case DOWN:
+			return (map[pos.y][pos.x] & 4) >> 2; 
+		case LEFT:
+			return (map[pos.y][pos.x] & 8) >> 3; 
+	}
+}
+
+int mapstring[7][7] = {
+	{0, 0, 0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0}
 };
 
 void current_m(Vec2i cur) { mapstring[cur.y][cur.x] = 2; }
 void open_m(Vec2i cur) { mapstring[cur.y][cur.x] = 1; }
 void replace_m(Vec2i cur) { mapstring[cur.y][cur.x] = 3; }
+void path_m(Vec2i cur) { mapstring[cur.y][cur.x] = 4; }
 
 void printmap()
 {
-	for(int i = 0; i < 5; i++)
+	printf("\n");
+	for(int i = 0; i < 7; i++)
 	{
-		printf("|");
-		for(int j = 0; j < 5; j++)
+		printf("| ");
+		for(int j = 0; j < 7; j++)
 		{
 			switch(mapstring[i][j])
 			{
 				case 0:
-					printf(".");
+					printf(". ");
 					break;
 				case 1:
-					printf("o");
+					printf("o ");
 					break;
 				case 2:
-					printf("@");
+					printf("@ ");
 					break;
 				case 3:
-					printf("x");
+					printf("x ");
+					break;
+				case 4:
+					printf("* ");
 					break;
 			}
 		}
@@ -175,7 +202,7 @@ void printmap()
 
 }
 void reset_m()
-{ for(int i = 0; i < 5; i++) for(int j = 0; j < 5; j++) mapstring[i][j] = 0; }
+{ for(int i = 0; i < 7; i++) for(int j = 0; j < 7; j++) mapstring[i][j] = 0; }
 
 std::vector<Vec2i> AStar::findPath(Vec2i origin, Vec2i goal)
 {
@@ -195,6 +222,7 @@ std::vector<Vec2i> AStar::findPath(Vec2i origin, Vec2i goal)
 			while (current != NULL)
 			{
 				response.push_back(current->pos);
+				path_m(current->pos);
 				printf("\t(%d, %d)\n", current->pos.x, current->pos.y);
 				current = current->parent;
 			}
@@ -202,6 +230,7 @@ std::vector<Vec2i> AStar::findPath(Vec2i origin, Vec2i goal)
 
 			std::reverse(response.begin(), response.end());
 
+			printmap();
 			reset_m();
 			open.clear();
 			closed.clear();
@@ -211,13 +240,22 @@ std::vector<Vec2i> AStar::findPath(Vec2i origin, Vec2i goal)
 		closed.push(current);
 		for(int i = 0; i < 4; i++)
 		{
+			if(!hasConnection(current->pos, i))
+				{ continue; }
+
 			Vec2i nextPos = current->pos + dirs[i];
 			//printf("(%d, %d)", nextPos.x, nextPos.y);
 			if(detectCollision(nextPos))
-				{ /*printf(" collision\n");*/ continue; }
+			{ 
+				//printf(" collision\n"); 
+				continue;
+			}
 
 			if(closed.findNodeWithPos(nextPos)) 
-				{ /*printf(" is in closed set\n");*/ continue; }
+			{ 
+				//printf(" is in closed set\n");
+				continue;
+			}
 
 			//finge que não viu essa atrocidade
 			//corrigirei se tiver tempo

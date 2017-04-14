@@ -13,7 +13,9 @@
 #include "pioneer_control/Vec2.h"
 #include "pioneer_control/PoseGrid.h"
 #include "pioneer_control/PathPlanningDefinePath.h"
-#define LOCALIZATION_TOPIC "map_position"
+#include "pioneer_control/LocalizationInit.h"
+
+#define LOCALIZATION_TOPIC "localization"
 
 #define ABS(var) ((var<0)? -var : var)
 #define PRINT_M for(int i = 0; i < height; i++)\
@@ -49,7 +51,7 @@ class Navigation
 	public:
 		Navigation(ros::NodeHandle n, Vec2i pos, Vec2i dir);
 	private:
-		enum Action {Action_stop, Action_turn_around, Action_turn_right, Action_turn_left, Action_go_straight, Action_follow_line};
+		enum Action {Action_stop, Action_turn_around, Action_turn_around2, Action_turn_right, Action_turn_left, Action_go_straight, Action_follow_line};
 		static const Vec2i dirs[4];
 		ros::NodeHandle node;
 		DriveActuatorAPI driveApi;
@@ -58,19 +60,23 @@ class Navigation
 		Vec2i currentLocalization;
 		Vec2i currentDirection;
 
-		ros::Subscriber processedImageSub, localizationSub;
+		ros::Subscriber processedImageSub;
 		bool isNavigationOn, isCrossing;
 		double identifyCrossingThreshold, stopTurningThreshold;
 		std::deque<Action> actions;
 		std::deque<Action> executedActions;
+
+		ros::Subscriber localizationSub;
+		pioneer_control::LocalizationInit localizationInitService;
+		ros::ServiceClient localizationInitClient;
 		bool waitLocalization;
+		void handleLocalizationChange(const pioneer_control::PoseGrid localization);
 		
 		Action convertToAction(Vec2i prev, Vec2i next);
 		void startNavigation();
 		void stopNavigation();
 		void testExecutePath();
 		bool checkPath();
-		void handleLocalizationChange(const pioneer_control::PoseGrid localization);
 		void handleProcessedImage(const std_msgs::Int16MultiArrayConstPtr& processed);
 		bool hasLineOnTheSides(const std_msgs::Int16MultiArrayConstPtr& processed, int height, int width);
 		Action nextPathAction();
@@ -99,7 +105,10 @@ class Navigation
 Navigation::Action Navigation::nextPathAction()
 {
 	if(actions.empty())
+	{
+		ROS_INFO("actions empty.");
 		return Action_stop;
+	}
 
 	Action front = actions.front();
 	executedActions.push_back(front);
@@ -162,11 +171,11 @@ void Navigation::handleProcessedImage(const std_msgs::Int16MultiArrayConstPtr& p
 
 
 	//stop if no guide line is identified
-	if(total_sum == 0){
-		//printf("sum == 0\n");
-		driveApi.setDrive(0, 0);
-		return;
-	}
+	//if(total_sum == 0){
+	//	//printf("sum == 0\n");
+	//	driveApi.setDrive(0, 0);
+	//	return;
+	//}
 
 	//crossing reached
 	if(total_sum >= identifyCrossingThreshold*(height*width) && isCrossing == false)
@@ -180,12 +189,18 @@ void Navigation::handleProcessedImage(const std_msgs::Int16MultiArrayConstPtr& p
 		case Action_turn_left: printf("turn_left\n"); break;
 		case Action_go_straight: printf("go_straight\n"); break;
 		case Action_follow_line: printf("follow_line\n"); break;
+		case Action_turn_around: printf("turn_around\n"); break;
+		case Action_turn_around2: printf("turn_around_2\n"); break;
 		default: printf("default\n"); break;
 		}
 	}
 
 	switch (action) {
 	case Action_stop:
+		if(total_sum >= identifyCrossingThreshold*(height*width))
+		{
+			printf("is in crossing!\n");
+		}
 		driveApi.setDrive(0, 0);
 		isCrossing = false;
 		break;
@@ -249,8 +264,25 @@ void Navigation::handleProcessedImage(const std_msgs::Int16MultiArrayConstPtr& p
 			isCrossing = false;
 		}
 		break;
+	case Action_turn_around:
+		driveApi.setDrive(0, 0.5);
+		if(total_sum <= 10)
+		{
+			action = Action_turn_around2;
+			isCrossing = true;
+		}
+		break;
+	case Action_turn_around2:
+		driveApi.setDrive(0, 0.5);
+		if(total_sum >= 28)
+		{
+			action = Action_follow_line;
+			isCrossing = false;
+		}
+		break;
 	default:
-		action = Action_stop;
+		driveApi.setDrive(0, 0);
+		isCrossing = false;
 		break;
 	}
 }
@@ -306,6 +338,7 @@ void Navigation::driveToAction(const pioneer_control::NavigationDriveToGoalConst
 	}
 	
 	actions.clear();
+	executedActions.clear();
 	//convert directions to actions
 	ROS_INFO("\n" 
 		"current direction (%d, %d)\n"
@@ -327,8 +360,8 @@ void Navigation::driveToAction(const pioneer_control::NavigationDriveToGoalConst
 	int actionsTotal = actions.size();
 
 	startNavigation();
-	pioneer_control::Vec2i32ConstPtr waitLocal;
-	waitLocal = ros::topic::waitForMessage<pioneer_control::Vec2i32>(LOCALIZATION_TOPIC, node);
+	pioneer_control::PoseGridConstPtr waitLocal;
+	waitLocal = ros::topic::waitForMessage<pioneer_control::PoseGrid>(LOCALIZATION_TOPIC, node);
 
 	navDriveToFeedback.progress = executedActions.size()*1.0/actionsTotal;
 	navDriveToServer.publishFeedback(navDriveToFeedback);
@@ -341,7 +374,7 @@ void Navigation::driveToAction(const pioneer_control::NavigationDriveToGoalConst
 		{
 			//wrong way - cancel executePath and set not succeded
 		}
-		waitLocal = ros::topic::waitForMessage<pioneer_control::Vec2i32>(LOCALIZATION_TOPIC, node);
+		waitLocal = ros::topic::waitForMessage<pioneer_control::PoseGrid>(LOCALIZATION_TOPIC, node);
 		navDriveToFeedback.progress = executedActions.size()*1.0/actionsTotal;
 		navDriveToServer.publishFeedback(navDriveToFeedback);
 	}
@@ -370,6 +403,8 @@ void Navigation::handleLocalizationChange(const pioneer_control::PoseGrid locali
 {
 	currentLocalization.x = localization.pos.x;
 	currentLocalization.y = localization.pos.y;
+	currentDirection.x = localization.dir.x;
+	currentDirection.y = localization.dir.y;
 }
 
 bool Navigation::checkPath()
@@ -407,11 +442,11 @@ void Navigation::executePathAction(const pioneer_control::NavigationExecutePathG
 	int actionsTotal = actions.size();
 
 	startNavigation();
-	pioneer_control::Vec2i32ConstPtr waitLocal;
+	pioneer_control::PoseGridConstPtr waitLocal;
 	while(!actions.empty())
 	{
 		//wait for localization 
-		/*waitLocal = */ros::topic::waitForMessage<pioneer_control::Vec2i32>(LOCALIZATION_TOPIC, node);
+		/*waitLocal = */ros::topic::waitForMessage<pioneer_control::PoseGrid>(LOCALIZATION_TOPIC, node);
 		if(!checkPath())
 		{
 			//wrong way - cancel executePath and set not succeded
@@ -431,18 +466,26 @@ Navigation::Navigation(ros::NodeHandle n, Vec2i pos, Vec2i dir) :
 	driveApi(n)
 {
 	node = n;
+	localizationInitClient = node.serviceClient<pioneer_control::LocalizationInit>("localization/init");
+	localizationInitService.request.pos.pos.x = pos.x;
+	localizationInitService.request.pos.pos.y = pos.y;
+	localizationInitService.request.pos.dir.x = dir.x;
+	localizationInitService.request.pos.dir.y = dir.y;
+	if(!localizationInitClient.call(localizationInitService) || !localizationInitService.response.status)
+	{
+		ROS_INFO("Couldn't init localization, shutting down...");
+		ros::shutdown();
+	}
 	processedImageSub = node.subscribe<std_msgs::Int16MultiArray>(IMAGE_PROCESSED_TOPIC, 1,  &Navigation::handleProcessedImage, this);
 	localizationSub = node.subscribe<pioneer_control::PoseGrid>(LOCALIZATION_TOPIC, 10, &Navigation::handleLocalizationChange, this);
 	definePathClient = node.serviceClient<pioneer_control::PathPlanningDefinePath>("define_path");
 
-	navDriveToServer.start();
 	//percentage covered in black
 	identifyCrossingThreshold = 0.6;
 	stopTurningThreshold = 0.44;
 
 	currentLocalization = pos;
 	currentDirection = dir;
-	//TODO: call init localization
 	action = Action_follow_line;
 	isCrossing = false;
 	isNavigationOn = false;
@@ -459,7 +502,7 @@ int main(int argc, char** argv)
 	ros::init(argc, argv, "navigation");
 	ros::NodeHandle node;
 	
-	Navigation navigation(node, Vec2i(0, 0), Vec2i(0, 1));
+	Navigation navigation(node, Vec2i(1, 1), Vec2i(0, 1));
 	ros::spin();
 	return 0;
 }

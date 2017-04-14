@@ -32,6 +32,7 @@ add_message_files(
    MapInformationUpdateMap.srv
    PathPlanningDefinePath.srv
    PathPlanningCalculateDistance.srv
+   LocalizationInit.srv
  )
 ## Generate actions in the 'action' folder
 add_action_files(

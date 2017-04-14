@@ -1,4 +1,5 @@
 #include "ros/ros.h"
+#include "std_msgs/UInt8MultiArray.h"
 #include "std_msgs/Int32MultiArray.h"
 #include "pioneer_control/map.h"
 #include "pioneer_control/MapInformationUpdateMap.h"
@@ -34,8 +35,8 @@ class MapInformation
 		};
 		void printMap();
 		std::vector<RobotPosition> robotPositions;
-		static int const width = 5;
-		static int const height = 5;
+		static int const width = 7;
+		static int const height = 7;
 		
 		//static int const width = 13;
 		//static int const height = 13;
@@ -45,15 +46,15 @@ class MapInformation
 				pioneer_control::MapInformationUpdateMap::Response& res);
 		bool getMap(pioneer_control::MapInformationGetMap::Request& req,
 				pioneer_control::MapInformationGetMap::Response& res);
+		int isOcupied(int i, int j);
+		int hasUpConnection(int i, int j);
+		int hasRightConnection(int i, int j);
+		int hasDownConnection(int i, int j);
+		int hasLeftConnection(int i, int j);
 };
 
 MapInformation::RobotPosition::RobotPosition(unsigned id, unsigned x, unsigned y)
 	: id(id), pos(x, y) {}
-
-// -1 = NO GUIDE LINE
-// < -1 = GUIDE LINE OCUPIED -(weight+1)
-// 0 = crossing
-// > 0 weight of node
 
 //int MapInformation::matrix[height][width] = {
 //		{-1, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, -1}, 
@@ -72,28 +73,48 @@ MapInformation::RobotPosition::RobotPosition(unsigned id, unsigned x, unsigned y
 //	};
 
 int MapInformation::matrix[height][width] = {
-	{1, 1, 1, 1, 1},
-	{1, 1, 1, 1, 1},
-	{1, 1, 1, 1, 1},
-	{1, 1, 1, 1, 1},
-	{1, 1, 1, 1, 1}
+	{0,  4,  4,  4,  4,  4,  0},
+	{2, 15, 15, 15, 15, 15,  8}, 
+	{2, 15, 15, 15, 15, 15,  8}, 
+	{2, 15, 15, 15, 15, 15,  8}, 
+	{2, 15, 15, 15, 15, 15,  8}, 
+	{2, 15, 15, 15, 15, 15,  8}, 
+	{0,  1,  1,  1,  1,  1,  0} 
 };
+////1////
+//8 O 2//
+////4////
+//..RULD
+//char const mapString[2*13*2*13+13+2*13+1] = {
+//"      .     .     .     .     .      \n\
+//      .     .     .     .     .      \n\
+//.  .  .  .  .  .  .  .  .  .  .  .  .\n\
+//      .     .     .     .     .      \n\
+//.  .  .  .  .  .  .  .  .  .  .  .  .\n\
+//      .     .     .     .     .      \n\
+//.  .  .  .  .  .  .  .  .  .  .  .  .\n\
+//      .     .     .     .     .      \n\
+//.  .  .  .  .  .  .  .  .  .  .  .  .\n\
+//      .     .     .     .     .      \n\
+//.  .  .  .  .  .  .  .  .  .  .  .  .\n\
+//      .     .     .     .     .      \n\
+//      .     .     .     .     .      \n"
+//};
 
-char const mapString[2*13*2*13+13+2*13+1] = {
-"      .     .     .     .     .      \n\
-      .     .     .     .     .      \n\
-.  .  .  .  .  .  .  .  .  .  .  .  .\n\
-      .     .     .     .     .      \n\
-.  .  .  .  .  .  .  .  .  .  .  .  .\n\
-      .     .     .     .     .      \n\
-.  .  .  .  .  .  .  .  .  .  .  .  .\n\
-      .     .     .     .     .      \n\
-.  .  .  .  .  .  .  .  .  .  .  .  .\n\
-      .     .     .     .     .      \n\
-.  .  .  .  .  .  .  .  .  .  .  .  .\n\
-      .     .     .     .     .      \n\
-      .     .     .     .     .      \n"
-};
+int MapInformation::isOcupied(int i, int j)
+{ return (matrix[i][j] < 0) ? 1 : 0; }
+
+int MapInformation::hasUpConnection(int i, int j)
+{ return (matrix[i][j] & 1) >> 0; }
+
+int MapInformation::hasRightConnection(int i, int j)
+{ return (matrix[i][j] & 2) >> 1; }
+
+int MapInformation::hasDownConnection(int i, int j)
+{ return (matrix[i][j] & 4) >> 2; }
+
+int MapInformation::hasLeftConnection(int i, int j)
+{ return (matrix[i][j] & 8) >> 3; }
 
 bool MapInformation::updateMap(pioneer_control::MapInformationUpdateMap::Request& req,
 		pioneer_control::MapInformationUpdateMap::Response& res)
@@ -162,6 +183,11 @@ void MapInformation::printMap()
 bool MapInformation::getMap(pioneer_control::MapInformationGetMap::Request& req,
 		pioneer_control::MapInformationGetMap::Response& res)
 {
+	//TODO: Better map passing.
+	//	UInt8MultiArray of 3 dimensions
+	//	[0] = height
+	//	[1] = width
+	//	[2] = informations about node: connections and if is occupied
 	res.map.layout.dim.push_back(std_msgs::MultiArrayDimension());
 	res.map.layout.data_offset = 0;
 	res.map.layout.dim[0].label = "height";
@@ -171,14 +197,29 @@ bool MapInformation::getMap(pioneer_control::MapInformationGetMap::Request& req,
 	res.map.layout.dim[1].label = "width";
 	res.map.layout.dim[1].size = width;
 	res.map.layout.dim[1].stride = 1;
+	//U: Up conection;
+	//R: Right conection;
+	//D: Down conection;
+	//L: Left conection;
+	//O: Ocupied;
+	//res.map.layout.dim[2].label = "node config, U R D L O";
+	//res.map.layout.dim[2].size = 5;
+	//res.map.layout.dim[2].stride = 1;
 	for(int i = 0; i < height; i++)
 	{
 		for(int j = 0; j < width; j++)
 		{
+			//res.map.data.push_back(hasUpConnection(i, j));
+			//res.map.data.push_back(hasRightConnection(i, j));
+			//res.map.data.push_back(hasDownConnection(i, j));
+			//res.map.data.push_back(hasLeftConnection(i, j));
+			//res.map.data.push_back(isOcupied(i, j));
 			res.map.data.push_back(matrix[i][j]);
 		}
 
 	}
+	ROS_INFO("Map passed successfully!");
+	return true;
 }
 
 MapInformation::MapInformation(ros::NodeHandle n)
