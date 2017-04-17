@@ -1,15 +1,20 @@
 #include "ros/ros.h"
-#include "std_msgs/Int16MultiArray.h"
-#include "std_msgs/Int32MultiArray.h"
 #include "pioneer_control/image_processing.h"
-#include "nav_msgs/Odometry.h"
+
+//Services
+#include "pioneer_control/GetLocalization.h"
+#include "pioneer_control/LocalizationInit.h"
 #include "pioneer_control/MapInformationGetMap.h"
-#include "geometry_msgs/Pose2D.h"
-#include "pioneer_control/Vec2.h"
+
+//Msgs
+#include "nav_msgs/Odometry.h"
+#include "std_msgs/Int16MultiArray.h"
 #include "pioneer_control/Vec2i32.h"
 #include "pioneer_control/PoseGrid.h"
-#include "pioneer_control/LocalizationInit.h"
 
+//Utils
+#include "pioneer_control/Vec2.h"
+#define PI 3.14159265358979323846
 #define LOCALIZATION_TOPIC "localization"
 
 class Localization
@@ -21,25 +26,30 @@ class Localization
 		ros::Subscriber processedImageSub;
 		ros::Subscriber odometrySub;
 
+		ros::ServiceClient getMapClient;
+		pioneer_control::MapInformationGetMap getMapService;
+		void getMap();
+
 		ros::Publisher localizationPub;
 		pioneer_control::PoseGrid localizationPubMsg;
 
-		ros::ServiceServer localizationInitService;
-		ros::ServiceClient getMapClient;
-		pioneer_control::MapInformationGetMap getMapService;
+		ros::ServiceServer localizationInitServer;
 		bool initService(pioneer_control::LocalizationInit::Request& req,
 				pioneer_control::LocalizationInit::Response& res);
 
+		ros::ServiceServer getLocalizationServer;
+		bool getLocalization(pioneer_control::GetLocalization::Request& req,
+				pioneer_control::GetLocalization::Response& res);
+
 		Vec2i static const dirs[4];
+		int currentDirection;
 		Vec2i currentPosition;
 
 		void publishCurrentDirection();
 		bool validatePosition(Vec2i pos);
-		bool validateDirection(Vec2i dir);
-		int currentDirection;
+		int indexOfDirection(Vec2i dir);
 		int** map;
 		int mapWidth, mapHeight;
-		void getMap();
 		void handleProcessedImage(const std_msgs::Int16MultiArrayConstPtr& processed);
 		void handleOdometry(const nav_msgs::OdometryConstPtr& odom);
 		bool isCrossing, isFollowing, isInit;
@@ -94,7 +104,8 @@ Localization::Localization(ros::NodeHandle n)
 	odometrySub = node.subscribe<nav_msgs::Odometry>("diff_drive/odom", 1,  &Localization::handleOdometry, this);
 	getMapClient = node.serviceClient<pioneer_control::MapInformationGetMap>("/get_map");
 
-	localizationInitService = node.advertiseService("localization/init", &Localization::initService, this);
+	localizationInitServer = node.advertiseService("localization/init", &Localization::initService, this);
+	getLocalizationServer = node.advertiseService("get_localization", &Localization::getLocalization, this);
 	localizationPub = node.advertise<pioneer_control::PoseGrid>(LOCALIZATION_TOPIC, 1); 
 	currentPosition = Vec2i(1, 1);
 	currentDirection = 3;
@@ -120,11 +131,11 @@ Localization::Localization(ros::NodeHandle n)
 
 void Localization::publishCurrentDirection()
 {
+	printf("New Localization: (%d, %d);(%d, %d)\n", currentPosition.x, currentPosition.y, dirs[currentDirection].x, dirs[currentDirection].y);
 	localizationPubMsg.pos.x = currentPosition.x;
 	localizationPubMsg.pos.y = currentPosition.y;
 	localizationPubMsg.dir.x = dirs[currentDirection].x;
 	localizationPubMsg.dir.y = dirs[currentDirection].y;
-	printf("pos: (%d, %d) dir[%d](%d, %d)\n", currentPosition.x, currentPosition.y, currentDirection, dirs[currentDirection].x, dirs[currentDirection].y);
 	//print_map(pos.x, pos.y);
 	localizationPub.publish(localizationPubMsg);
 }
@@ -137,29 +148,36 @@ bool Localization::validatePosition(Vec2i pos)
 	return true;
 }
 
-bool Localization::validateDirection(Vec2i dir)
+int Localization::indexOfDirection(Vec2i dir)
 {
 	for(int i = 0; i < 4; i++)
-		if(dir == dirs[i]) return true;
-	return false;
+		if(dir == dirs[i]) return i;
+	return -1;
 }
-
 bool Localization::initService(pioneer_control::LocalizationInit::Request& req,
 				pioneer_control::LocalizationInit::Response& res)
 {
 	res.status = true;
 	getMap();
 
-	if(!validatePosition(Vec2i(req.pos.pos.x, req.pos.pos.y)))
+	if(validatePosition(Vec2i(req.pos.pos.x, req.pos.pos.y)))
 	{
-		ROS_INFO("Position (%d, %d) received is invalid! Position must be in the map (< (%d, %d))", req.pos.pos.x, req.pos.pos.y, mapWidth, mapHeight);
+		currentPosition = Vec2i(req.pos.pos.x, req.pos.pos.y);
+	} else {
+		ROS_INFO("Position (%d, %d) received is invalid!"
+			"Position must be in the map (< (%d, %d))",
+		       	req.pos.pos.x, req.pos.pos.y, mapWidth, mapHeight);
 		res.status = false;
 	}
-
-	if(!validateDirection(Vec2i(req.pos.dir.x, req.pos.dir.y)))
+	
+	currentDirection = indexOfDirection(Vec2i(req.pos.dir.x, req.pos.dir.y));
+	if(currentDirection == -1)
 	{
-		ROS_INFO("Direction (%d, %d) is invalid! Direction must be (0,1), (0,-1), (1,0) or (-1,0)", req.pos.dir.x, req.pos.dir.y);
+		ROS_INFO("Direction (%d, %d) is invalid!"
+			"Direction must be (0, 1), (0,-1), (1, 0) or (-1, 0)",
+			req.pos.dir.x, req.pos.dir.y);
 		res.status = false;
+	} else {
 	}
 
 	if(res.status)
@@ -169,6 +187,25 @@ bool Localization::initService(pioneer_control::LocalizationInit::Request& req,
 	}
 	return false;
 
+}
+
+bool Localization::getLocalization(pioneer_control::GetLocalization::Request& req,
+				pioneer_control::GetLocalization::Response& res)
+{
+	if(currentPosition == Vec2i(-1, -1) || currentDirection == -1)
+	{
+		res.pose.pos.x = -1;
+		res.pose.pos.y = -1;
+		res.pose.dir.x = -2;
+		res.pose.dir.y = -2;
+		return false;
+	}
+
+	res.pose.pos.x = currentPosition.x;
+	res.pose.pos.y = currentPosition.y;
+	res.pose.dir.x = dirs[currentDirection].x;
+	res.pose.dir.y = dirs[currentDirection].y;
+	return true;
 }
 
 void Localization::getMap()
@@ -202,32 +239,50 @@ void Localization::getMap()
 
 void Localization::handleOdometry(const nav_msgs::OdometryConstPtr& odom)
 {
+	geometry_msgs::Twist twist = odom->twist.twist;
+	double dt = (ros::Time::now() - prevTime).toSec();
+
+	if(!isFollowing)
+	{
+		angularTotal += twist.angular.z*dt;
+		if(angularTotal >= PI/2)
+		{
+			angularTotal -= PI/2;
+			currentDirection = (4 + currentDirection+1)%4;
+			printf("Localization: turned left\n");
+		}
+		else if(angularTotal <= -PI/2)
+		{
+			angularTotal += PI/2;
+			currentDirection = (4 + currentDirection-1)%4;
+			printf("Localization: turned right\n");
+		}
+	}
+
 	if(!isCrossing)
 	{
 		prevTime = ros::Time::now();
 		return;
 	}
 
-	geometry_msgs::Twist twist = odom->twist.twist;
-	double dt = (ros::Time::now() - prevTime).toSec();
 	linearTotal += twist.linear.x*dt;
 	angularTotal += twist.angular.z*dt;
 
 	if (linearTotal >= 0.3)
 	{
 		printf("angularTotal = %lf\n", angularTotal);
-		if(angularTotal > 3.1415/2.1 || angularTotal < -3.1415/2.1)
+		if(angularTotal > PI/1.1 || angularTotal < -PI/1.1)
 		{
 			printf("Localization: turned around\n");
-			currentDirection =  (4 + currentDirection+2)%4;
+			currentDirection = (4 + currentDirection+2)%4;
 		}
-		else if(angularTotal > 3.1415/4)
+		else if(angularTotal > PI/3)
 		{
 			printf("Localization: turned left\n");
-			currentDirection =  (4 + currentDirection+1)%4;
+			currentDirection = (4 + currentDirection+1)%4;
 
 		}
-		else if(angularTotal < -3.1415/4)
+		else if(angularTotal < -PI/3)
 		{
 			currentDirection = (4 + currentDirection-1)%4;
 			printf("Localization: turned right\n");

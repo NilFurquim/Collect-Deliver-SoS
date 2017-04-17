@@ -65,12 +65,16 @@ class Navigation
 		double identifyCrossingThreshold, stopTurningThreshold;
 		std::deque<Action> actions;
 		std::deque<Action> executedActions;
+		std::deque<Vec2i> path;
+		bool isPathValid;
 
 		ros::Subscriber localizationSub;
 		pioneer_control::LocalizationInit localizationInitService;
 		ros::ServiceClient localizationInitClient;
 		bool waitLocalization;
 		void handleLocalizationChange(const pioneer_control::PoseGrid localization);
+
+		void handlePositionChange(const pioneer_control::PoseGrid foreignLocalization);
 		
 		Action convertToAction(Vec2i prev, Vec2i next);
 		void startNavigation();
@@ -110,6 +114,7 @@ Navigation::Action Navigation::nextPathAction()
 		return Action_stop;
 	}
 
+	path.pop_front();
 	Action front = actions.front();
 	executedActions.push_back(front);
 	actions.pop_front();
@@ -180,7 +185,7 @@ void Navigation::handleProcessedImage(const std_msgs::Int16MultiArrayConstPtr& p
 	//crossing reached
 	if(total_sum >= identifyCrossingThreshold*(height*width) && isCrossing == false)
 	{
-		printf("next action\n");
+		printf("Next action: ");
 		action = nextPathAction();
 		isCrossing = true;
 		switch (action) {
@@ -307,6 +312,7 @@ void Navigation::driveToAction(const pioneer_control::NavigationDriveToGoalConst
 
 	typedef std::vector<pioneer_control::Vec2i32> vectorVec2i32msg;
 	vectorVec2i32msg nodePath = definePathService.response.path;
+	isPathValid = true;
 	
 	if(nodePath.size() == 0)
 	{
@@ -328,13 +334,20 @@ void Navigation::driveToAction(const pioneer_control::NavigationDriveToGoalConst
 		return;
 	}
 
+	
+	printf("Path:\n");
+	path.clear();
+	for(vectorVec2i32msg::iterator it = nodePath.begin(); it < nodePath.end(); it++)
+	{
+		path.push_back(Vec2i((*it).x, (*it).y));
+		printf("(%d, %d)\n", (*it).x, (*it).y);
+	}
+
 	//convert path to directions
 	std::vector<Vec2i> directions;
-	for(vectorVec2i32msg::iterator it = nodePath.begin()+1; it < nodePath.end(); it++)
+	for(std::deque<Vec2i>::iterator it = path.begin()+1; it < path.end(); it++)
 	{
-		directions.push_back(Vec2i((*(it)).x, (*(it)).y) -
-					Vec2i((*(it-1)).x, (*(it-1)).y)); 
-		//printf("(%d, %d) ", directions.back().x, directions.back().y);
+		directions.push_back((*it) - *(it-1));
 	}
 	
 	actions.clear();
@@ -362,6 +375,7 @@ void Navigation::driveToAction(const pioneer_control::NavigationDriveToGoalConst
 	startNavigation();
 	pioneer_control::PoseGridConstPtr waitLocal;
 	waitLocal = ros::topic::waitForMessage<pioneer_control::PoseGrid>(LOCALIZATION_TOPIC, node);
+	checkPath();
 
 	navDriveToFeedback.progress = executedActions.size()*1.0/actionsTotal;
 	navDriveToServer.publishFeedback(navDriveToFeedback);
@@ -370,11 +384,12 @@ void Navigation::driveToAction(const pioneer_control::NavigationDriveToGoalConst
 	{
 		//wait for localization 
 		//waitForLocalizationChange();
+		waitLocal = ros::topic::waitForMessage<pioneer_control::PoseGrid>(LOCALIZATION_TOPIC, node);
 		if(!checkPath())
 		{
-			//wrong way - cancel executePath and set not succeded
+			ROS_INFO("Wrong waaay!");
+			//recalculate path or set failure and caller
 		}
-		waitLocal = ros::topic::waitForMessage<pioneer_control::PoseGrid>(LOCALIZATION_TOPIC, node);
 		navDriveToFeedback.progress = executedActions.size()*1.0/actionsTotal;
 		navDriveToServer.publishFeedback(navDriveToFeedback);
 	}
@@ -407,10 +422,36 @@ void Navigation::handleLocalizationChange(const pioneer_control::PoseGrid locali
 	currentDirection.y = localization.dir.y;
 }
 
+void Navigation::handlePositionChange(const pioneer_control::PoseGrid foreignLocalization)
+{
+	//Check if new location affects path
+	for(std::deque<Vec2i>::iterator it = path.begin(); it < path.end(); it++)
+	{
+		if((*it).x == foreignLocalization.pos.x &&
+				(*it).y == foreignLocalization.pos.y)
+		{
+			ROS_INFO("Path invalidated!");
+			isPathValid = false;
+			return;
+		}
+
+	}
+	isPathValid = true;
+}
+
 bool Navigation::checkPath()
 {
+	//printf("current localziation (%d, %d)", currentLocalization.x, currentLocalization.y);
+	//printf("Path front (%d, %d)\n", path.front().x, path.front().y);
 	//if actions.size() < distance(local, goal) return false;
 	//if local is not in path return false;
+	if(currentLocalization != path.front())
+	{
+		ROS_INFO("Current is no actual path!");
+		return false;
+	}
+	if(!isPathValid)
+		return false;
 	return true;
 }
 
@@ -490,6 +531,7 @@ Navigation::Navigation(ros::NodeHandle n, Vec2i pos, Vec2i dir) :
 	isCrossing = false;
 	isNavigationOn = false;
 	waitLocalization = false;
+	isPathValid = true;
 
 	navExecutePathServer.start();
 	navDriveToServer.start();
@@ -501,8 +543,15 @@ int main(int argc, char** argv)
 {
 	ros::init(argc, argv, "navigation");
 	ros::NodeHandle node;
+	if(argc != 5)
+	{
+		printf("Navigation: requires 4 arguments.\n"
+			"gridPos.x gridPos.y dir.x dir.y\n");
+	}
 	
-	Navigation navigation(node, Vec2i(1, 1), Vec2i(0, 1));
+	Vec2i pos = Vec2i(atoi(argv[1]), atoi(argv[2]));
+	Vec2i dir = Vec2i(atoi(argv[3]), atoi(argv[4]));
+	Navigation navigation(node, pos, dir);
 	ros::spin();
 	return 0;
 }

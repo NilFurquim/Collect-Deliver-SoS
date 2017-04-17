@@ -1,77 +1,74 @@
 #include "ros/ros.h"
-#include "pioneer_control/NavigationExecutePathAction.h"
-#include "pioneer_control/NavigationDriveToAction.h"
-#include "actionlib/client/simple_action_client.h"
-#include "actionlib/client/terminal_state.h"
 
-typedef actionlib::SimpleActionClient<pioneer_control::NavigationExecutePathAction> NavigationExecutePathClient;
+#include "actionlib/server/simple_action_server.h"
+#include "pioneer_control/ControlGoPickUpProductAction.h"
+#include "pioneer_control/ControlGoDeliverProductAction.h"
+
+#include "actionlib/client/terminal_state.h"
+#include "actionlib/client/simple_action_client.h"
+//#include "pioneer_control/NavigationExecutePathAction.h"
+#include "pioneer_control/NavigationDriveToAction.h"
+
+
+//typedef actionlib::SimpleActionClient<pioneer_control::NavigationExecutePathAction> NavigationExecutePathClient;
 typedef actionlib::SimpleActionClient<pioneer_control::NavigationDriveToAction> NavigationDriveToClient;
 
+typedef actionlib::SimpleActionServer<pioneer_control::ControlGoPickUpProductAction> ControlGoPickUpProduct;
+typedef actionlib::SimpleActionServer<pioneer_control::ControlGoDeliverProductAction> ControlGoDeliverProduct;
 class Control
 {
 	public:
 		Control(ros::NodeHandle node);
 	private:
+		NavigationDriveToClient driveToClient;
+		pioneer_control::NavigationDriveToGoal driveToGoal;
+		pioneer_control::Vec2i32 msg;
+
+		ControlGoPickUpProduct goPickUpProductServer;
+		pioneer_control::ControlGoPickUpProductFeedback goPickUpProductFeedback;
+		pioneer_control::ControlGoPickUpProductResult goPickUpProductResult;
+		void goPickUpProductAction(const pioneer_control::ControlGoPickUpProductGoalConstPtr& goal);
+
+		ControlGoDeliverProduct goDeliverProductServer;
+		pioneer_control::ControlGoDeliverProductFeedback goDeliverProductFeedback;
+		pioneer_control::ControlGoDeliverProductResult goDeliverProductResult;
+		void goDeliverProductAction(const pioneer_control::ControlGoDeliverProductGoalConstPtr& goal);
 };
 
 Control::Control(ros::NodeHandle node)
+		: goPickUpProductServer(node, "pick_up_product", boost::bind(&Control::goPickUpProductAction, this, _1), false),
+		goDeliverProductServer(node, "deliver_product", boost::bind(&Control::goDeliverProductAction, this, _1), false),
+		 driveToClient("drive_to", true)
 {
-	//goPickUpProductService = node.advertise;
 }
 
-void executePath()
+void Control::goPickUpProductAction(const pioneer_control::ControlGoPickUpProductGoalConstPtr& goal)
 {
-	NavigationExecutePathClient navExecutePathClient("execute_path", true);
-	ROS_INFO("Waiting for server...");
-	navExecutePathClient.waitForServer();
-	pioneer_control::NavigationExecutePathGoal goal;
-	pioneer_control::Vec2i32 msg;
-	msg.x = 0; msg.y = 1; 
-	goal.directions.push_back(msg);
-	msg.x = 0; msg.y = 1; 
-	goal.directions.push_back(msg);
-	msg.x = 1; msg.y = 0; 
-	goal.directions.push_back(msg);
-	msg.x = 0; msg.y = -1; 
-	goal.directions.push_back(msg);
-	msg.x = 1; msg.y = 0; 
-	goal.directions.push_back(msg);
-	msg.x = 0; msg.y = 1; 
-	goal.directions.push_back(msg);
-	msg.x = 0; msg.y = 1; 
-	goal.directions.push_back(msg);
-	msg.x = -1; msg.y = 0; 
-	goal.directions.push_back(msg);
-	ROS_INFO("Sending goal...");
-	navExecutePathClient.sendGoal(goal);
-	ROS_INFO("Waiting for Result...");
-	navExecutePathClient.waitForResult();
-	ROS_INFO("DONE!");
+	driveToGoal.pos = goal->pAPos;
+	driveToClient.sendGoal(driveToGoal);
+	//TODO: subscribe and pass on feedback/2
+	driveToClient.waitForResult();
+
+	//TODO: action pick up product
+	//TODO: subscribe and pass on 1/2 + feedback/2
 }
 
-void driveTo(int x, int y)
+void Control::goDeliverProductAction(const pioneer_control::ControlGoDeliverProductGoalConstPtr& goal)
 {
-	NavigationDriveToClient navDriveToClient("drive_to", true);
-	ROS_INFO("Waiting for server...");
-	navDriveToClient.waitForServer();
-	pioneer_control::NavigationDriveToGoal goal;
-	pioneer_control::Vec2i32 msg;
-	msg.x = x; msg.y = y; 
-	goal.pos = msg;
-	ROS_INFO("Sending goal...");
-	navDriveToClient.sendGoal(goal);
-	ROS_INFO("Waiting for Result...");
-	navDriveToClient.waitForResult();
-	ROS_INFO("DONE!");
+	driveToGoal.pos = goal->pAPos;
+	driveToClient.sendGoal(driveToGoal);
+	//TODO: subscribe and pass on feedback/2
+	driveToClient.waitForResult();
+
+	//TODO: action release product
+	//TODO: subscribe and pass on 1/2 + feedback/2
 }
 
 int main(int argc, char** argv)
 {
 	ros::init(argc, argv, "control");
 	ros::NodeHandle node;
-	driveTo(1, 5);
-	driveTo(1, 1);
-	driveTo(0, 2);
+	Control control(node);
 	
 	ros::spin();
 	return 0;

@@ -1,18 +1,19 @@
 #include "ros/ros.h"
+//Services
+#include "pioneer_control/MapInformationGetMap.h"
+#include "pioneer_control/MapInformationGetProductAreas.h"
+#include "pioneer_control/MapInformationUpdateMap.h"
+
+//Msgs
+#include "pioneer_control/PoseGrid.h"
+#include "pioneer_control/PAInformation.h"
 #include "std_msgs/UInt8MultiArray.h"
 #include "std_msgs/Int32MultiArray.h"
-#include "pioneer_control/map.h"
-#include "pioneer_control/MapInformationUpdateMap.h"
-#include "pioneer_control/MapInformationGetMap.h"
+
+//Utils
 #include "pioneer_control/Vec2.h"
-
-
-//updateMap()
-//	update robot position
-//getMap()
-//	map
-//subscribe()
-//	tell positions updated
+#include <map>
+#include <string>
 
 #define MAP_INFORMATION_GET_MAP_SERV "/get_map"
 #define MAP_INFORMATION_UPDATE_MAP_SERV "/update_map"
@@ -24,8 +25,8 @@ class MapInformation
 		MapInformation(ros::NodeHandle node);
 	private:
 		ros::NodeHandle node;
-		ros::ServiceServer updateMapService;
-		ros::ServiceServer getMapService;
+
+		pioneer_control::PoseGrid posChangeMsg;
 		ros::Publisher posChangePub;
 		class RobotPosition {
 			public:
@@ -38,14 +39,22 @@ class MapInformation
 		static int const width = 7;
 		static int const height = 7;
 		
-		//static int const width = 13;
-		//static int const height = 13;
+		static const std::map<std::string, Vec2i> pAreaPos;
+		static std::map<std::string, Vec2i> initMap();
 		static int matrix[height][width];
 
+		ros::ServiceServer updateMapService;
 		bool updateMap(pioneer_control::MapInformationUpdateMap::Request& req,
 				pioneer_control::MapInformationUpdateMap::Response& res);
+
+		ros::ServiceServer getMapService;
 		bool getMap(pioneer_control::MapInformationGetMap::Request& req,
 				pioneer_control::MapInformationGetMap::Response& res);
+
+		ros::ServiceServer getProductAreasService;
+		bool getProductAreas(pioneer_control::MapInformationGetProductAreas::Request& req,
+				pioneer_control::MapInformationGetProductAreas::Response& res);
+
 		int isOcupied(int i, int j);
 		int hasUpConnection(int i, int j);
 		int hasRightConnection(int i, int j);
@@ -56,22 +65,6 @@ class MapInformation
 MapInformation::RobotPosition::RobotPosition(unsigned id, unsigned x, unsigned y)
 	: id(id), pos(x, y) {}
 
-//int MapInformation::matrix[height][width] = {
-//		{-1, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, -1}, 
-//		{-1, -1,  3, -1,  3, -1,  3, -1,  3, -1,  3, -1, -1}, 
-//		{ 0,  3,  0,  3,  0,  3,  0,  3,  0,  3,  0,  3,  0}, 
-//		{-1, -1,  3, -1,  3, -1,  3, -1,  3, -1,  3, -1, -1}, 
-//		{ 0,  3,  0,  3,  0,  3,  0,  3,  0,  3,  0,  3,  0}, 
-//		{-1, -1,  3, -1,  3, -1,  3, -1,  3, -1,  3, -1, -1}, 
-//		{ 0,  3,  0,  3,  0,  3,  0,  3,  0,  3,  0,  3,  0}, 
-//		{-1, -1,  3, -1,  3, -1,  3, -1,  3, -1,  3, -1, -1}, 
-//		{ 0,  3,  0,  3,  0,  3,  0,  3,  0,  3,  0,  3,  0}, 
-//		{-1, -1,  3, -1,  3, -1,  3, -1,  3, -1,  3, -1, -1}, 
-//		{ 0,  3,  0,  3,  0,  3,  0,  3,  0,  3,  0,  3,  0}, 
-//		{-1, -1,  3, -1,  3, -1,  3, -1,  3, -1,  3, -1, -1}, 
-//		{-1, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, -1}
-//	};
-
 int MapInformation::matrix[height][width] = {
 	{0,  4,  4,  4,  4,  4,  0},
 	{2, 15, 15, 15, 15, 15,  8}, 
@@ -81,25 +74,40 @@ int MapInformation::matrix[height][width] = {
 	{2, 15, 15, 15, 15, 15,  8}, 
 	{0,  1,  1,  1,  1,  1,  0} 
 };
+
+const std::map<std::string, Vec2i>MapInformation::pAreaPos = MapInformation::initMap();
+
+std::map<std::string, Vec2i> MapInformation::initMap()
+{
+	std::map<std::string, Vec2i> pAreaPos;
+	pAreaPos["A0"] = Vec2i(1,0);
+	pAreaPos["A1"] = Vec2i(2,0);
+	pAreaPos["A2"] = Vec2i(3,0);
+	pAreaPos["A3"] = Vec2i(4,0);
+	pAreaPos["A4"] = Vec2i(5,0);
+
+	pAreaPos["B0"] = Vec2i(6,1);
+	pAreaPos["B1"] = Vec2i(6,2);
+	pAreaPos["B2"] = Vec2i(6,3);
+	pAreaPos["B3"] = Vec2i(6,4);
+	pAreaPos["B4"] = Vec2i(6,5);
+
+	pAreaPos["C0"] = Vec2i(1,6);
+	pAreaPos["C1"] = Vec2i(2,6);
+	pAreaPos["C2"] = Vec2i(3,6);
+	pAreaPos["C3"] = Vec2i(4,6);
+	pAreaPos["C4"] = Vec2i(5,6);
+
+	pAreaPos["D0"] = Vec2i(0,1);
+	pAreaPos["D1"] = Vec2i(0,2);
+	pAreaPos["D2"] = Vec2i(0,3);
+	pAreaPos["D3"] = Vec2i(0,4);
+	pAreaPos["D4"] = Vec2i(0,5);
+}
 ////1////
 //8 O 2//
 ////4////
 //..RULD
-//char const mapString[2*13*2*13+13+2*13+1] = {
-//"      .     .     .     .     .      \n\
-//      .     .     .     .     .      \n\
-//.  .  .  .  .  .  .  .  .  .  .  .  .\n\
-//      .     .     .     .     .      \n\
-//.  .  .  .  .  .  .  .  .  .  .  .  .\n\
-//      .     .     .     .     .      \n\
-//.  .  .  .  .  .  .  .  .  .  .  .  .\n\
-//      .     .     .     .     .      \n\
-//.  .  .  .  .  .  .  .  .  .  .  .  .\n\
-//      .     .     .     .     .      \n\
-//.  .  .  .  .  .  .  .  .  .  .  .  .\n\
-//      .     .     .     .     .      \n\
-//      .     .     .     .     .      \n"
-//};
 
 int MapInformation::isOcupied(int i, int j)
 { return (matrix[i][j] < 0) ? 1 : 0; }
@@ -143,6 +151,9 @@ bool MapInformation::updateMap(pioneer_control::MapInformationUpdateMap::Request
 			robotPositions[i].pos.x = req.x;
 			robotPositions[i].pos.y = req.y;
 			matrix[req.y][req.x] = -_ABS(matrix[req.y][req.x]);
+			posChangeMsg.pos.x = req.x;
+			posChangeMsg.pos.y = req.y;
+			posChangePub.publish(posChangeMsg);
 			robotFound = true;
 		}
 	}
@@ -165,6 +176,9 @@ bool MapInformation::updateMap(pioneer_control::MapInformationUpdateMap::Request
 	{
 		robotPositions.push_back(RobotPosition(req.robotId, req.x, req.y));
 		matrix[req.y][req.x] = -_ABS(matrix[req.y][req.x]);
+		posChangeMsg.pos.x = req.x;
+		posChangeMsg.pos.y = req.y;
+		posChangePub.publish(posChangeMsg);
 		res.status = 0;
 		return true;
 	}
@@ -222,12 +236,30 @@ bool MapInformation::getMap(pioneer_control::MapInformationGetMap::Request& req,
 	return true;
 }
 
+bool MapInformation::getProductAreas(pioneer_control::MapInformationGetProductAreas::Request& req,
+				pioneer_control::MapInformationGetProductAreas::Response& res)
+{
+	pioneer_control::PAInformation pAInfo;
+	for(std::map<std::string, Vec2i>::const_iterator it = pAreaPos.begin(); it != pAreaPos.end(); it++)
+	{
+		pAInfo.name = it->first;
+		pAInfo.pos.x = it->second.x;
+		pAInfo.pos.y = it->second.y;
+		res.pAs.push_back(pAInfo);
+	}
+
+	return true;
+}
+
 MapInformation::MapInformation(ros::NodeHandle n)
 {
 	node = n;
 	updateMapService = node.advertiseService(MAP_INFORMATION_UPDATE_MAP_SERV, &MapInformation::updateMap, this);
 	getMapService = node.advertiseService(MAP_INFORMATION_GET_MAP_SERV, &MapInformation::getMap, this);
-	//posChangePub = node.advertise(MAP_INFORMATION_POS_CHANGE_TOPIC); 
+	getProductAreasService = node.advertiseService("/get_pas", &MapInformation::getProductAreas, this);
+	initMap();
+
+	posChangePub = node.advertise<pioneer_control::PoseGrid>(MAP_INFORMATION_POS_CHANGE_TOPIC, 10); 
 	
 }
 int main(int argc, char **argv)

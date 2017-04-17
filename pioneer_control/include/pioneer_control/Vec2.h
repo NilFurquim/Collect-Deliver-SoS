@@ -40,13 +40,13 @@ class Vec2
 		bool operator<=(const Vec2& v)
 		{ return (x <= v.x && y <= v.y); }
 
-		bool operator<(const Vec2& v)
+		bool operator<(const Vec2& v) const
 		{ return (x < v.x && y < v.y); }
 
 		bool operator>=(const Vec2& v)
 		{ return (x >= v.x && y >= v.y); }
 
-		bool operator>(const Vec2& v)
+		bool operator>(const Vec2& v) const
 		{ return (x > v.x && y > v.y); }
 
 		bool operator==(const Vec2& v) const

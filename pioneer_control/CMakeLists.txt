@@ -21,6 +21,9 @@ add_message_files(
    Vec2i32.msg
    Vec2i8.msg
    PoseGrid.msg
+   TransportRequest.msg
+   ChooseClosestMsg.msg
+   PAInformation.msg
 )
 
  add_service_files(
@@ -29,9 +32,11 @@ add_message_files(
    ForkliftLower.srv
    ForkliftMoveTo.srv
    MapInformationGetMap.srv
+   MapInformationGetProductAreas.srv
    MapInformationUpdateMap.srv
    PathPlanningDefinePath.srv
    PathPlanningCalculateDistance.srv
+   GetLocalization.srv
    LocalizationInit.srv
  )
 ## Generate actions in the 'action' folder
@@ -39,6 +44,8 @@ add_action_files(
    FILES
    NavigationDriveTo.action
    NavigationExecutePath.action
+   ControlGoPickUpProduct.action
+   ControlGoDeliverProduct.action
 )
 
 generate_messages(
@@ -68,9 +75,11 @@ add_exec_dep_and_link(navigation)
 add_exec_dep_and_link(forklift_actuator)
 add_exec_dep_and_link(image_processing)
 add_exec_dep_and_link(localization)
-add_exec_dep_and_link(control)
 add_exec_dep_and_link(map_information)
 add_exec_dep_and_link(path_planning)
+add_exec_dep_and_link(control)
+add_exec_dep_and_link(robotic_agent)
+add_exec_dep_and_link(application)
 
 install(DIRECTORY config
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
