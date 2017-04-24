@@ -1,0 +1,25 @@
+pioneer1:
+  px: 1
+  py: 0
+  dx: 0
+  dy: 1
+pioneer2:
+  px: 2
+  py: 0
+  dx: 0
+  dy: 1
+pioneer3:
+  px: 3
+  py: 0
+  dx: 0
+  dy: 1
+pioneer4:
+  px: 4
+  py: 0
+  dx: 0
+  dy: 1
+pioneer5:
+  px: 5
+  py: 0
+  dx: 0
+  dy: 1

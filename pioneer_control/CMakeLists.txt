@@ -24,6 +24,7 @@ add_message_files(
    TransportRequest.msg
    ChooseClosestMsg.msg
    PAInformation.msg
+   UpdateMapMsg.msg
 )
 
  add_service_files(

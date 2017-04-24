@@ -1,19 +1,29 @@
 #include "ros/ros.h"
-#include "std_msgs/Int16MultiArray.h"
-#include "geometry_msgs/Twist.h"
+
 #include "pioneer_control/image_processing.h"
-#include "pioneer_control/NavigationDriveToAction.h"
-#include "pioneer_control/NavigationExecutePathAction.h"
-#include "actionlib/server/simple_action_server.h"
-#include "actionlib/client/terminal_state.h"
-#include "pioneer_control/DriveActuatorAPI.h"
-#include "geometry_msgs/Pose2D.h"
-#include "std_msgs/Int32.h"
-#include <deque>
-#include "pioneer_control/Vec2.h"
-#include "pioneer_control/PoseGrid.h"
+
+//Services
 #include "pioneer_control/PathPlanningDefinePath.h"
 #include "pioneer_control/LocalizationInit.h"
+#include "pioneer_control/MapInformationUpdateMap.h"
+
+//Actions
+#include "actionlib/server/simple_action_server.h"
+#include "pioneer_control/NavigationDriveToAction.h"
+typedef actionlib::SimpleActionServer<pioneer_control::NavigationDriveToAction> NavigationDriveToServer;
+#include "pioneer_control/NavigationExecutePathAction.h"
+typedef actionlib::SimpleActionServer<pioneer_control::NavigationExecutePathAction> NavigationExecutePathServer;
+
+//Msgs
+#include "std_msgs/Int16MultiArray.h"
+#include "pioneer_control/PoseGrid.h"
+#include "pioneer_control/UpdateMapMsg.h"
+
+//Utils
+#include "pioneer_control/DriveActuatorAPI.h"
+#include "pioneer_control/Vec2.h"
+#include <deque>
+typedef std::vector<pioneer_control::Vec2i32> vectorVec2i32msg;
 
 #define LOCALIZATION_TOPIC "localization"
 
@@ -43,30 +53,36 @@
 //MapInformation:
 //PathPlanning:
 
-typedef actionlib::SimpleActionServer<pioneer_control::NavigationDriveToAction> NavigationDriveToServer;
-typedef actionlib::SimpleActionServer<pioneer_control::NavigationExecutePathAction> NavigationExecutePathServer;
 
 class Navigation
 {
 	public:
-		Navigation(ros::NodeHandle n, Vec2i pos, Vec2i dir);
+		Navigation(ros::NodeHandle n, int id, Vec2i pos, Vec2i dir);
 	private:
-		enum Action {Action_stop, Action_turn_around, Action_turn_around2, Action_turn_right, Action_turn_left, Action_go_straight, Action_follow_line};
-		static const Vec2i dirs[4];
 		ros::NodeHandle node;
 		DriveActuatorAPI driveApi;
+		int id;
 
+		enum Action {Action_leave_crossing, Action_wait, Action_stop, Action_turn_around, Action_turn_around2, Action_turn_around3, Action_turn_right, Action_turn_left, Action_go_straight, Action_follow_line};
 		Action action;
+
 		Vec2i currentLocalization;
 		Vec2i currentDirection;
 
-		ros::Subscriber processedImageSub;
 		bool isNavigationOn, isCrossing;
 		double identifyCrossingThreshold, stopTurningThreshold;
 		std::deque<Action> actions;
 		std::deque<Action> executedActions;
+		std::deque<Vec2i> directions;
 		std::deque<Vec2i> path;
-		bool isPathValid;
+		bool isPathValid, isNodeValid;
+		bool isPositionValid;
+		Action convertToAction(Vec2i prev, Vec2i next);
+		void startNavigation();
+		void stopNavigation();
+		void testExecutePath();
+		bool checkPath();
+		bool nextPathAction();
 
 		ros::Subscriber localizationSub;
 		pioneer_control::LocalizationInit localizationInitService;
@@ -74,23 +90,21 @@ class Navigation
 		bool waitLocalization;
 		void handleLocalizationChange(const pioneer_control::PoseGrid localization);
 
-		void handlePositionChange(const pioneer_control::PoseGrid foreignLocalization);
+		ros::ServiceClient updateMapClient;
+		pioneer_control::MapInformationUpdateMap updateMapService;
+
+		ros::Subscriber positionChangeSub;
+		void handlePositionChange(const pioneer_control::UpdateMapMsg foreignLocalization);
 		
-		Action convertToAction(Vec2i prev, Vec2i next);
-		void startNavigation();
-		void stopNavigation();
-		void testExecutePath();
-		bool checkPath();
+		ros::Subscriber processedImageSub;
 		void handleProcessedImage(const std_msgs::Int16MultiArrayConstPtr& processed);
-		bool hasLineOnTheSides(const std_msgs::Int16MultiArrayConstPtr& processed, int height, int width);
-		Action nextPathAction();
 
 		ros::ServiceClient definePathClient;
 		pioneer_control::PathPlanningDefinePath definePathService;
 
 		//Vec2i msg2Vec2i(pioneer_control::Vec2i32 v);
 
-		void driveToAction(const pioneer_control::NavigationDriveToGoalConstPtr& goal);
+		bool driveToAction(const pioneer_control::NavigationDriveToGoalConstPtr& goal);
 		NavigationExecutePathServer navExecutePathServer;
 		pioneer_control::NavigationExecutePathFeedback navExecutePathFeedback;
 		pioneer_control::NavigationExecutePathResult navExecutePathResult;
@@ -106,19 +120,18 @@ class Navigation
 //	return Vec2i(v.x, v.y);
 //}
 
-Navigation::Action Navigation::nextPathAction()
+bool Navigation::nextPathAction()
 {
 	if(actions.empty())
 	{
 		ROS_INFO("actions empty.");
-		return Action_stop;
+		return false;
 	}
 
-	path.pop_front();
-	Action front = actions.front();
-	executedActions.push_back(front);
+	action = actions.front();
 	actions.pop_front();
-	return front;
+	executedActions.push_back(action);
+	return true;
 }
 
 Navigation::Action Navigation::convertToAction(Vec2i prev, Vec2i next)
@@ -152,7 +165,7 @@ double cubicInterpolation(double min, double t, double max)
 {return (1 - t*t*t) * min + t*t*t * max;}
 
 void Navigation::startNavigation()
-{ isNavigationOn = true; action = Action_follow_line;}
+{ isNavigationOn = true; action = Action_follow_line; }
 void Navigation::stopNavigation()
 { driveApi.setDrive(0, 0); isNavigationOn = false; }
 
@@ -181,63 +194,46 @@ void Navigation::handleProcessedImage(const std_msgs::Int16MultiArrayConstPtr& p
 	//	driveApi.setDrive(0, 0);
 	//	return;
 	//}
+	if(total_sum >= identifyCrossingThreshold*(height*width))
+		{ isCrossing = true; }
+	else 
+		{ isCrossing = false; }
 
 	//crossing reached
-	if(total_sum >= identifyCrossingThreshold*(height*width) && isCrossing == false)
+	if(action == Action_follow_line && isCrossing)
 	{
-		printf("Next action: ");
-		action = nextPathAction();
-		isCrossing = true;
-		switch (action) {
-		case Action_stop: printf("stop\n"); break;
-		case Action_turn_right: printf("turn_right\n"); break;
-		case Action_turn_left: printf("turn_left\n"); break;
-		case Action_go_straight: printf("go_straight\n"); break;
-		case Action_follow_line: printf("follow_line\n"); break;
-		case Action_turn_around: printf("turn_around\n"); break;
-		case Action_turn_around2: printf("turn_around_2\n"); break;
-		default: printf("default\n"); break;
-		}
+		action = Action_wait;
+		//switch (action) {
+		//case Action_stop: printf("stop\n"); break;
+		//case Action_turn_right: printf("turn_right\n"); break;
+		//case Action_turn_left: printf("turn_left\n"); break;
+		//case Action_go_straight: printf("go_straight\n"); break;
+		//case Action_follow_line: printf("follow_line\n"); break;
+		//case Action_turn_around: printf("turn_around\n"); break;
+		//case Action_turn_around2: printf("turn_around_2\n"); break;
+		//default: printf("default\n"); break;
+		//}
 	}
 
 	switch (action) {
 	case Action_stop:
-		if(total_sum >= identifyCrossingThreshold*(height*width))
-		{
-			printf("is in crossing!\n");
-		}
+		//printf("Action_stop\n");
 		driveApi.setDrive(0, 0);
-		isCrossing = false;
+		action = Action_wait;
 		break;
 	case Action_turn_right:
+		//printf("Action_turn_right\n");
 		driveApi.setDrive(0.055, 0.4);
-		if(total_sum <= 28) {
-			action = Action_follow_line;
-			isCrossing = false;
-		}
+		action = Action_leave_crossing;
 		break;
 	case Action_turn_left:
+		//printf("Action_turn_left\n");
 		driveApi.setDrive(0.055, -0.4);
-		if(total_sum <= 28) {
-			action = Action_follow_line;
-			isCrossing = false;
-			printf("change\n");
-		}
+		action = Action_leave_crossing;
 		break;
-		actions.size();
-
 	case Action_go_straight:
+		//printf("Action_go_straight\n");
 	case Action_follow_line:
-		//printf("firstLineAvg = %f\n", firstLineAvg);
-		//printf("lastLineAvg = %f\n", lastLineAvg);
-
-
-		/*
-		printf("avg=%f\n",avg);
-		printf("total_sum=%d\n",total_sum);
-		printf("norm=%f\n",normalized_avg);
-		*/
-
 		lastLineSum = firstLineSum = 0;
 		lastLineAvg = firstLineAvg = 0;
 		for(int i = 0; i < width; i++)
@@ -264,154 +260,214 @@ void Navigation::handleProcessedImage(const std_msgs::Int16MultiArrayConstPtr& p
 		linearRegulator = 1 - ABS(angularRegulator);
 		driveApi.setDrive(quadraticInterpolation(0.04,	linearRegulator, 0.35),
 				  quadraticInterpolation(0.00, angularRegulator, 1.7));
-		if(total_sum <= 28) {
+		if(action == Action_go_straight && total_sum <= 28) {
 			action = Action_follow_line;
-			isCrossing = false;
 		}
 		break;
 	case Action_turn_around:
+		//printf("Action_turn_around\n");
 		driveApi.setDrive(0, 0.5);
-		if(total_sum <= 10)
-		{
-			action = Action_turn_around2;
-			isCrossing = true;
-		}
+		action = Action_turn_around2;
 		break;
 	case Action_turn_around2:
-		driveApi.setDrive(0, 0.5);
+		if(total_sum <= 10)
+		{
+			action = Action_turn_around3;
+		}
+		break;
+	case Action_turn_around3:
 		if(total_sum >= 28)
 		{
 			action = Action_follow_line;
-			isCrossing = false;
 		}
+		break;
+	case Action_leave_crossing:
+		if(total_sum <= 20) {
+			action = Action_follow_line;
+		}
+		break;
+	case Action_wait:
 		break;
 	default:
 		driveApi.setDrive(0, 0);
-		isCrossing = false;
 		break;
 	}
 }
 
-void Navigation::driveToAction(const pioneer_control::NavigationDriveToGoalConstPtr& goalmsg)
+bool Navigation::driveToAction(const pioneer_control::NavigationDriveToGoalConstPtr& goalmsg)
 {
+	bool isDriveToDone = false;
 	//ROS_INFO("\nLOCAL (%d, %d)", local.x, local.y);
-	definePathService.request.origin.x = currentLocalization.x;
-	definePathService.request.origin.y = currentLocalization.y;
-	Vec2i goal(goalmsg->pos.x,goalmsg->pos.y);
-
-	definePathService.request.goal = goalmsg->pos;
-	if(!definePathClient.call(definePathService))
-	{
-		ROS_INFO("Not Able to get path from path planning service");
-		navDriveToFeedback.progress = 0;
-		navDriveToServer.publishFeedback(navDriveToFeedback);
-		navDriveToResult.status = false;
-		navDriveToServer.setAborted(navDriveToResult);
-		return;
-	}
-
-	typedef std::vector<pioneer_control::Vec2i32> vectorVec2i32msg;
-	vectorVec2i32msg nodePath = definePathService.response.path;
-	isPathValid = true;
 	
-	if(nodePath.size() == 0)
-	{
-		ROS_INFO("No path to goal");
-		navDriveToFeedback.progress = 0;
-		navDriveToServer.publishFeedback(navDriveToFeedback);
-		navDriveToResult.status = false;
-		navDriveToServer.setAborted(navDriveToResult);
-		return;
-	}
+	do {
+		//updateMapService.request.info.id = id*1000 + 1;
+		//updateMapService.request.info.pose.pos.x = currentLocalization.x;
+		//updateMapService.request.info.pose.pos.y = currentLocalization.y;
+		//updateMapService.request.info.pose.dir.x = currentDirection.x;
+		//updateMapService.request.info.pose.dir.y = currentDirection.y;
+		//if(!updateMapClient.call(updateMapService))
+		//{
+		//	ROS_INFO("Couldn't update map for next pos!");
+		//}
+		definePathService.request.origin.x = currentLocalization.x;
+		definePathService.request.origin.y = currentLocalization.y;
+		Vec2i goal(goalmsg->pos.x,goalmsg->pos.y);
 
-	if(nodePath.size() == 1)
-	{
-		ROS_INFO("Origin == Goal");
-		navDriveToFeedback.progress = 1;
-		navDriveToServer.publishFeedback(navDriveToFeedback);
-		navDriveToResult.status = true;
-		navDriveToServer.setSucceeded(navDriveToResult);
-		return;
-	}
-
-	
-	printf("Path:\n");
-	path.clear();
-	for(vectorVec2i32msg::iterator it = nodePath.begin(); it < nodePath.end(); it++)
-	{
-		path.push_back(Vec2i((*it).x, (*it).y));
-		printf("(%d, %d)\n", (*it).x, (*it).y);
-	}
-
-	//convert path to directions
-	std::vector<Vec2i> directions;
-	for(std::deque<Vec2i>::iterator it = path.begin()+1; it < path.end(); it++)
-	{
-		directions.push_back((*it) - *(it-1));
-	}
-	
-	actions.clear();
-	executedActions.clear();
-	//convert directions to actions
-	ROS_INFO("\n" 
-		"current direction (%d, %d)\n"
-		"next direction (%d, %d)", 
-		currentDirection.x, currentDirection.y, 
-		directions[0].x, directions[0].y);
-
-	actions.push_back(convertToAction(currentDirection, directions[0]));
-
-	for(int i = 1; i < directions.size(); i++)
-	{
-		actions.push_back(convertToAction(directions[i-1], directions[i]));
-	}
-	actions.push_back(Action_stop);
-
-	navDriveToFeedback.progress = 0.0;
-	navDriveToServer.publishFeedback(navDriveToFeedback);
-
-	int actionsTotal = actions.size();
-
-	startNavigation();
-	pioneer_control::PoseGridConstPtr waitLocal;
-	waitLocal = ros::topic::waitForMessage<pioneer_control::PoseGrid>(LOCALIZATION_TOPIC, node);
-	checkPath();
-
-	navDriveToFeedback.progress = executedActions.size()*1.0/actionsTotal;
-	navDriveToServer.publishFeedback(navDriveToFeedback);
-
-	while(currentLocalization != goal)
-	{
-		//wait for localization 
-		//waitForLocalizationChange();
-		waitLocal = ros::topic::waitForMessage<pioneer_control::PoseGrid>(LOCALIZATION_TOPIC, node);
-		if(!checkPath())
+		definePathService.request.goal = goalmsg->pos;
+		if(!definePathClient.call(definePathService))
 		{
-			ROS_INFO("Wrong waaay!");
-			//recalculate path or set failure and caller
+			ROS_INFO("Not Able to get path from path planning service");
+			stopNavigation();
+			navDriveToFeedback.progress = 0;
+			navDriveToServer.publishFeedback(navDriveToFeedback);
+			navDriveToResult.status = false;
+			navDriveToServer.setAborted(navDriveToResult);
+			//ros::Duration(n).sleep() //Trying again!
+			//continue;
+			return false;
 		}
+
+		vectorVec2i32msg nodePath = definePathService.response.path;
+		isPathValid = true;
+		
+		if(nodePath.size() == 0)
+		{
+			ROS_INFO("No path to goal, aborting...");
+			stopNavigation();
+			navDriveToFeedback.progress = 0;
+			navDriveToServer.publishFeedback(navDriveToFeedback);
+			navDriveToResult.status = false;
+			navDriveToServer.setAborted(navDriveToResult);
+			//ros::Duration(n).sleep() //Trying again!
+			//continue;
+			return false;
+		}
+
+		if(nodePath.size() == 1)
+		{
+			//Maybe it won't turn around...
+			ROS_INFO("Origin == Goal, success!");
+			stopNavigation();
+			navDriveToFeedback.progress = 1;
+			navDriveToServer.publishFeedback(navDriveToFeedback);
+			navDriveToResult.status = true;
+			navDriveToServer.setSucceeded(navDriveToResult);
+			isDriveToDone = true;
+			return true;
+		}
+
+		
+		//printf("Path:\n");
+		path.clear();
+		for(vectorVec2i32msg::iterator it = nodePath.begin(); it < nodePath.end(); it++)
+		{
+			path.push_back(Vec2i((*it).x, (*it).y));
+		//	printf("\t(%d, %d)\n", (*it).x, (*it).y);
+		}
+
+		//convert path to directions
+		directions.clear();
+		for(std::deque<Vec2i>::iterator it = path.begin()+1; it < path.end(); it++)
+		{
+			directions.push_back((*it) - *(it-1));
+		}
+		
+		actions.clear();
+		executedActions.clear();
+		//convert directions to actions
+		//ROS_INFO("\n" 
+		//	"(%d, %d) -> (%d, %d)", 
+		//	currentDirection.x, currentDirection.y, 
+		//	directions[0].x, directions[0].y);
+
+		actions.push_back(convertToAction(currentDirection, directions[0]));
+
+		for(int i = 1; i < directions.size(); i++)
+		{
+			actions.push_back(convertToAction(directions[i-1], directions[i]));
+		}
+
+		navDriveToFeedback.progress = 0.0;
+		navDriveToServer.publishFeedback(navDriveToFeedback);
+
+		int actionsTotal = actions.size();
+		startNavigation();
+		while(action != Action_wait);
+		nextPathAction();
+
+		ros::Duration waitTime(10);
+		pioneer_control::PoseGridConstPtr waitLocal;
 		navDriveToFeedback.progress = executedActions.size()*1.0/actionsTotal;
 		navDriveToServer.publishFeedback(navDriveToFeedback);
-	}
+		//while(true) {
+			//if(!checkPath())
+			//{
+			//	isDriveToDone = false;
+			//	if(!isNodeValid)
+			//	{
+			//		while(!isNodeValid);
+			//		action = Action_follow_line;
+			//	}
+			//	while(action != Action_wait);
+			//	break;
+			//}
+			path.pop_front();
+			directions.pop_front();
 
-	if(actions.size() == 1 && actions[0] == Action_stop)
-	{
-		ROS_INFO("Almost done, waiting to get to node.");
-		while(!actions.empty());
-		navDriveToFeedback.progress = 1;
-		navDriveToServer.publishFeedback(navDriveToFeedback);
-		navDriveToResult.status = true;
-		navDriveToServer.setSucceeded(navDriveToResult);
-		stopNavigation();
-		ROS_INFO("DriveTo succeeded.!");
-		return;
-	}
+			//updateMapService.request.info.id = id*1000 + 1;
+			//if(!path.empty())
+			//{
+			//	updateMapService.request.info.pose.pos.x = path.front().x;
+			//	updateMapService.request.info.pose.pos.y = path.front().y;
+			//	updateMapService.request.info.pose.dir.x = directions.front().x;
+			//	updateMapService.request.info.pose.dir.y = directions.front().y;
+			//}
+			//if(!updateMapClient.call(updateMapService))
+			//{
+			//	ROS_INFO("Couldn't update map for next pos!");
+			//}
+
+			if(currentLocalization == goal)
+			{
+				isDriveToDone = true;
+				while(action != Action_wait);
+				break;
+			}
+
+			do {
+				waitLocal = ros::topic::waitForMessage<pioneer_control::PoseGrid>(LOCALIZATION_TOPIC, waitTime);
+				//TODO: Check how many times while ran
+			} while(waitLocal == NULL);
+			if(!isPositionValid)
+			{
+				ROS_INFO("%d: Position invalid. Stop.", id);
+				stopNavigation();
+				while(true);
+			}
+
+			while(action != Action_wait);
+			nextPathAction();
+
+			navDriveToFeedback.progress = executedActions.size()*1.0/actionsTotal;
+			navDriveToServer.publishFeedback(navDriveToFeedback);
+		//}
+		
+	} while(!isDriveToDone);
+
+	ROS_INFO("Almost done, waiting to get to node.");
+	stopNavigation();
+	navDriveToFeedback.progress = 1;
+	navDriveToServer.publishFeedback(navDriveToFeedback);
+	navDriveToResult.status = true;
+	navDriveToServer.setSucceeded(navDriveToResult);
+	ROS_INFO("DriveTo succeeded.!");
+	return true;
 
 	navDriveToResult.status = false;
 	navDriveToServer.setAborted(navDriveToResult);
 	stopNavigation();
 	ROS_INFO("DriveTo aborted.");
-
+	return false;
 }
 
 void Navigation::handleLocalizationChange(const pioneer_control::PoseGrid localization)
@@ -420,15 +476,50 @@ void Navigation::handleLocalizationChange(const pioneer_control::PoseGrid locali
 	currentLocalization.y = localization.pos.y;
 	currentDirection.x = localization.dir.x;
 	currentDirection.y = localization.dir.y;
+	updateMapService.request.info.id = id*1000;
+	updateMapService.request.info.pose.pos.x = localization.pos.x;
+	updateMapService.request.info.pose.pos.y = localization.pos.y;
+	updateMapService.request.info.pose.dir.x = localization.dir.x;
+	updateMapService.request.info.pose.dir.y = localization.dir.y;
+	if(!updateMapClient.call(updateMapService))
+	{
+		ROS_INFO("Couldn't update map!");
+		if(updateMapService.response.status == false)
+		{
+			ROS_INFO("Current robot's position is invalid!");
+			isPositionValid = false;
+		}
+	}
+	else
+	{
+	}
 }
 
-void Navigation::handlePositionChange(const pioneer_control::PoseGrid foreignLocalization)
+void Navigation::handlePositionChange(const pioneer_control::UpdateMapMsg foreignLocalization)
 {
 	//Check if new location affects path
-	for(std::deque<Vec2i>::iterator it = path.begin(); it < path.end(); it++)
+	int foreignId = foreignLocalization.id/1000;
+	if(foreignId == id) return;
+	isPathValid = true;
+	isNodeValid = true;
+
+	if(path[0].x == foreignLocalization.pose.pos.x && path[0].y == foreignLocalization.pose.pos.y)
 	{
-		if((*it).x == foreignLocalization.pos.x &&
-				(*it).y == foreignLocalization.pos.y)
+		if(foreignId < id)
+		{
+			isNodeValid = false;
+			isPathValid = false;
+			action = Action_stop;
+			return;
+		}
+	}
+
+	for(int i = 1; i < 3; i++)
+	{
+		//If location is in path and is not the same direction then path is invalid
+		if(path[i].x == foreignLocalization.pose.pos.x && path[i].y == foreignLocalization.pose.pos.y
+		   // && !(directions[i].x == foreignLocalization.dir.x && directions[i].y == foreignLocalization.dir.y))
+			)
 		{
 			ROS_INFO("Path invalidated!");
 			isPathValid = false;
@@ -441,17 +532,19 @@ void Navigation::handlePositionChange(const pioneer_control::PoseGrid foreignLoc
 
 bool Navigation::checkPath()
 {
-	//printf("current localziation (%d, %d)", currentLocalization.x, currentLocalization.y);
-	//printf("Path front (%d, %d)\n", path.front().x, path.front().y);
 	//if actions.size() < distance(local, goal) return false;
 	//if local is not in path return false;
 	if(currentLocalization != path.front())
 	{
-		ROS_INFO("Current is no actual path!");
+		ROS_INFO("%d: Current is not actual path!\nIs (%d, %d) but expected (%d, %d).", id, currentLocalization.x, currentLocalization.y, path.front().x, path.front().y);
 		return false;
 	}
 	if(!isPathValid)
+	{
+		ROS_INFO("Some robot in the way!");
 		return false;
+	}
+
 	return true;
 }
 
@@ -465,16 +558,19 @@ void Navigation::executePathAction(const pioneer_control::NavigationExecutePathG
 		navExecutePathServer.setSucceeded(navExecutePathResult);
 		return;
 	}
-	actions.clear();
-	actions.push_back(convertToAction(
-				currentDirection, 
-				Vec2i(goal->directions[0].x, goal->directions[0].y)));
 
-	for(int i = 1; i < goal->directions.size(); i++)
+	directions.clear();
+	for(vectorVec2i32msg::const_iterator it = goal->directions.begin(); it != goal->directions.end(); it++)
 	{
-		actions.push_back(convertToAction(
-					Vec2i(goal->directions[i-1].x,goal->directions[i-1].y),
-					Vec2i(goal->directions[i].x, goal->directions[i].y)));
+		directions.push_back(Vec2i(it->x, it->y));
+
+	}
+	actions.clear();
+	actions.push_back(convertToAction(currentDirection, directions[0]));
+
+	for(std::deque<Vec2i>::iterator it = directions.begin()+1; it != directions.end(); it++)
+	{
+		actions.push_back(convertToAction(*(it-1), *it));
 	}
 	actions.push_back(Action_stop);
 
@@ -501,25 +597,32 @@ void Navigation::executePathAction(const pioneer_control::NavigationExecutePathG
 
 }
 
-Navigation::Navigation(ros::NodeHandle n, Vec2i pos, Vec2i dir) : 
+Navigation::Navigation(ros::NodeHandle n, int id, Vec2i pos, Vec2i dir) : 
 	navDriveToServer(node, "drive_to", boost::bind(&Navigation::driveToAction, this, _1), false),
 	navExecutePathServer(node, "execute_path", boost::bind(&Navigation::executePathAction, this, _1), false),
-	driveApi(n)
+	driveApi(n), id(id), node(n)
 {
-	node = n;
 	localizationInitClient = node.serviceClient<pioneer_control::LocalizationInit>("localization/init");
 	localizationInitService.request.pos.pos.x = pos.x;
 	localizationInitService.request.pos.pos.y = pos.y;
 	localizationInitService.request.pos.dir.x = dir.x;
 	localizationInitService.request.pos.dir.y = dir.y;
-	if(!localizationInitClient.call(localizationInitService) || !localizationInitService.response.status)
+	if(!localizationInitClient.call(localizationInitService))
 	{
-		ROS_INFO("Couldn't init localization, shutting down...");
+		ROS_INFO("Couldn't call localizationInit, shutting down...");
+		ros::shutdown();
+	}
+	else if(!localizationInitService.response.status)
+	{
+		
+		ROS_INFO("Position not valid, shutting down...");
 		ros::shutdown();
 	}
 	processedImageSub = node.subscribe<std_msgs::Int16MultiArray>(IMAGE_PROCESSED_TOPIC, 1,  &Navigation::handleProcessedImage, this);
 	localizationSub = node.subscribe<pioneer_control::PoseGrid>(LOCALIZATION_TOPIC, 10, &Navigation::handleLocalizationChange, this);
+	positionChangeSub = node.subscribe<pioneer_control::UpdateMapMsg>("/pos_change", 5, &Navigation::handlePositionChange, this);
 	definePathClient = node.serviceClient<pioneer_control::PathPlanningDefinePath>("define_path");
+	updateMapClient = node.serviceClient<pioneer_control::MapInformationUpdateMap>("/update_map");
 
 	//percentage covered in black
 	identifyCrossingThreshold = 0.6;
@@ -532,26 +635,29 @@ Navigation::Navigation(ros::NodeHandle n, Vec2i pos, Vec2i dir) :
 	isNavigationOn = false;
 	waitLocalization = false;
 	isPathValid = true;
+	isNodeValid = true;
+	isPositionValid = true;
 
 	navExecutePathServer.start();
 	navDriveToServer.start();
 	ROS_INFO("Servers started!");
-	//testExecutePath();
 }
 
 int main(int argc, char** argv)
 {
 	ros::init(argc, argv, "navigation");
 	ros::NodeHandle node;
-	if(argc != 5)
+	if(argc != 6)
 	{
 		printf("Navigation: requires 4 arguments.\n"
-			"gridPos.x gridPos.y dir.x dir.y\n");
+			"id gridPos.x gridPos.y dir.x dir.y\n");
 	}
 	
-	Vec2i pos = Vec2i(atoi(argv[1]), atoi(argv[2]));
-	Vec2i dir = Vec2i(atoi(argv[3]), atoi(argv[4]));
-	Navigation navigation(node, pos, dir);
+	int id = atoi(argv[1]);
+	Vec2i pos = Vec2i(atoi(argv[2]), atoi(argv[3]));
+	Vec2i dir = Vec2i(atoi(argv[4]), atoi(argv[5]));
+	printf("PASSED PARAMS: %d %d %d %d %d", id, pos.x, pos.y, dir.x, dir.y);
+	Navigation navigation(node, id, pos, dir);
 	ros::spin();
 	return 0;
 }

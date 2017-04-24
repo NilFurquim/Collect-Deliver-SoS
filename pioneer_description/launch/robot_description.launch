@@ -7,4 +7,5 @@
 	 command="$(find xacro)/xacro.py '$(find pioneer_description)/urdf/pioneer3dx_multi.xacro' robot_name:=pioneer1" />--> 
   <rosparam file="$(find pioneer_description)/launch/pioneer_poses.yaml" command="load"/>
   <!--  <rosparam file="$(find pioneer_control)/config/pioneer_control.yaml" command="load"/>-->
+  <rosparam file="$(find pioneer_control)/launch/grid_poses.yaml" command="load"/>
 </launch>

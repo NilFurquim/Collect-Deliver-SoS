@@ -90,7 +90,7 @@ class AStar
 	private:
 		int** map;
 		int mapHeight, mapWidth;
-		bool detectCollision(Vec2i pos);
+		bool detectBorders(Vec2i pos);
 		bool hasConnection(Vec2i pos, int dirIndex);
 		NodeList closed;
 		NodeList open;
@@ -129,29 +129,29 @@ int AStar::distance(Vec2i origin, Vec2i goal)
 //	}
 }
 
-bool AStar::detectCollision(Vec2i pos)
+bool AStar::detectBorders(Vec2i pos)
 {
 	if(pos.x < 0 || pos.y < 0)
 		return true;
 	if(pos.x > mapWidth-1 || pos.y > mapHeight-1)
-		return true;
-	if(map[pos.y][pos.x] < 0)
 		return true;
 	return false;
 }
 
 bool AStar::hasConnection(Vec2i pos, int dirIndex)
 {
+	int value = map[pos.y][pos.x];
+	value = (value>0)?value:-value;
 	switch(dirIndex)
 	{
 		case UP:
-			return (map[pos.y][pos.x] & 1) >> 0; 
+			return (value & 1) >> 0; 
 		case RIGHT:
-			return (map[pos.y][pos.x] & 2) >> 1; 
+			return (value & 2) >> 1; 
 		case DOWN:
-			return (map[pos.y][pos.x] & 4) >> 2; 
+			return (value & 4) >> 2; 
 		case LEFT:
-			return (map[pos.y][pos.x] & 8) >> 3; 
+			return (value & 8) >> 3; 
 	}
 }
 
@@ -217,16 +217,16 @@ std::vector<Vec2i> AStar::findPath(Vec2i origin, Vec2i goal)
 		current_m(current->pos);
 		if (current->pos == goal)
 		{
-			printf("RESULT FOUND\n");
+			//printf("RESULT FOUND\n");
 			response.clear();
 			while (current != NULL)
 			{
 				response.push_back(current->pos);
 				path_m(current->pos);
-				printf("\t(%d, %d)\n", current->pos.x, current->pos.y);
+				//printf("\t(%d, %d)\n", current->pos.x, current->pos.y);
 				current = current->parent;
 			}
-			printf("DONE!\n");
+			//printf("DONE!\n");
 
 			std::reverse(response.begin(), response.end());
 
@@ -245,7 +245,7 @@ std::vector<Vec2i> AStar::findPath(Vec2i origin, Vec2i goal)
 
 			Vec2i nextPos = current->pos + dirs[i];
 			//printf("(%d, %d)", nextPos.x, nextPos.y);
-			if(detectCollision(nextPos))
+			if(detectBorders(nextPos))
 			{ 
 				//printf(" collision\n"); 
 				continue;
@@ -257,9 +257,11 @@ std::vector<Vec2i> AStar::findPath(Vec2i origin, Vec2i goal)
 				continue;
 			}
 
-			//finge que não viu essa atrocidade
-			//corrigirei se tiver tempo
 			int this_g = current->g + 1;
+			if(this_g <= 3 && map[nextPos.y][nextPos.x] < 0)
+			{
+				continue;
+			}
 			int this_h = distance(nextPos, goal);
 			Node *node = open.findNodeWithPos(nextPos);
 			if(node == NULL)

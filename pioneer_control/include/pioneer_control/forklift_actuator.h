@@ -11,7 +11,7 @@
 #define FORKLIFT_LOWER_SERV "ForkliftLower"
 #define FORKLIFT_LIFT_SERV "ForkliftLift"
 #define FORKLIFT_MOVETO_SERV "ForkliftMoveTo"
-#define FORKLIFT_MIN_HEIGHT (-0.1)
+#define FORKLIFT_MIN_HEIGHT (-0.115)
 #define FORKLIFT_MAX_HEIGHT (0.19)
 #define FORKLIFT_ERROR_MIN (-1)
 #define FORKLIFT_ERROR_MAX (-2)

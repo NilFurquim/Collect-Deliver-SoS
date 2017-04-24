@@ -6,7 +6,7 @@
   <collision name='tape_x_0_collision'>
     <geometry>
       <box>
-        <size>15.00 0.05 0.001</size>
+        <size>18.50 0.05 0.001</size>
       </box>
     </geometry>
     <pose>0 0 0.0005 0 -0 0</pose>
@@ -15,7 +15,7 @@
     <pose>0 0 0.0005 0 -0 0</pose>
     <geometry>
       <box>
-        <size>15.00 0.05 0.001</size>
+        <size>18.50 0.05 0.001</size>
       </box>
     </geometry>
     <material>
@@ -35,7 +35,7 @@
   <collision name='tape_x_1_collision'>
     <geometry>
       <box>
-        <size>15.00 0.05 0.001</size>
+        <size>18.50 0.05 0.001</size>
       </box>
     </geometry>
     <pose>0 0 0.0005 0 -0 0</pose>
@@ -44,7 +44,7 @@
     <pose>0 0 0.0005 0 -0 0</pose>
     <geometry>
       <box>
-        <size>15.00 0.05 0.001</size>
+        <size>18.50 0.05 0.001</size>
       </box>
     </geometry>
     <material>
@@ -64,7 +64,7 @@
   <collision name='tape_x_2_collision'>
     <geometry>
       <box>
-        <size>15.00 0.05 0.001</size>
+        <size>18.50 0.05 0.001</size>
       </box>
     </geometry>
     <pose>0 0 0.0005 0 -0 0</pose>
@@ -73,7 +73,7 @@
     <pose>0 0 0.0005 0 -0 0</pose>
     <geometry>
       <box>
-        <size>15.00 0.05 0.001</size>
+        <size>18.50 0.05 0.001</size>
       </box>
     </geometry>
     <material>
@@ -93,7 +93,7 @@
   <collision name='tape_x_3_collision'>
     <geometry>
       <box>
-        <size>15.00 0.05 0.001</size>
+        <size>18.50 0.05 0.001</size>
       </box>
     </geometry>
     <pose>0 0 0.0005 0 -0 0</pose>
@@ -102,7 +102,7 @@
     <pose>0 0 0.0005 0 -0 0</pose>
     <geometry>
       <box>
-        <size>15.00 0.05 0.001</size>
+        <size>18.50 0.05 0.001</size>
       </box>
     </geometry>
     <material>
@@ -122,7 +122,7 @@
   <collision name='tape_x_4_collision'>
     <geometry>
       <box>
-        <size>15.00 0.05 0.001</size>
+        <size>18.50 0.05 0.001</size>
       </box>
     </geometry>
     <pose>0 0 0.0005 0 -0 0</pose>
@@ -131,7 +131,7 @@
     <pose>0 0 0.0005 0 -0 0</pose>
     <geometry>
       <box>
-        <size>15.00 0.05 0.001</size>
+        <size>18.50 0.05 0.001</size>
       </box>
     </geometry>
     <material>
@@ -151,7 +151,7 @@
   <collision name='tape_x_5_collision'>
     <geometry>
       <box>
-        <size>0.05 0.30 0.001</size>
+        <size>0.05 0.50 0.001</size>
       </box>
     </geometry>
     <pose>0 0 0.0005 0 -0 0</pose>
@@ -160,7 +160,7 @@
     <pose>0 0 0.0005 0 -0 0</pose>
     <geometry>
       <box>
-        <size>0.05 0.30 0.001</size>
+        <size>0.05 0.50 0.001</size>
       </box>
     </geometry>
     <material>
@@ -174,13 +174,13 @@
     <linear>0</linear>
     <angular>0</angular>
   </velocity_decay>
-  <pose>7.35 6.00 0 0 -0 0</pose>
+  <pose>9.00 6.00 0 0 -0 0</pose>
 </link>
 <link name='tape_x_6'>
   <collision name='tape_x_6_collision'>
     <geometry>
       <box>
-        <size>0.05 0.30 0.001</size>
+        <size>0.05 0.50 0.001</size>
       </box>
     </geometry>
     <pose>0 0 0.0005 0 -0 0</pose>
@@ -189,7 +189,7 @@
     <pose>0 0 0.0005 0 -0 0</pose>
     <geometry>
       <box>
-        <size>0.05 0.30 0.001</size>
+        <size>0.05 0.50 0.001</size>
       </box>
     </geometry>
     <material>
@@ -203,13 +203,13 @@
     <linear>0</linear>
     <angular>0</angular>
   </velocity_decay>
-  <pose>7.35 3.00 0 0 -0 0</pose>
+  <pose>9.00 3.00 0 0 -0 0</pose>
 </link>
 <link name='tape_x_7'>
   <collision name='tape_x_7_collision'>
     <geometry>
       <box>
-        <size>0.05 0.30 0.001</size>
+        <size>0.05 0.50 0.001</size>
       </box>
     </geometry>
     <pose>0 0 0.0005 0 -0 0</pose>
@@ -218,7 +218,7 @@
     <pose>0 0 0.0005 0 -0 0</pose>
     <geometry>
       <box>
-        <size>0.05 0.30 0.001</size>
+        <size>0.05 0.50 0.001</size>
       </box>
     </geometry>
     <material>
@@ -232,13 +232,13 @@
     <linear>0</linear>
     <angular>0</angular>
   </velocity_decay>
-  <pose>7.35 0.00 0 0 -0 0</pose>
+  <pose>9.00 0.00 0 0 -0 0</pose>
 </link>
 <link name='tape_x_8'>
   <collision name='tape_x_8_collision'>
     <geometry>
       <box>
-        <size>0.05 0.30 0.001</size>
+        <size>0.05 0.50 0.001</size>
       </box>
     </geometry>
     <pose>0 0 0.0005 0 -0 0</pose>
@@ -247,7 +247,7 @@
     <pose>0 0 0.0005 0 -0 0</pose>
     <geometry>
       <box>
-        <size>0.05 0.30 0.001</size>
+        <size>0.05 0.50 0.001</size>
       </box>
     </geometry>
     <material>
@@ -261,13 +261,13 @@
     <linear>0</linear>
     <angular>0</angular>
   </velocity_decay>
-  <pose>7.35 -3.00 0 0 -0 0</pose>
+  <pose>9.00 -3.00 0 0 -0 0</pose>
 </link>
 <link name='tape_x_9'>
   <collision name='tape_x_9_collision'>
     <geometry>
       <box>
-        <size>0.05 0.30 0.001</size>
+        <size>0.05 0.50 0.001</size>
       </box>
     </geometry>
     <pose>0 0 0.0005 0 -0 0</pose>
@@ -276,7 +276,7 @@
     <pose>0 0 0.0005 0 -0 0</pose>
     <geometry>
       <box>
-        <size>0.05 0.30 0.001</size>
+        <size>0.05 0.50 0.001</size>
       </box>
     </geometry>
     <material>
@@ -290,13 +290,13 @@
     <linear>0</linear>
     <angular>0</angular>
   </velocity_decay>
-  <pose>7.35 -6.00 0 0 -0 0</pose>
+  <pose>9.00 -6.00 0 0 -0 0</pose>
 </link>
 <link name='tape_x_10'>
   <collision name='tape_x_10_collision'>
     <geometry>
       <box>
-        <size>0.05 0.30 0.001</size>
+        <size>0.05 0.50 0.001</size>
       </box>
     </geometry>
     <pose>0 0 0.0005 0 -0 0</pose>
@@ -305,7 +305,7 @@
     <pose>0 0 0.0005 0 -0 0</pose>
     <geometry>
       <box>
-        <size>0.05 0.30 0.001</size>
+        <size>0.05 0.50 0.001</size>
       </box>
     </geometry>
     <material>
@@ -319,13 +319,13 @@
     <linear>0</linear>
     <angular>0</angular>
   </velocity_decay>
-  <pose>-7.35 6.00 0 0 -0 0</pose>
+  <pose>-9.00 6.00 0 0 -0 0</pose>
 </link>
 <link name='tape_x_11'>
   <collision name='tape_x_11_collision'>
     <geometry>
       <box>
-        <size>0.05 0.30 0.001</size>
+        <size>0.05 0.50 0.001</size>
       </box>
     </geometry>
     <pose>0 0 0.0005 0 -0 0</pose>
@@ -334,7 +334,7 @@
     <pose>0 0 0.0005 0 -0 0</pose>
     <geometry>
       <box>
-        <size>0.05 0.30 0.001</size>
+        <size>0.05 0.50 0.001</size>
       </box>
     </geometry>
     <material>
@@ -348,13 +348,13 @@
     <linear>0</linear>
     <angular>0</angular>
   </velocity_decay>
-  <pose>-7.35 3.00 0 0 -0 0</pose>
+  <pose>-9.00 3.00 0 0 -0 0</pose>
 </link>
 <link name='tape_x_12'>
   <collision name='tape_x_12_collision'>
     <geometry>
       <box>
-        <size>0.05 0.30 0.001</size>
+        <size>0.05 0.50 0.001</size>
       </box>
     </geometry>
     <pose>0 0 0.0005 0 -0 0</pose>
@@ -363,7 +363,7 @@
     <pose>0 0 0.0005 0 -0 0</pose>
     <geometry>
       <box>
-        <size>0.05 0.30 0.001</size>
+        <size>0.05 0.50 0.001</size>
       </box>
     </geometry>
     <material>
@@ -377,13 +377,13 @@
     <linear>0</linear>
     <angular>0</angular>
   </velocity_decay>
-  <pose>-7.35 0.00 0 0 -0 0</pose>
+  <pose>-9.00 0.00 0 0 -0 0</pose>
 </link>
 <link name='tape_x_13'>
   <collision name='tape_x_13_collision'>
     <geometry>
       <box>
-        <size>0.05 0.30 0.001</size>
+        <size>0.05 0.50 0.001</size>
       </box>
     </geometry>
     <pose>0 0 0.0005 0 -0 0</pose>
@@ -392,7 +392,7 @@
     <pose>0 0 0.0005 0 -0 0</pose>
     <geometry>
       <box>
-        <size>0.05 0.30 0.001</size>
+        <size>0.05 0.50 0.001</size>
       </box>
     </geometry>
     <material>
@@ -406,13 +406,13 @@
     <linear>0</linear>
     <angular>0</angular>
   </velocity_decay>
-  <pose>-7.35 -3.00 0 0 -0 0</pose>
+  <pose>-9.00 -3.00 0 0 -0 0</pose>
 </link>
 <link name='tape_x_14'>
   <collision name='tape_x_14_collision'>
     <geometry>
       <box>
-        <size>0.05 0.30 0.001</size>
+        <size>0.05 0.50 0.001</size>
       </box>
     </geometry>
     <pose>0 0 0.0005 0 -0 0</pose>
@@ -421,7 +421,7 @@
     <pose>0 0 0.0005 0 -0 0</pose>
     <geometry>
       <box>
-        <size>0.05 0.30 0.001</size>
+        <size>0.05 0.50 0.001</size>
       </box>
     </geometry>
     <material>
@@ -435,13 +435,13 @@
     <linear>0</linear>
     <angular>0</angular>
   </velocity_decay>
-  <pose>-7.35 -6.00 0 0 -0 0</pose>
+  <pose>-9.00 -6.00 0 0 -0 0</pose>
 </link>
 <link name='tape_x_15'>
   <collision name='tape_x_15_collision'>
     <geometry>
       <box>
-        <size>0.05 15.00 0.001</size>
+        <size>0.05 18.50 0.001</size>
       </box>
     </geometry>
     <pose>0 0 0.0005 0 -0 0</pose>
@@ -450,7 +450,7 @@
     <pose>0 0 0.0005 0 -0 0</pose>
     <geometry>
       <box>
-        <size>0.05 15.00 0.001</size>
+        <size>0.05 18.50 0.001</size>
       </box>
     </geometry>
     <material>
@@ -470,7 +470,7 @@
   <collision name='tape_x_16_collision'>
     <geometry>
       <box>
-        <size>0.05 15.00 0.001</size>
+        <size>0.05 18.50 0.001</size>
       </box>
     </geometry>
     <pose>0 0 0.0005 0 -0 0</pose>
@@ -479,7 +479,7 @@
     <pose>0 0 0.0005 0 -0 0</pose>
     <geometry>
       <box>
-        <size>0.05 15.00 0.001</size>
+        <size>0.05 18.50 0.001</size>
       </box>
     </geometry>
     <material>
@@ -499,7 +499,7 @@
   <collision name='tape_x_17_collision'>
     <geometry>
       <box>
-        <size>0.05 15.00 0.001</size>
+        <size>0.05 18.50 0.001</size>
       </box>
     </geometry>
     <pose>0 0 0.0005 0 -0 0</pose>
@@ -508,7 +508,7 @@
     <pose>0 0 0.0005 0 -0 0</pose>
     <geometry>
       <box>
-        <size>0.05 15.00 0.001</size>
+        <size>0.05 18.50 0.001</size>
       </box>
     </geometry>
     <material>
@@ -528,7 +528,7 @@
   <collision name='tape_x_18_collision'>
     <geometry>
       <box>
-        <size>0.05 15.00 0.001</size>
+        <size>0.05 18.50 0.001</size>
       </box>
     </geometry>
     <pose>0 0 0.0005 0 -0 0</pose>
@@ -537,7 +537,7 @@
     <pose>0 0 0.0005 0 -0 0</pose>
     <geometry>
       <box>
-        <size>0.05 15.00 0.001</size>
+        <size>0.05 18.50 0.001</size>
       </box>
     </geometry>
     <material>
@@ -557,7 +557,7 @@
   <collision name='tape_x_19_collision'>
     <geometry>
       <box>
-        <size>0.05 15.00 0.001</size>
+        <size>0.05 18.50 0.001</size>
       </box>
     </geometry>
     <pose>0 0 0.0005 0 -0 0</pose>
@@ -566,7 +566,7 @@
     <pose>0 0 0.0005 0 -0 0</pose>
     <geometry>
       <box>
-        <size>0.05 15.00 0.001</size>
+        <size>0.05 18.50 0.001</size>
       </box>
     </geometry>
     <material>
@@ -586,7 +586,7 @@
   <collision name='tape_x_20_collision'>
     <geometry>
       <box>
-        <size>0.30 0.05 0.001</size>
+        <size>0.50 0.05 0.001</size>
       </box>
     </geometry>
     <pose>0 0 0.0005 0 -0 0</pose>
@@ -595,7 +595,7 @@
     <pose>0 0 0.0005 0 -0 0</pose>
     <geometry>
       <box>
-        <size>0.30 0.05 0.001</size>
+        <size>0.50 0.05 0.001</size>
       </box>
     </geometry>
     <material>
@@ -609,13 +609,13 @@
     <linear>0</linear>
     <angular>0</angular>
   </velocity_decay>
-  <pose>6.00 7.35 0 0 -0 0</pose>
+  <pose>6.00 9.00 0 0 -0 0</pose>
 </link>
 <link name='tape_x_21'>
   <collision name='tape_x_21_collision'>
     <geometry>
       <box>
-        <size>0.30 0.05 0.001</size>
+        <size>0.50 0.05 0.001</size>
       </box>
     </geometry>
     <pose>0 0 0.0005 0 -0 0</pose>
@@ -624,7 +624,7 @@
     <pose>0 0 0.0005 0 -0 0</pose>
     <geometry>
       <box>
-        <size>0.30 0.05 0.001</size>
+        <size>0.50 0.05 0.001</size>
       </box>
     </geometry>
     <material>
@@ -638,13 +638,13 @@
     <linear>0</linear>
     <angular>0</angular>
   </velocity_decay>
-  <pose>3.00 7.35 0 0 -0 0</pose>
+  <pose>3.00 9.00 0 0 -0 0</pose>
 </link>
 <link name='tape_x_22'>
   <collision name='tape_x_22_collision'>
     <geometry>
       <box>
-        <size>0.30 0.05 0.001</size>
+        <size>0.50 0.05 0.001</size>
       </box>
     </geometry>
     <pose>0 0 0.0005 0 -0 0</pose>
@@ -653,7 +653,7 @@
     <pose>0 0 0.0005 0 -0 0</pose>
     <geometry>
       <box>
-        <size>0.30 0.05 0.001</size>
+        <size>0.50 0.05 0.001</size>
       </box>
     </geometry>
     <material>
@@ -667,13 +667,13 @@
     <linear>0</linear>
     <angular>0</angular>
   </velocity_decay>
-  <pose>0.00 7.35 0 0 -0 0</pose>
+  <pose>0.00 9.00 0 0 -0 0</pose>
 </link>
 <link name='tape_x_23'>
   <collision name='tape_x_23_collision'>
     <geometry>
       <box>
-        <size>0.30 0.05 0.001</size>
+        <size>0.50 0.05 0.001</size>
       </box>
     </geometry>
     <pose>0 0 0.0005 0 -0 0</pose>
@@ -682,7 +682,7 @@
     <pose>0 0 0.0005 0 -0 0</pose>
     <geometry>
       <box>
-        <size>0.30 0.05 0.001</size>
+        <size>0.50 0.05 0.001</size>
       </box>
     </geometry>
     <material>
@@ -696,13 +696,13 @@
     <linear>0</linear>
     <angular>0</angular>
   </velocity_decay>
-  <pose>-3.00 7.35 0 0 -0 0</pose>
+  <pose>-3.00 9.00 0 0 -0 0</pose>
 </link>
 <link name='tape_x_24'>
   <collision name='tape_x_24_collision'>
     <geometry>
       <box>
-        <size>0.30 0.05 0.001</size>
+        <size>0.50 0.05 0.001</size>
       </box>
     </geometry>
     <pose>0 0 0.0005 0 -0 0</pose>
@@ -711,7 +711,7 @@
     <pose>0 0 0.0005 0 -0 0</pose>
     <geometry>
       <box>
-        <size>0.30 0.05 0.001</size>
+        <size>0.50 0.05 0.001</size>
       </box>
     </geometry>
     <material>
@@ -725,13 +725,13 @@
     <linear>0</linear>
     <angular>0</angular>
   </velocity_decay>
-  <pose>-6.00 7.35 0 0 -0 0</pose>
+  <pose>-6.00 9.00 0 0 -0 0</pose>
 </link>
 <link name='tape_x_25'>
   <collision name='tape_x_25_collision'>
     <geometry>
       <box>
-        <size>0.30 0.05 0.001</size>
+        <size>0.50 0.05 0.001</size>
       </box>
     </geometry>
     <pose>0 0 0.0005 0 -0 0</pose>
@@ -740,7 +740,7 @@
     <pose>0 0 0.0005 0 -0 0</pose>
     <geometry>
       <box>
-        <size>0.30 0.05 0.001</size>
+        <size>0.50 0.05 0.001</size>
       </box>
     </geometry>
     <material>
@@ -754,13 +754,13 @@
     <linear>0</linear>
     <angular>0</angular>
   </velocity_decay>
-  <pose>6.00 -7.35 0 0 -0 0</pose>
+  <pose>6.00 -9.00 0 0 -0 0</pose>
 </link>
 <link name='tape_x_26'>
   <collision name='tape_x_26_collision'>
     <geometry>
       <box>
-        <size>0.30 0.05 0.001</size>
+        <size>0.50 0.05 0.001</size>
       </box>
     </geometry>
     <pose>0 0 0.0005 0 -0 0</pose>
@@ -769,7 +769,7 @@
     <pose>0 0 0.0005 0 -0 0</pose>
     <geometry>
       <box>
-        <size>0.30 0.05 0.001</size>
+        <size>0.50 0.05 0.001</size>
       </box>
     </geometry>
     <material>
@@ -783,13 +783,13 @@
     <linear>0</linear>
     <angular>0</angular>
   </velocity_decay>
-  <pose>3.00 -7.35 0 0 -0 0</pose>
+  <pose>3.00 -9.00 0 0 -0 0</pose>
 </link>
 <link name='tape_x_27'>
   <collision name='tape_x_27_collision'>
     <geometry>
       <box>
-        <size>0.30 0.05 0.001</size>
+        <size>0.50 0.05 0.001</size>
       </box>
     </geometry>
     <pose>0 0 0.0005 0 -0 0</pose>
@@ -798,7 +798,7 @@
     <pose>0 0 0.0005 0 -0 0</pose>
     <geometry>
       <box>
-        <size>0.30 0.05 0.001</size>
+        <size>0.50 0.05 0.001</size>
       </box>
     </geometry>
     <material>
@@ -812,13 +812,13 @@
     <linear>0</linear>
     <angular>0</angular>
   </velocity_decay>
-  <pose>0.00 -7.35 0 0 -0 0</pose>
+  <pose>0.00 -9.00 0 0 -0 0</pose>
 </link>
 <link name='tape_x_28'>
   <collision name='tape_x_28_collision'>
     <geometry>
       <box>
-        <size>0.30 0.05 0.001</size>
+        <size>0.50 0.05 0.001</size>
       </box>
     </geometry>
     <pose>0 0 0.0005 0 -0 0</pose>
@@ -827,7 +827,7 @@
     <pose>0 0 0.0005 0 -0 0</pose>
     <geometry>
       <box>
-        <size>0.30 0.05 0.001</size>
+        <size>0.50 0.05 0.001</size>
       </box>
     </geometry>
     <material>
@@ -841,13 +841,13 @@
     <linear>0</linear>
     <angular>0</angular>
   </velocity_decay>
-  <pose>-3.00 -7.35 0 0 -0 0</pose>
+  <pose>-3.00 -9.00 0 0 -0 0</pose>
 </link>
 <link name='tape_x_29'>
   <collision name='tape_x_29_collision'>
     <geometry>
       <box>
-        <size>0.30 0.05 0.001</size>
+        <size>0.50 0.05 0.001</size>
       </box>
     </geometry>
     <pose>0 0 0.0005 0 -0 0</pose>
@@ -856,7 +856,7 @@
     <pose>0 0 0.0005 0 -0 0</pose>
     <geometry>
       <box>
-        <size>0.30 0.05 0.001</size>
+        <size>0.50 0.05 0.001</size>
       </box>
     </geometry>
     <material>
@@ -870,7 +870,7 @@
     <linear>0</linear>
     <angular>0</angular>
   </velocity_decay>
-  <pose>-6.00 -7.35 0 0 -0 0</pose>
+  <pose>-6.00 -9.00 0 0 -0 0</pose>
 </link>
   </model>
 </sdf>

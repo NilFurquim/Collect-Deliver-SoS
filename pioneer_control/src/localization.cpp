@@ -11,6 +11,8 @@
 #include "std_msgs/Int16MultiArray.h"
 #include "pioneer_control/Vec2i32.h"
 #include "pioneer_control/PoseGrid.h"
+#include "geometry_msgs/Point.h"
+#include "geometry_msgs/Quaternion.h"
 
 //Utils
 #include "pioneer_control/Vec2.h"
@@ -25,6 +27,7 @@ class Localization
 		ros::NodeHandle node;
 		ros::Subscriber processedImageSub;
 		ros::Subscriber odometrySub;
+
 
 		ros::ServiceClient getMapClient;
 		pioneer_control::MapInformationGetMap getMapService;
@@ -45,7 +48,7 @@ class Localization
 		int currentDirection;
 		Vec2i currentPosition;
 
-		void publishCurrentDirection();
+		void publishCurrentLocalization();
 		bool validatePosition(Vec2i pos);
 		int indexOfDirection(Vec2i dir);
 		int** map;
@@ -129,9 +132,9 @@ Localization::Localization(ros::NodeHandle n)
 	}\
 	printf("\n")
 
-void Localization::publishCurrentDirection()
+void Localization::publishCurrentLocalization()
 {
-	printf("New Localization: (%d, %d);(%d, %d)\n", currentPosition.x, currentPosition.y, dirs[currentDirection].x, dirs[currentDirection].y);
+	//printf("New Localization: (%d, %d);(%d, %d)\n", currentPosition.x, currentPosition.y, dirs[currentDirection].x, dirs[currentDirection].y);
 	localizationPubMsg.pos.x = currentPosition.x;
 	localizationPubMsg.pos.y = currentPosition.y;
 	localizationPubMsg.dir.x = dirs[currentDirection].x;
@@ -183,6 +186,12 @@ bool Localization::initService(pioneer_control::LocalizationInit::Request& req,
 	if(res.status)
 	{
 		ROS_INFO("Position and direction validated!");
+		localizationPubMsg.pos.x = currentPosition.x;
+		localizationPubMsg.pos.y = currentPosition.y;
+		localizationPubMsg.dir.x = dirs[currentDirection].x;
+		localizationPubMsg.dir.y = dirs[currentDirection].y;
+		//print_map(pos.x, pos.y);
+		localizationPub.publish(localizationPubMsg);
 		return true;
 	}
 	return false;
@@ -239,26 +248,70 @@ void Localization::getMap()
 
 void Localization::handleOdometry(const nav_msgs::OdometryConstPtr& odom)
 {
+	if(!isCrossing) return;
+	Vec2i newPosition;
+	int newDirection;
+
+	geometry_msgs::Point absolutePosition = odom->pose.pose.position;
+	geometry_msgs::Quaternion absoluteOrientation = odom->pose.pose.orientation;
 	geometry_msgs::Twist twist = odom->twist.twist;
-	double dt = (ros::Time::now() - prevTime).toSec();
 
-	if(!isFollowing)
-	{
-		angularTotal += twist.angular.z*dt;
-		if(angularTotal >= PI/2)
-		{
-			angularTotal -= PI/2;
-			currentDirection = (4 + currentDirection+1)%4;
-			printf("Localization: turned left\n");
-		}
-		else if(angularTotal <= -PI/2)
-		{
-			angularTotal += PI/2;
-			currentDirection = (4 + currentDirection-1)%4;
-			printf("Localization: turned right\n");
-		}
+#define ABS(var) ((var>0)?var:-var)
+	float orz = odom->pose.pose.orientation.z;
+	float absOrz = ABS(orz);
+	if(absOrz < 0.35)
+	{ newDirection = 3; }
+	else 
+	if(absOrz > 0.9)
+	{ newDirection = 1; }
+	else {
+		if(orz * odom->pose.pose.orientation.w > 0)
+		{ newDirection = 0; }
+		else
+		{ newDirection = 2; }
 	}
+	newPosition.x = absolutePosition.y/3.0 + (mapWidth - (newDirection+1)%2)/2.0 + (newDirection+1)%2;
+	newPosition.y = absolutePosition.x/3.0 + (mapHeight  - (newDirection)%2)/2.0 + (newDirection)%2;
+	if(newDirection == 1) newPosition.y -= 1;
+	else if(newDirection == 2) newPosition.x -= 1;
+	
+	//if((absolutePosition.x - (int)absolutePosition.x)/3 + 0.85)
+	//{
+	//	gridx = absolutePosition.x/3 + (mapWidth - 1)/2;
+	//	if(newDirection == 2) gridx -= 1;
+	//}
+	//if((absolutePosition.y - (int)absolutePosition.y)/3 + 0.85)
+	//{
+	//	gridy = absolutePosition.y/3 + (mapHeight - 1)/2;
+	//	if(newDirection == 1 gridx -= 1;
+	//}
+	if(newPosition != currentPosition)
+	{
+		//ROS_INFO("(%d, %d);(%d, %d)", newPosition.x, newPosition.y, dirs[newDirection].x, dirs[newDirection].y);
+		currentPosition = newPosition;
+		currentDirection = newDirection;
+		publishCurrentLocalization();
+	}
+	return;
+	//if(!isFollowing)
+	//{
+	//	angularTotal += twist.angular.z*dt;
+	//	if(angularTotal >= PI/2)
+	//	{
+	//		angularTotal -= PI/2;
+	//		currentDirection = (4 + currentDirection+1)%4;
+	//		printf("Localization: turned left\n");
+	//	}
+	//	else if(angularTotal <= -PI/2)
+	//	{
+	//		angularTotal += PI/2;
+	//		currentDirection = (4 + currentDirection-1)%4;
+	//		printf("Localization: turned right\n");
+	//	}
+	//	prevTime = ros::Time::now();
+	//}
 
+	double dt = (ros::Time::now() - prevTime).toSec();
 	if(!isCrossing)
 	{
 		prevTime = ros::Time::now();
@@ -270,25 +323,25 @@ void Localization::handleOdometry(const nav_msgs::OdometryConstPtr& odom)
 
 	if (linearTotal >= 0.3)
 	{
-		printf("angularTotal = %lf\n", angularTotal);
+		//printf("angularTotal = %lf\n", angularTotal);
 		if(angularTotal > PI/1.1 || angularTotal < -PI/1.1)
 		{
-			printf("Localization: turned around\n");
+			//printf("Localization: turned around\n");
 			currentDirection = (4 + currentDirection+2)%4;
 		}
 		else if(angularTotal > PI/3)
 		{
-			printf("Localization: turned left\n");
+			//printf("Localization: turned left\n");
 			currentDirection = (4 + currentDirection+1)%4;
 
 		}
 		else if(angularTotal < -PI/3)
 		{
 			currentDirection = (4 + currentDirection-1)%4;
-			printf("Localization: turned right\n");
+			//printf("Localization: turned right\n");
 		}
 		currentPosition += dirs[currentDirection];
-		publishCurrentDirection();
+		publishCurrentLocalization();
 		isCrossing = false;
 		//angularTotal = 0;
 		//linearTotal = 0;

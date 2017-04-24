@@ -36,7 +36,7 @@ class Application
 		};
 		std::map<std::string, struct PAInformation> productAreasInformation;
 
-		enum TransportStatus {TransportStatus_Unassigned, TransportStatus_PickUp, TransportStatus_Deliver};
+		enum TransportStatus {TransportStatus_WaitingRobot, TransportStatus_PickUp, TransportStatus_Deliver};
 		struct TransportInformation
 		{
 			int id, robotId;
@@ -50,6 +50,8 @@ Application::Application(ros::NodeHandle n)
 {
 	node = n;
 	transportCount = 0;
+	getProductAreasClient = node.serviceClient<pioneer_control::MapInformationGetProductAreas>("/get_pas");
+	transportRequestPub = node.advertise<pioneer_control::TransportRequest>("/transport_request", 0);
 	if(!getProductAreasClient.call(getProductAreasService))
 	{
 		ROS_INFO("Couldn't initialize product areas.");
@@ -65,6 +67,7 @@ Application::Application(ros::NodeHandle n)
 			pAInfo.status = PAStatus_Empty;
 			productAreasInformation[it->name] = pAInfo;
 		}
+		productAreasInformation["D0"].status = PAStatus_Idle;
 	}
 }
 
@@ -91,10 +94,12 @@ bool Application::requestTransport(std::string pickUp, std::string deliver)
 		case PAStatus_Deliver:
 			ROS_INFO("Pick Up PA (%s): ERROR! PA to be occupied.", pickUp.c_str());
 			isTransportValid = false;
+isTransportValid = true;
 			break;
 		case PAStatus_Empty:
 			ROS_INFO("Pick Up PA (%s): ERROR! PA empty, no product here.", pickUp.c_str());
 			isTransportValid = false;
+isTransportValid = true;
 			break;
 		case PAStatus_Idle:
 			ROS_INFO("Pick Up PA (%s): OK! Product waiting to be transported!.", pickUp.c_str());
@@ -106,17 +111,21 @@ bool Application::requestTransport(std::string pickUp, std::string deliver)
 		case PAStatus_PickUp: 
 			ROS_INFO("Deliver PA (%s): ERROR! Product in this PA already to be picked up.", deliver.c_str());
 			isTransportValid = false;
+			isTransportValid = true;
 			break;
 		case PAStatus_Deliver:
 			ROS_INFO("Deliver PA (%s): ERROR! PA to be occupied.", deliver.c_str());
 			isTransportValid = false;
+isTransportValid = true;
 			break;
 		case PAStatus_Empty:
 			ROS_INFO("Deliver PA (%s): OK! PA empty, product can be delivered here!.", deliver.c_str());
+isTransportValid = true;
 			break;
 		case PAStatus_Idle:
 			ROS_INFO("Deliver PA (%s): ERROR! Product here, can't deliver here!.", deliver.c_str());
 			isTransportValid = false;
+isTransportValid = true;
 			break;
 	}
 
@@ -129,16 +138,20 @@ bool Application::requestTransport(std::string pickUp, std::string deliver)
 	transportInfo.id = transportCount;
 	transportInfo.from = pickUpPAInfo.name;
 	transportInfo.to = deliverPAInfo.name;
-	transportInfo.status = TransportStatus_Unassigned;
+	transportInfo.status = TransportStatus_WaitingRobot;
 
 	transports[transportCount] = transportInfo;
 
 	transportRequestMsg.id = transportCount;
-	transportRequestMsg.pickUpPA.x = pickUpPAInfo.pos.y;
+	transportRequestMsg.pickUpPA.x = pickUpPAInfo.pos.x;
 	transportRequestMsg.pickUpPA.y = pickUpPAInfo.pos.y;
 	transportRequestMsg.deliverPA.x = deliverPAInfo.pos.x;
 	transportRequestMsg.deliverPA.y = deliverPAInfo.pos.y;
+	printf("Request %d: Pick up from (%d, %d) ", transportCount, transportRequestMsg.pickUpPA.x, transportRequestMsg.pickUpPA.y);
+	printf("deliver to (%d, %d).\n", transportRequestMsg.deliverPA.x, transportRequestMsg.deliverPA.y);
 	transportRequestPub.publish(transportRequestMsg);
+	ROS_INFO("Transport request from %s to %s published!", 
+						pickUp.c_str(), deliver.c_str());
 
 	transportCount++;
 	return true;
@@ -152,14 +165,21 @@ int main(int argc, char** argv)
 	bool exit = false;
 	std::string pickUpPA;
 	std::string deliverPA;
-	while(true)
+	while(!exit)
 	{
-		std::cin >> pickUpPA;
-		if(pickUpPA == "exit") break;	
-		std::cin >> deliverPA;
-		if(pickUpPA == "exit") break;	
+		std::getline(std::cin, pickUpPA);
+		if(pickUpPA == "exit")
+		{
+			exit = true;	
+			break;
+		}
+		std::getline(std::cin, deliverPA);
+		if(pickUpPA == "exit")
+		{
+			exit = true;	
+			break;
+		}
 		app.requestTransport(pickUpPA, deliverPA);
-		//publish transport request
 	}
 	
 	ros::spin();

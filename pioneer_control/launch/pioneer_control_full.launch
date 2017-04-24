@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<launch>
+	<arg name="id"/>
+	<arg name="gridpos"/>
+	<group ns="pioneer$(arg id)">
+		<node pkg="pioneer_control" output="screen" 
+			name="localization" 
+			type="localization" args=""/>
+
+		<node pkg="pioneer_control" output="screen" 
+			name="forklift_actuator" 
+			type="forklift_actuator" args=""/>
+
+		<node pkg="pioneer_control" 
+			name="image_processing" output="screen" 
+			type="image_processing" args=""/>
+
+		<node pkg="pioneer_control" output="screen" 
+			name="path_planning" 
+			type="path_planning" args=""/>
+
+		<node pkg="pioneer_control" output="screen" 
+			name="navigation" 
+			type="navigation" args="$(arg gridpos)"/>
+
+		<node pkg="pioneer_control" output="screen" 
+			name="control" 
+			type="control" args=""/>
+
+		<node pkg="pioneer_control" output="screen" 
+			name="robotic_agent" 
+			type="robotic_agent" args="$(arg id)"/>
+	</group>
+</launch>

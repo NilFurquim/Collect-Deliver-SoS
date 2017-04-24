@@ -117,5 +117,4 @@ int main(int argc, char **argv)
 	ros::Subscriber sub = nh.subscribe<sensor_msgs::Image>("camera/image_raw",1, &ImageProcessing::handleImage, &imageProcessing);
 
         ros::spin();
-        printf("Im out! No error.");
 }
