@@ -1,0 +1,4 @@
+---
+int16 sensorsAmount
+float32 minRange
+float32 maxRange

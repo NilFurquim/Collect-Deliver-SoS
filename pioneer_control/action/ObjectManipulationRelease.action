@@ -1,0 +1,4 @@
+---
+float32 progress
+---
+bool status

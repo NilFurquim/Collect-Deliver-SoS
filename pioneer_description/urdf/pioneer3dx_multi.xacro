@@ -13,6 +13,49 @@
   </gazebo>
  <xacro:include filename="$(find pioneer_description)/urdf/pioneer_multi.gazebo" />
 
+ <xacro:macro name="sonar_plugin" params="name frame">
+	 <gazebo reference="${name}">
+		 <sensor type="ray" name="${name}">
+	      <pose>0 0 0 0 0 0</pose>
+	      <update_rate>100</update_rate>
+	      <ray>
+		<scan>
+		  <horizontal>
+		    <samples>5</samples>
+		    <resolution>1.0</resolution>
+		    <min_angle>-0.25</min_angle>
+		    <max_angle>0.25</max_angle>
+		  </horizontal>
+		  <vertical>
+		    <samples>5</samples>
+		    <resolution>1</resolution>
+		    <min_angle>-0.25</min_angle>
+		    <max_angle>0.25</max_angle>
+		  </vertical>
+		</scan>
+		<range>
+		  <min>0.01</min>
+		  <max>0.75</max>
+		  <resolution>0.01</resolution>
+		</range>
+	      </ray>
+	      <plugin filename="libgazebo_ros_range.so" name="gazebo_ros_range2">
+		<!-- gaussianNoise>0.005</gaussianNoise-->
+		<gaussianNoise>0.005</gaussianNoise>
+		<alwaysOn>true</alwaysOn>
+		<updateRate>12</updateRate>
+		<topicName>${name}</topicName>
+		<frameName>${frame}</frameName>
+		<fov>0.28</fov>
+		<radiation>ultrasound</radiation>
+	      </plugin>
+	    </sensor>
+	  </gazebo>
+  </xacro:macro>
+  <xacro:sonar_plugin name="sonar1" frame="sonar1"/>
+  <xacro:sonar_plugin name="sonar2" frame="sonar2"/>
+  <xacro:sonar_plugin name="sonar3" frame="sonar3"/>
+  <xacro:sonar_plugin name="sonar4" frame="sonar4"/>
 
 <!-- Base link to interface with gmapping and move_base -->
   <link name="base_link"/>
@@ -286,6 +329,38 @@
 		</collision>
 	</link>
 
+	<xacro:macro name="sonar" params="name origin rotation">
+		<joint name="${name}_joint" type="fixed">
+			<origin xyz="${origin}" rpy="${rotation}"/>
+			<parent link="base_link"/>
+			<child link="${name}"/>
+		</joint>
+
+		<link name="${name}">
+			<inertial>
+				<mass value="0.0001"/>
+				<origin xyz="0 0 0"/>
+				<inertia ixx="1" ixy="0" ixz="0"
+					 iyy="1" iyz="0" izz="1"/>
+			</inertial>
+			<visual>
+				<origin xyz="-0.025 0 0" rpy="0 1.57 0"/>
+				<geometry>
+					<cylinder length="0.05" radius="0.015"/>
+				</geometry>
+			</visual>
+			<collision>
+				<origin xyz="-0.025 0 0" rpy="0 1.57 0"/>
+				<geometry>
+					<cylinder length="0.05" radius="0.015"/>
+				</geometry>
+			</collision>
+		</link>
+	</xacro:macro>
+	<xacro:sonar name="sonar1" origin="0.200 -0.080 0.209" rotation="0 0 -0.60" />
+	<xacro:sonar name="sonar2" origin="0.215 -0.045 0.209" rotation="0 0 -0.28" />
+	<xacro:sonar name="sonar3" origin="0.215  0.045 0.209" rotation="0 0  0.28" />
+	<xacro:sonar name="sonar4" origin="0.200  0.080 0.209" rotation="0 0  0.60" />
 <!-- Front + Back Sonar -->
 	<link name="front_sonar">
 		<inertial>
@@ -373,9 +448,67 @@
     </inertial>
   </link>
 
+<!-- Forklift Base -->
+  <joint name="fork_base_horizontal_joint" type="fixed">
+    <origin xyz="0.13 0 0.02" rpy="0 0 0"/>
+    <parent link="top_plate"/>
+    <child link="fork_base_horizontal"/>
+  </joint>
+  
+  <link name="fork_base_horizontal">
+    <collision>
+       <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+	      <box size="0.25 0.0399 0.0399"/>
+      </geometry>
+   </collision>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+	      <box size="0.25 0.0399 0.0399"/>
+      </geometry>
+     <material name="CameraGreen"/>
+    </visual>
+
+    <inertial>
+      <mass value="1e-4" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+  </link>
+
+  <joint name="fork_base_diag_joint" type="fixed">
+    <origin xyz="0.13 0 0.12" rpy="0 -0.77 0"/>
+    <parent link="top_plate"/>
+    <child link="fork_base_diag"/>
+  </joint>
+  
+  <link name="fork_base_diag">
+    <collision>
+       <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+	      <box size="0.25 0.0398 0.0398"/>
+      </geometry>
+   </collision>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+	      <box size="0.30 0.0398 0.0398"/>
+      </geometry>
+     <material name="CameraGreen"/>
+    </visual>
+
+    <inertial>
+      <mass value="1e-4" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+  </link>
+
 <!-- Fork Vertical Base -->
   <joint name="fork_vertical_base_joint" type="fixed">
-    <axis xyz="0 1 0"/>
     <origin xyz="0.245 0 0.124" rpy="0 -0.01 0"/>
     <parent link="top_plate"/>
     <child link="fork_vertical_base"/>
@@ -385,14 +518,14 @@
     <collision>
        <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-	      <box size="0.04 0.05 0.25"/>
+	      <box size="0.04 0.04 0.25"/>
       </geometry>
    </collision>
 
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-	      <box size="0.04 0.05 0.25"/>
+	      <box size="0.04 0.04 0.25"/>
       </geometry>
      <material name="CameraGreen"/>
     </visual>
@@ -407,7 +540,7 @@
 <!-- Fork Vertical Moving Base -->
   <joint name="fork_moving_base_joint" type="prismatic">
     <axis xyz="0 0 1"/>
-    <limit effort="1000.0" lower="-0.1" upper="0.2" velocity="0.01"/> 
+    <limit effort="1000.0" lower="-0.13" upper="0.25" velocity="1"/> 
     <origin xyz="0.028 0 -0.02" rpy="0 0 0"/>
     <parent link="fork_vertical_base"/>
     <child link="fork_moving_base"/>
@@ -417,14 +550,14 @@
     <collision>
        <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <box size="0.018 0.03 0.3"/>
+        <box size="0.018 0.02 0.3"/>
       </geometry>
    </collision>
 
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-	      <box size="0.018 0.03 0.3"/>
+	      <box size="0.018 0.02 0.3"/>
       </geometry>
      <material name="CameraGreen"/>
     </visual>

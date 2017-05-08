@@ -4,7 +4,6 @@
 #include "geometry_msgs/Pose2D.h"
 #include "pioneer_control/PathPlanningDefinePath.h"
 #include "pioneer_control/PathPlanningCalculateDistance.h"
-#include "pioneer_control/Vec2.h"
 #include <queue>
 #include <utility>
 #include "pioneer_control/AStar.h"

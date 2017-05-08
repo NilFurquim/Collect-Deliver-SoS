@@ -26,7 +26,7 @@ int main(int argc, char **argv)
 	geometry_msgs::Twist twist_msg;
 	std_msgs::Float64 fork_msg;
 
-	driveRobot_pub = n.advertise<geometry_msgs::Twist>(DRIVE_ROBOT_TOPIC, 1000);
+	driveRobot_pub = n.advertise<geometry_msgs::Twist>(DRIVE_ROBOT_TOPIC, 0);
 	ros::ServiceClient fork_lift_client = n.serviceClient<pioneer_control::ForkliftLift>("ForkliftLift");
 	ros::ServiceClient fork_lower_client = n.serviceClient<pioneer_control::ForkliftLower>("ForkliftLower");
 	pioneer_control::ForkliftLift fork_lift_srv;
@@ -38,8 +38,8 @@ int main(int argc, char **argv)
 	twist_msg.angular.x = 0;
 	twist_msg.angular.y = 0;
 	twist_msg.angular.z = 0;
-	fork_lift_srv.request.percentage = 0.1;
-	fork_lower_srv.request.percentage = 0.1;
+	fork_lift_srv.request.amount = 0.1;
+	fork_lower_srv.request.amount = 0.1;
 
 	char input = 'q';
 	while(ros::ok())

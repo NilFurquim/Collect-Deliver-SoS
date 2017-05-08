@@ -8,10 +8,14 @@
 #include "actionlib/client/simple_action_client.h"
 //#include "pioneer_control/NavigationExecutePathAction.h"
 #include "pioneer_control/NavigationDriveToAction.h"
+#include "pioneer_control/ObjectManipulationPickUpAction.h"
+#include "pioneer_control/ObjectManipulationReleaseAction.h"
 
 
 //typedef actionlib::SimpleActionClient<pioneer_control::NavigationExecutePathAction> NavigationExecutePathClient;
 typedef actionlib::SimpleActionClient<pioneer_control::NavigationDriveToAction> NavigationDriveToClient;
+typedef actionlib::SimpleActionClient<pioneer_control::ObjectManipulationPickUpAction> ObjectManipulationPickUpClient;
+typedef actionlib::SimpleActionClient<pioneer_control::ObjectManipulationReleaseAction> ObjectManipulationReleaseAction;
 
 typedef actionlib::SimpleActionServer<pioneer_control::ControlGoPickUpProductAction> ControlGoPickUpProduct;
 typedef actionlib::SimpleActionServer<pioneer_control::ControlGoDeliverProductAction> ControlGoDeliverProduct;
@@ -24,6 +28,14 @@ class Control
 		NavigationDriveToClient driveToClient;
 		pioneer_control::NavigationDriveToGoal driveToGoal;
 		pioneer_control::Vec2i32 msg;
+
+		ObjectManipulationPickUpClient pickUpClient;
+		pioneer_control::ObjectManipulationPickUpGoal pickUpGoal;
+
+		ObjectManipulationReleaseAction releaseClient;
+		pioneer_control::ObjectManipulationReleaseGoal releaseGoal;
+
+
 
 		//ros::Subscriber goPickUp;
 		//ros::Subscriber goDeliver;
@@ -41,13 +53,13 @@ class Control
 Control::Control(ros::NodeHandle n)
 		: goPickUpProductServer(node, "go_pick_up_product", boost::bind(&Control::goPickUpProductAction, this, _1), false),
 		goDeliverProductServer(node, "go_deliver_product", boost::bind(&Control::goDeliverProductAction, this, _1), false),
-		driveToClient("drive_to", true)
+		driveToClient("drive_to", true),
+		pickUpClient("pick_up", true),
+		releaseClient("release", true)
 {
 	node = n;
 	goPickUpProductServer.start();
 	goDeliverProductServer.start();
-	//goPickUp = node.subscribe<pioneer_control::Vec2i32>("pick_up", 1, &Control::handleGoPickUpRequest, this);
-	//goDeliver = node.subscribe<pioneer_control::Vec2i32>("deliver", 1, &Control::handleGoDeliverRequest, this);
 }
 
 void Control::goPickUpProductAction(const pioneer_control::ControlGoPickUpProductGoalConstPtr& goal)
@@ -57,18 +69,28 @@ void Control::goPickUpProductAction(const pioneer_control::ControlGoPickUpProduc
 	driveToClient.sendGoal(driveToGoal);
 	//TODO: subscribe and pass on feedback/2
 	driveToClient.waitForResult();
-	if(driveToClient.getState() == actionlib::SimpleClientGoalState::SUCCEEDED) 
+	if(driveToClient.getState() != actionlib::SimpleClientGoalState::SUCCEEDED) 
 	{
-		goPickUpProductResult.status = true;
-		goPickUpProductServer.setSucceeded(goPickUpProductResult);
+		goPickUpProductResult.status = false;
+		goPickUpProductServer.setAborted(goPickUpProductResult);
+		ROS_INFO("Something wrong with reaching PA, aborting...");
 		return;
 	}
 
-	goPickUpProductResult.status = false;
-	goPickUpProductServer.setAborted(goPickUpProductResult);
 
-	//TODO: action pick up product
-	//TODO: subscribe and pass on 1/2 + feedback/2
+	pickUpClient.waitForServer();
+	pickUpClient.sendGoal(pickUpGoal);
+	pickUpClient.waitForResult();
+	if(pickUpClient.getState() != actionlib::SimpleClientGoalState::SUCCEEDED) 
+	{
+		goPickUpProductResult.status = false;
+		goPickUpProductServer.setAborted(goPickUpProductResult);
+		ROS_INFO("Something wrong with picking up product, aborting...");
+		return;
+	}
+
+	goPickUpProductResult.status = true;
+	goPickUpProductServer.setSucceeded(goPickUpProductResult);
 }
 
 void Control::goDeliverProductAction(const pioneer_control::ControlGoDeliverProductGoalConstPtr& goal)
@@ -79,17 +101,28 @@ void Control::goDeliverProductAction(const pioneer_control::ControlGoDeliverProd
 	driveToClient.sendGoal(driveToGoal);
 	//TODO: subscribe and pass on feedback/2
 	driveToClient.waitForResult();
-
-	if(driveToClient.getState() == actionlib::SimpleClientGoalState::SUCCEEDED) 
+	if(driveToClient.getState() != actionlib::SimpleClientGoalState::SUCCEEDED) 
 	{
-		goDeliverProductResult.status = true;
-		goDeliverProductServer.setSucceeded(goDeliverProductResult);
+		goDeliverProductResult.status = false;
+		goDeliverProductServer.setAborted(goDeliverProductResult);
+		ROS_INFO("Something wrong with reaching PA, aborting...");
 		return;
 	}
 
-	goDeliverProductResult.status = false;
-	goDeliverProductServer.setAborted(goDeliverProductResult);
 
+	releaseClient.waitForServer();
+	releaseClient.sendGoal(releaseGoal);
+	releaseClient.waitForResult();
+	if(releaseClient.getState() != actionlib::SimpleClientGoalState::SUCCEEDED) 
+	{
+		goDeliverProductResult.status = false;
+		goDeliverProductServer.setAborted(goDeliverProductResult);
+		ROS_INFO("Something wrong with picking up product, aborting...");
+		return;
+	}
+
+	goDeliverProductResult.status = true;
+	goDeliverProductServer.setSucceeded(goDeliverProductResult);
 	//TODO: action release product
 	//TODO: subscribe and pass on 1/2 + feedback/2
 }

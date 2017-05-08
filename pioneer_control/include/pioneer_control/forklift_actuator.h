@@ -8,10 +8,10 @@
 #include "pioneer_control/ForkliftLower.h"
 #include "pioneer_control/ForkliftMoveTo.h"
 
-#define FORKLIFT_LOWER_SERV "ForkliftLower"
-#define FORKLIFT_LIFT_SERV "ForkliftLift"
-#define FORKLIFT_MOVETO_SERV "ForkliftMoveTo"
-#define FORKLIFT_MIN_HEIGHT (-0.115)
+#define FORKLIFT_LOWER_SERV "forklift_lower"
+#define FORKLIFT_LIFT_SERV "forklift_lift"
+#define FORKLIFT_MOVETO_SERV "forklift_move_to"
+#define FORKLIFT_MIN_HEIGHT (-0.13)
 #define FORKLIFT_MAX_HEIGHT (0.19)
 #define FORKLIFT_ERROR_MIN (-1)
 #define FORKLIFT_ERROR_MAX (-2)
@@ -25,10 +25,10 @@ class ForkLiftActuator
 	bool moveToServ(pioneer_control::ForkliftMoveTo::Request &req, pioneer_control::ForkliftMoveTo::Response &res);
 	void lowerServ(const std_msgs::Float64::ConstPtr& msg);
 	void moveToServ(const std_msgs::Float64::ConstPtr& msg);
-	int lift(float amount);
-	int lower(float amount);
+	int lift(double amount);
+	int lower(double amount);
 	void stop();
-	int moveTo(float position);
+	int moveTo(double position);
 	control_msgs::JointControllerState report();
 	ForkLiftActuator(ros::NodeHandle n);
 
@@ -37,15 +37,15 @@ class ForkLiftActuator
 	ros::ServiceServer lowerService;
 	ros::ServiceServer moveToService;
 	ros::NodeHandle node;
-	float maxHeight;
-	float minHeight;
+	double maxHeight;
+	double minHeight;
 	control_msgs::JointControllerState state;
-	float command;
+	double currentPosition;
 	std_msgs::Float64 commMsg;
 
 	ros::Publisher commander;
 	ros::Subscriber subscriber;
 
-	float forkPositionInterpolation(float t);
+	double quadraticInterpolation(double a, double t, double b);
 };
 #endif

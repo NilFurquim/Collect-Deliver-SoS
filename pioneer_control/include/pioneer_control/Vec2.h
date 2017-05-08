@@ -1,4 +1,4 @@
-#ifndef _VEC2_H_
+#ifndef _VEC2_H
 #define _VEC2_H_
 
 template <class T>
@@ -37,6 +37,12 @@ class Vec2
 			return *this;
 		};
 
+		double operator^(const Vec2& v)
+		{ return x * v.y - y * v.x; }
+
+		double operator*(const Vec2& v)
+		{ return x * v.x + y * v.y; }
+
 		bool operator<=(const Vec2& v) const
 		{ return (x <= v.x && y <= v.y); }
 
@@ -55,7 +61,17 @@ class Vec2
 		bool operator!=(const Vec2& v) const
 		{ return (x != v.x || y != v.y); }
 
+		void rotate(const double theta) {
+			double c = cos(theta);
+			double s = sin(theta);
+			double tx = x * c - y * s;
+			double ty = x * s + y * c;
+			x = tx;
+			y = ty;
+		}
+
 };
 
 typedef Vec2<int> Vec2i;
+typedef Vec2<double> Vec2d;
 #endif

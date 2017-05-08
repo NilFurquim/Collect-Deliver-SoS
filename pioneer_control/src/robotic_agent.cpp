@@ -8,6 +8,7 @@
 #include "pioneer_control/Vec2i32.h"
 #include "pioneer_control/TransportRequest.h"
 #include "pioneer_control/ChooseClosestMsg.h"
+#include "pioneer_control/TransportDone.h"
 
 //Utils
 #include <string>
@@ -47,6 +48,9 @@ class RoboticAgent
 		pioneer_control::ChooseClosestMsg chooseClosestMsg;
 		void handleChooseClosest(const pioneer_control::ChooseClosestMsgConstPtr& msg);
 
+		ros::Publisher transportDonePub;
+		pioneer_control::TransportDone transportDoneMsg;
+
 		pioneer_control::ControlGoPickUpProductGoal goPickUpProductGoal;
 		ControlGoPickUpProduct goPickUpProductClient;
 
@@ -65,7 +69,7 @@ RoboticAgent::RoboticAgent(ros::NodeHandle n, int id)
 	transportRequestSub = node.subscribe<pioneer_control::TransportRequest>("/transport_request", 0,  &RoboticAgent::handleTransportRequest, this);
 	chooseClosestSub = node.subscribe<pioneer_control::ChooseClosestMsg>("/choose_closest", 300, &RoboticAgent::handleChooseClosest, this);
 	chooseClosestPub = node.advertise<pioneer_control::ChooseClosestMsg>("/choose_closest", 300);
-
+	transportDonePub = node.advertise<pioneer_control::TransportDone>("/transport_done", 5);
 	isClosest = false;
 	isTransporting = false;
 	distance = 10000000;
@@ -127,6 +131,10 @@ void RoboticAgent::handleTransportRequest(const pioneer_control::TransportReques
 	goDeliverProductGoal.pAPos = request->deliverPA;
 	goDeliverProductClient.sendGoal(goDeliverProductGoal);
 	goDeliverProductClient.waitForResult();
+	isTransporting = false;
+	transportDoneMsg.transportId = transportId;
+	ROS_INFO("Robot agent done with %d.", transportId);
+	transportDonePub.publish(transportDoneMsg);
 }
 
 void RoboticAgent::handleChooseClosest(const pioneer_control::ChooseClosestMsgConstPtr& msg)

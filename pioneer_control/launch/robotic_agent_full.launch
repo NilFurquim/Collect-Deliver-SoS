@@ -8,6 +8,10 @@
 			type="localization" args=""/>
 
 		<node pkg="pioneer_control" output="screen" 
+			name="sonar_sensor" 
+			type="sonar_sensor" args=""/>
+	
+		<node pkg="pioneer_control" output="screen" 
 			name="forklift_actuator" 
 			type="forklift_actuator" args=""/>
 
@@ -22,6 +26,10 @@
 		<node pkg="pioneer_control" output="screen" 
 			name="navigation" 
 			type="navigation" args="$(arg id) $(arg gridpos)"/>
+
+		<node pkg="pioneer_control" output="screen" 
+			name="object_manipulation" 
+			type="object_manipulation" args=""/>
 
 		<node pkg="pioneer_control" output="screen" 
 			name="control" 

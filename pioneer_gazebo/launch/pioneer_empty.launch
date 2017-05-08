@@ -20,7 +20,9 @@
     <arg name="headless" value="$(arg headless)"/>
   </include>
   <!-- Load the URDF into the ROS Parameter Server -->
-  <param name="robot_description" command="$(find xacro)/xacro.py '$(find pioneer_description)/urdf/pioneer3dx_mod.xacro'"/>
+  <param name="robot_description" command="$(find xacro)/xacro.py '$(find pioneer_description)/urdf/pioneer3dx_multi.xacro'">
+	  <arg name="robot_name" value="pioneer1"/>
+  </param>
 
   <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen" args="-x 0 -y 0 -z 0 -Y 1.57 -urdf -model pioneer -param robot_description"/>
 

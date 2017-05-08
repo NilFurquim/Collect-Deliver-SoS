@@ -180,7 +180,6 @@ bool Localization::initService(pioneer_control::LocalizationInit::Request& req,
 			"Direction must be (0, 1), (0,-1), (1, 0) or (-1, 0)",
 			req.pos.dir.x, req.pos.dir.y);
 		res.status = false;
-	} else {
 	}
 
 	if(res.status)
@@ -363,7 +362,12 @@ void Localization::handleProcessedImage(const std_msgs::Int16MultiArrayConstPtr&
 	if(totalSum >= 0) isFollowing = true;
 	else isFollowing = false;
 
-	if(totalSum >= 40 && isCrossing==false)
+	if(totalSum <= 28 && isCrossing == true)
+	{ 
+		isCrossing = false; 
+	}
+
+	if(totalSum >= 40 && isCrossing == false)
 	{
 		//printf("Is crossing\n");
 		isCrossing = true;

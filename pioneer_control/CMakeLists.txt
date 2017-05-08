@@ -22,9 +22,12 @@ add_message_files(
    Vec2i8.msg
    PoseGrid.msg
    TransportRequest.msg
+   TransportAccept.msg
+   TransportDone.msg
    ChooseClosestMsg.msg
    PAInformation.msg
    UpdateMapMsg.msg
+   RangeArray.msg
 )
 
  add_service_files(
@@ -39,6 +42,7 @@ add_message_files(
    PathPlanningCalculateDistance.srv
    GetLocalization.srv
    LocalizationInit.srv
+   #SonarSensorGetInformation.srv
  )
 ## Generate actions in the 'action' folder
 add_action_files(
@@ -47,6 +51,8 @@ add_action_files(
    NavigationExecutePath.action
    ControlGoPickUpProduct.action
    ControlGoDeliverProduct.action
+   ObjectManipulationPickUp.action
+   ObjectManipulationRelease.action
 )
 
 generate_messages(
@@ -78,6 +84,8 @@ add_exec_dep_and_link(image_processing)
 add_exec_dep_and_link(localization)
 add_exec_dep_and_link(map_information)
 add_exec_dep_and_link(path_planning)
+add_exec_dep_and_link(sonar_sensor)
+add_exec_dep_and_link(object_manipulation)
 add_exec_dep_and_link(control)
 add_exec_dep_and_link(robotic_agent)
 add_exec_dep_and_link(application)
