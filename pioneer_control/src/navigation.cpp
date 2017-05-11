@@ -315,12 +315,12 @@ bool Navigation::driveToAction(const pioneer_control::NavigationDriveToGoalConst
 		if(!definePathClient.call(definePathService))
 		{
 			//ROS_INFO("Not Able to get path from path planning service");
-			ROS_INFO("Not Able to get path from path planning service, trying again in 2 seconds");
-			stopNavigation();
-			navDriveToFeedback.progress = 0;
-			navDriveToServer.publishFeedback(navDriveToFeedback);
-			navDriveToResult.status = false;
-			navDriveToServer.setAborted(navDriveToResult);
+			//ROS_INFO("Not Able to get path from path planning service, trying again in 2 seconds");
+			//stopNavigation();
+			//navDriveToFeedback.progress = 0;
+			//navDriveToServer.publishFeedback(navDriveToFeedback);
+			//navDriveToResult.status = false;
+			//navDriveToServer.setAborted(navDriveToResult);
 			ros::Duration(2).sleep(); //Trying again!
 			continue;
 			return false;
@@ -332,12 +332,12 @@ bool Navigation::driveToAction(const pioneer_control::NavigationDriveToGoalConst
 		if(nodePath.size() == 0)
 		{
 			//ROS_INFO("No path to goal, aborting...");
-			ROS_INFO("No path to goal, trying again in 2 seconds...");
-			stopNavigation();
-			navDriveToFeedback.progress = 0;
-			navDriveToServer.publishFeedback(navDriveToFeedback);
-			navDriveToResult.status = false;
-			navDriveToServer.setAborted(navDriveToResult);
+			//ROS_INFO("No path to goal, trying again in 2 seconds...");
+			//stopNavigation();
+			//navDriveToFeedback.progress = 0;
+			//navDriveToServer.publishFeedback(navDriveToFeedback);
+			//navDriveToResult.status = false;
+			//navDriveToServer.setAborted(navDriveToResult);
 			ros::Duration(2).sleep(); //Trying again!
 			continue;
 			return false;
@@ -401,17 +401,17 @@ bool Navigation::driveToAction(const pioneer_control::NavigationDriveToGoalConst
 		navDriveToFeedback.progress = executedActions.size()*1.0/actionsTotal;
 		navDriveToServer.publishFeedback(navDriveToFeedback);
 		//while(true) {
-			//if(!checkPath())
-			//{
-			//	isDriveToDone = false;
-			//	if(!isNodeValid)
-			//	{
-			//		while(!isNodeValid);
-			//		action = Action_follow_line;
-			//	}
-			//	while(action != Action_wait);
-			//	break;
-			//}
+			if(!checkPath())
+			{
+				isDriveToDone = false;
+				if(!isNodeValid)
+				{
+					while(!isNodeValid);
+					action = Action_follow_line;
+				}
+				while(action != Action_wait);
+				break;
+			}
 			path.pop_front();
 			directions.pop_front();
 
@@ -524,11 +524,11 @@ bool Navigation::checkPath()
 {
 	//if actions.size() < distance(local, goal) return false;
 	//if local is not in path return false;
-	if(currentLocalization != path.front())
-	{
-		ROS_INFO("%d: Current is not actual path!\nIs (%d, %d) but expected (%d, %d).", id, currentLocalization.x, currentLocalization.y, path.front().x, path.front().y);
-		return false;
-	}
+	//if(currentLocalization != path.front())
+	//{
+	//	ROS_INFO("%d: Current is not actual path!\nIs (%d, %d) but expected (%d, %d).", id, currentLocalization.x, currentLocalization.y, path.front().x, path.front().y);
+	//	return false;
+	//}
 	if(!isPathValid)
 	{
 		ROS_INFO("Some robot in the way!");

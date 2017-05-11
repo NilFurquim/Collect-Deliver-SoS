@@ -30,3 +30,4 @@ stage_assets/assets/shop_floor_7by7_even.txt
 stage_assets/assets/shop_floor_7by7_even_out.sdf
 stage_assets/assets/shop_floor_tape.xacro
 test_map_information.sh
+/tests

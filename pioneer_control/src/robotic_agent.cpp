@@ -40,6 +40,7 @@ class RoboticAgent
 		ros::ServiceClient getLocalizationClient;
 		pioneer_control::GetLocalization getLocalizationService;
 
+		void subscribeToTransportRequest();
 		ros::Subscriber transportRequestSub;
 		void handleTransportRequest(const pioneer_control::TransportRequestConstPtr& request);
 		ros::Publisher transportDonePub;
@@ -72,7 +73,7 @@ RoboticAgent::RoboticAgent(ros::NodeHandle n, int id)
 	chooseClosestSub = node.subscribe<pioneer_control::ChooseClosestMsg>("/choose_closest", 30, &RoboticAgent::handleChooseClosest, this);
 	chooseClosestPub = node.advertise<pioneer_control::ChooseClosestMsg>("/choose_closest", 30);
 
-	transportRequestSub = node.subscribe<pioneer_control::TransportRequest>("/transport_request", 0,  &RoboticAgent::handleTransportRequest, this);
+	subscribeToTransportRequest();
 	transportDonePub = node.advertise<pioneer_control::TransportDone>("/transport_done", 5);
 	transportAcceptPub = node.advertise<pioneer_control::TransportAccept>("/transport_accept", 5);
 	
@@ -81,19 +82,27 @@ RoboticAgent::RoboticAgent(ros::NodeHandle n, int id)
 	distance = 10000000;
 }
 
+void RoboticAgent::subscribeToTransportRequest()
+{
+	transportRequestSub = node.subscribe<pioneer_control::TransportRequest>("/transport_request", 100,  &RoboticAgent::handleTransportRequest, this);
+}
+
 void RoboticAgent::handleTransportRequest(const pioneer_control::TransportRequestConstPtr& request)
 {
+	transportRequestSub.shutdown();
 	//Am i the closest robot? 2 seconds to determine
 	//isTransporting here should never happen
 	if(isTransporting)
 	{
 		ROS_INFO("Robot %d: In transport, transport %d denied.", id, request->id);
+		subscribeToTransportRequest();
 		return;
 	}
 
 	if(!getLocalizationClient.call(getLocalizationService))
 	{
 		ROS_INFO("Robot %d: Something's wrong with localization, transport %d denied.", id, request->id);
+		subscribeToTransportRequest();
 		return;
 	}
 	calculateDistanceService.request.origin = getLocalizationService.response.pose.pos;
@@ -101,6 +110,7 @@ void RoboticAgent::handleTransportRequest(const pioneer_control::TransportReques
 	if(!calculateDistanceClient.call(calculateDistanceService))
 	{
 		ROS_INFO("Robot %d: Something's wrong with path planning, transport %d denied.", id, request->id);
+		subscribeToTransportRequest();
 		return;
 	}
 
@@ -121,7 +131,7 @@ void RoboticAgent::handleTransportRequest(const pioneer_control::TransportReques
 	if(!isClosest)
 	{
 		ROS_INFO("Robot %d: Not the closest to pickUp PA, transport %d denied", id, request->id);
-		isClosest = true;
+		subscribeToTransportRequest();
 		return;
 	}	
 
@@ -144,6 +154,7 @@ void RoboticAgent::handleTransportRequest(const pioneer_control::TransportReques
 	transportDoneMsg.transportId = transportId;
 	ROS_INFO("Robot agent done with %d.", transportId);
 	transportDonePub.publish(transportDoneMsg);
+	subscribeToTransportRequest();
 }
 
 void RoboticAgent::handleChooseClosest(const pioneer_control::ChooseClosestMsgConstPtr& msg)

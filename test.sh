@@ -12,7 +12,7 @@ if [ $2 = "" ]; then
 	exit 1
 fi
 
-if [ ! -f $2.test ]; then
+if [ ! -f tests/$2.test ]; then
 	echo "File not found!"
 	exit 1
 fi
@@ -49,7 +49,9 @@ echo "Launching MapInformation 1..."
 rosrun pioneer_control map_information &
 pid="$pid $!"
 sleep 1s
-rosrun pioneer_control product_manager 2> result_$2.out&
+current_date_time="`date +%Y.%m.%d.%H.%M.%S`";
+echo "$2_$1_$current_date_time.out"
+rosrun pioneer_control product_manager 2> tests/$2_$1_$current_date_time.out&
 pid="$pid $!"
 sleep 1s
 
@@ -75,7 +77,7 @@ do
 done
 
 sleep 5s
-rosrun pioneer_control application < $2_$1_$3.test
+rosrun pioneer_control application < tests/$2.test
 #sleep 5s
 #for i in `seq 1 5`;
 #do

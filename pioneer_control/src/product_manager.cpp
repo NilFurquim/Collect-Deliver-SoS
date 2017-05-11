@@ -63,6 +63,7 @@ class ProductManager
 					: id(id), deliverPA(deliverPA), pickUpPA(pickUpPA), requestTime(ros::Time::now()) {};
 				int id, robotId;
 				ros::Time requestTime;
+				ros::Time acceptTime;
 				ros::Time doneTime;
 				struct PAInformation *pickUpPA, *deliverPA;
 
@@ -80,8 +81,8 @@ ProductManager::ProductManager(ros::NodeHandle n)
 	isDone = false;
 	getProductAreasClient = node.serviceClient<pioneer_control::MapInformationGetProductAreas>("/get_pas");
 	transportRequestPub = node.advertise<pioneer_control::TransportRequest>("/transport_request", 0);
-	transportAcceptSub = node.subscribe<pioneer_control::TransportAccept>("/transport_accept", 10, &ProductManager::handleTransportAccept, this);
-	transportDoneSub = node.subscribe<pioneer_control::TransportDone>("/transport_done", 10, &ProductManager::handleTransportDone, this);
+	transportAcceptSub = node.subscribe<pioneer_control::TransportAccept>("/transport_accept", 30, &ProductManager::handleTransportAccept, this);
+	transportDoneSub = node.subscribe<pioneer_control::TransportDone>("/transport_done", 30, &ProductManager::handleTransportDone, this);
 	addRequestService = node.advertiseService("/add_request", &ProductManager::addRequest, this);
 	if(!getProductAreasClient.call(getProductAreasService))
 	{
@@ -169,14 +170,14 @@ bool ProductManager::addRequest(pioneer_control::ProductManagerAddRequest::Reque
 	transportsWaitingAccept.push_back(transportInfo);
 
 	ROS_INFO("Product Manager: Transport request %d (%s to %s) added to request queue.", transportCount, pickUp.c_str(), deliver.c_str());
-	transportRequestMsg.id = transportInfo->id;
-	transportRequestMsg.pickUpPA.x = transportInfo->pickUpPA->pos.x;
-	transportRequestMsg.pickUpPA.y = transportInfo->pickUpPA->pos.y;
-	transportRequestMsg.deliverPA.x = transportInfo->deliverPA->pos.x;
-	transportRequestMsg.deliverPA.y = transportInfo->deliverPA->pos.y;
-	printf("Product Manager: Request %d pick up from (%d, %d) ", transportCount, transportRequestMsg.pickUpPA.x, transportRequestMsg.pickUpPA.y);
-	printf("deliver to (%d, %d) published\n", transportRequestMsg.deliverPA.x, transportRequestMsg.deliverPA.y);
-	transportRequestPub.publish(transportRequestMsg);
+	//transportRequestMsg.id = transportInfo->id;
+	//transportRequestMsg.pickUpPA.x = transportInfo->pickUpPA->pos.x;
+	//transportRequestMsg.pickUpPA.y = transportInfo->pickUpPA->pos.y;
+	//transportRequestMsg.deliverPA.x = transportInfo->deliverPA->pos.x;
+	//transportRequestMsg.deliverPA.y = transportInfo->deliverPA->pos.y;
+	//printf("Product Manager: Request %d pick up from (%d, %d) ", transportCount, transportRequestMsg.pickUpPA.x, transportRequestMsg.pickUpPA.y);
+	//printf("deliver to (%d, %d) published\n", transportRequestMsg.deliverPA.x, transportRequestMsg.deliverPA.y);
+	//transportRequestPub.publish(transportRequestMsg);
 
 	transportCount++;
 	res.status = true;
@@ -193,6 +194,7 @@ void ProductManager::handleTransportAccept(const pioneer_control::TransportAccep
 		{
 			(*it)->pickUpPA->status = PAStatus_PickUp;
 			(*it)->deliverPA->status = PAStatus_Deliver;
+			(*it)->acceptTime = ros::Time::now();
 			transportsWaitingResult.push_back(*it);
 			transportsWaitingAccept.erase(it);
 			ROS_INFO("Product Manager: Transport %d accepted.", id);
@@ -214,10 +216,11 @@ void ProductManager::handleTransportDone(const pioneer_control::TransportDoneCon
 			(*it)->deliverPA->status = PAStatus_Idle;
 			(*it)->doneTime = ros::Time::now();
 			transportsDone.push_back(*it);
+			//fprintf(stderr, "%s->%s: (%lf\n", (*it)->pickUpPA->name.c_str(), (*it)->deliverPA->name.c_str(), doneTimeSec);
 			double doneTimeSec = ((*it)->doneTime - (*it)->requestTime).toSec();
-			fprintf(stderr, "%s->%s: %lf\n", (*it)->pickUpPA->name.c_str(), (*it)->deliverPA->name.c_str(), doneTimeSec);
+			std::cerr << (*it)->pickUpPA->name <<"->"<< (*it)->deliverPA->name << ", ";
+			std::cerr << (*it)->requestTime << ", "<< (*it)->acceptTime << ", " << (*it)->doneTime << ", " << doneTimeSec << std::endl;
 			transportsWaitingResult.erase(it);
-
 			ROS_INFO("Product Manager: Transport %d done.", id);
 			return;
 		}
@@ -233,30 +236,55 @@ void ProductManager::run()
 	ros::Duration interval;
 	while(ros::ok() && !isDone)
 	{
-		init = ros::Time::now();
-		for(std::vector<TransportInformation*>::iterator it = transportsWaitingAccept.begin();
-				it != transportsWaitingAccept.end(); it++)
+		//init = ros::Time::now();
+		if(transportsWaitingAccept.size() > 0)
 		{
-			if((*it)->pickUpPA->status == PAStatus_Idle 
-					&& (*it)->deliverPA->status == PAStatus_Empty)
+			TransportInformation* first = transportsWaitingAccept.front();
+			if(first->pickUpPA->status == PAStatus_Idle 
+					&& first->deliverPA->status == PAStatus_Empty)
 			{
-				transportRequestMsg.id = (*it)->id;
-				transportRequestMsg.pickUpPA.x = (*it)->pickUpPA->pos.x;
-				transportRequestMsg.pickUpPA.y = (*it)->pickUpPA->pos.y;
-				transportRequestMsg.deliverPA.x = (*it)->deliverPA->pos.x;
-				transportRequestMsg.deliverPA.y = (*it)->deliverPA->pos.y;
+				transportRequestMsg.id = first->id;
+				transportRequestMsg.pickUpPA.x = first->pickUpPA->pos.x;
+				transportRequestMsg.pickUpPA.y = first->pickUpPA->pos.y;
+				transportRequestMsg.deliverPA.x = first->deliverPA->pos.x;
+				transportRequestMsg.deliverPA.y = first->deliverPA->pos.y;
 				printf("Product Manager: Request %d pick up from (%d, %d) ", transportRequestMsg.id, transportRequestMsg.pickUpPA.x, transportRequestMsg.pickUpPA.y);
 				printf("deliver to (%d, %d) published\n", transportRequestMsg.deliverPA.x, transportRequestMsg.deliverPA.y);
 				transportRequestPub.publish(transportRequestMsg);
-				ros::Duration(0.01).sleep();
+			}
+			else
+			{
+				printf("Couldn't publish request.\n");
 			}
 		}
-		interval = init - ros::Time::now();
-		if(interval < sleepDuration)
+		else
 		{
-			(sleepDuration - interval).sleep();
-
+			printf("Product Manager: Request queue empty.\n");
 		}
+		ros::Duration(3).sleep();
+		//for(std::vector<TransportInformation*>::iterator it = transportsWaitingAccept.begin();
+		//		it != transportsWaitingAccept.end(); it++)
+		//{
+		//	if((*it)->pickUpPA->status == PAStatus_Idle 
+		//			&& (*it)->deliverPA->status == PAStatus_Empty)
+		//	{
+		//		transportRequestMsg.id = (*it)->id;
+		//		transportRequestMsg.pickUpPA.x = (*it)->pickUpPA->pos.x;
+		//		transportRequestMsg.pickUpPA.y = (*it)->pickUpPA->pos.y;
+		//		transportRequestMsg.deliverPA.x = (*it)->deliverPA->pos.x;
+		//		transportRequestMsg.deliverPA.y = (*it)->deliverPA->pos.y;
+		//		printf("Product Manager: Request %d pick up from (%d, %d) ", transportRequestMsg.id, transportRequestMsg.pickUpPA.x, transportRequestMsg.pickUpPA.y);
+		//		printf("deliver to (%d, %d) published\n", transportRequestMsg.deliverPA.x, transportRequestMsg.deliverPA.y);
+		//		transportRequestPub.publish(transportRequestMsg);
+		//		ros::Duration(0.01).sleep();
+		//	}
+		//}
+		//interval = init - ros::Time::now();
+		//if(interval < sleepDuration)
+		//{
+		//	(sleepDuration - interval).sleep();
+
+		//}
 	}
 }
 
