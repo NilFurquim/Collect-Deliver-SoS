@@ -16,7 +16,7 @@
 <xacro:property name="pick_up_mass" value="0.01"/>
 
 <xacro:property name="product_length" value="0.35"/>
-<xacro:property name="product_radius" value="0.09"/>
+<xacro:property name="product_radius" value="0.08"/>
 <xacro:property name="product_mass" value="0.05"/>
 
 <link name="base">

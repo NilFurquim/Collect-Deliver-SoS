@@ -191,7 +191,7 @@ void Navigation::handleProcessedImage(const std_msgs::Int16MultiArrayConstPtr& p
 
 	//stop if no guide line is identified
 	if(action == Action_follow_line && total_sum == 0){
-		driveApi.setDrive(0, 0);
+		driveApi.setDrive(0, 0.1);
 		return;
 	}
 	if(total_sum >= identifyCrossingThreshold*(height*width))
@@ -217,7 +217,7 @@ void Navigation::handleProcessedImage(const std_msgs::Int16MultiArrayConstPtr& p
 
 	switch (action) {
 	case Action_stop:
-		//printf("Action_stop\n");
+		printf("Action_stop\n");
 		driveApi.setDrive(0, 0);
 		action = Action_wait;
 		break;
@@ -258,8 +258,8 @@ void Navigation::handleProcessedImage(const std_msgs::Int16MultiArrayConstPtr& p
 
 		if(lastLineSum == 0) angularRegulator = 0;
 		linearRegulator = 1 - ABS(angularRegulator);
-		driveApi.setDrive(cubicInterpolation(0.03, linearRegulator, 0.28),
-				  cubicInterpolation(0.00, angularRegulator, 1.2));
+		driveApi.setDrive(cubicInterpolation(0.03, linearRegulator, 0.17),
+				  quadraticInterpolation(0.00, angularRegulator, 1.0));
 		if(action == Action_go_straight && total_sum <= 28) {
 			action = Action_follow_line;
 		}
@@ -272,6 +272,7 @@ void Navigation::handleProcessedImage(const std_msgs::Int16MultiArrayConstPtr& p
 	case Action_turn_around2:
 		if(total_sum <= 10)
 		{
+			driveApi.setDrive(0, 0.3);
 			action = Action_turn_around3;
 		}
 		break;
@@ -287,7 +288,6 @@ void Navigation::handleProcessedImage(const std_msgs::Int16MultiArrayConstPtr& p
 		}
 		break;
 	case Action_wait:
-		ROS_INFO("WAITING, ALTHOUGH I SHOUDN'T BE");
 		break;
 	default:
 		driveApi.setDrive(0, 0);
@@ -299,6 +299,14 @@ bool Navigation::driveToAction(const pioneer_control::NavigationDriveToGoalConst
 {
 	bool isDriveToDone = false;
 	do {
+		if(!ros::ok())
+		{
+			navDriveToResult.status = false;
+			navDriveToServer.setAborted(navDriveToResult);
+			stopNavigation();
+			ROS_INFO("Ros not ok, DriveTo aborting...");
+			return false;
+		}
 		definePathService.request.origin.x = currentLocalization.x;
 		definePathService.request.origin.y = currentLocalization.y;
 		Vec2i goal(goalmsg->pos.x,goalmsg->pos.y);
@@ -306,14 +314,15 @@ bool Navigation::driveToAction(const pioneer_control::NavigationDriveToGoalConst
 		definePathService.request.goal = goalmsg->pos;
 		if(!definePathClient.call(definePathService))
 		{
-			ROS_INFO("Not Able to get path from path planning service");
+			//ROS_INFO("Not Able to get path from path planning service");
+			ROS_INFO("Not Able to get path from path planning service, trying again in 2 seconds");
 			stopNavigation();
 			navDriveToFeedback.progress = 0;
 			navDriveToServer.publishFeedback(navDriveToFeedback);
 			navDriveToResult.status = false;
 			navDriveToServer.setAborted(navDriveToResult);
-			//ros::Duration(n).sleep() //Trying again!
-			//continue;
+			ros::Duration(2).sleep(); //Trying again!
+			continue;
 			return false;
 		}
 
@@ -322,14 +331,15 @@ bool Navigation::driveToAction(const pioneer_control::NavigationDriveToGoalConst
 		
 		if(nodePath.size() == 0)
 		{
-			ROS_INFO("No path to goal, aborting...");
+			//ROS_INFO("No path to goal, aborting...");
+			ROS_INFO("No path to goal, trying again in 2 seconds...");
 			stopNavigation();
 			navDriveToFeedback.progress = 0;
 			navDriveToServer.publishFeedback(navDriveToFeedback);
 			navDriveToResult.status = false;
 			navDriveToServer.setAborted(navDriveToResult);
-			//ros::Duration(n).sleep() //Trying again!
-			//continue;
+			ros::Duration(2).sleep(); //Trying again!
+			continue;
 			return false;
 		}
 
@@ -348,12 +358,12 @@ bool Navigation::driveToAction(const pioneer_control::NavigationDriveToGoalConst
 		}
 
 		
-		//printf("Path:\n");
+		printf("Path:\n");
 		path.clear();
 		for(vectorVec2i32msg::iterator it = nodePath.begin(); it < nodePath.end(); it++)
 		{
 			path.push_back(Vec2i((*it).x, (*it).y));
-		//	printf("\t(%d, %d)\n", (*it).x, (*it).y);
+			printf("\t(%d, %d)\n", (*it).x, (*it).y);
 		}
 
 		//convert path to directions
@@ -435,9 +445,9 @@ bool Navigation::driveToAction(const pioneer_control::NavigationDriveToGoalConst
 			} while(waitLocal == NULL);
 			if(!isPositionValid)
 			{
-				ROS_INFO("%d: Position invalid. Stop.", id);
-				stopNavigation();
-				waitTime.sleep();
+				ROS_INFO("%d: Position invalid.", id);
+				//stopNavigation();
+				//waitTime.sleep();
 			}
 
 			while(action != Action_wait);
@@ -449,20 +459,7 @@ bool Navigation::driveToAction(const pioneer_control::NavigationDriveToGoalConst
 		
 	} while(!isDriveToDone);
 
-	ROS_INFO("Almost done, waiting to get to node.");
-	stopNavigation();
-	navDriveToFeedback.progress = 1;
-	navDriveToServer.publishFeedback(navDriveToFeedback);
-	navDriveToResult.status = true;
-	navDriveToServer.setSucceeded(navDriveToResult);
-	ROS_INFO("DriveTo succeeded.!");
-	return true;
 
-	navDriveToResult.status = false;
-	navDriveToServer.setAborted(navDriveToResult);
-	stopNavigation();
-	ROS_INFO("DriveTo aborted.");
-	return false;
 }
 
 void Navigation::handleLocalizationChange(const pioneer_control::PoseGrid localization)

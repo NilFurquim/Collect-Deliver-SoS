@@ -1,7 +1,7 @@
 #!/bin/bash
 
 pid=""
-for i in `seq 2 1`;
+for i in `seq 2 $1`;
 do
 	roslaunch pioneer_control robotic_agent_full.launch id:="$i" gridpos:="$(rosparam get /pioneer$i/px) $(rosparam get /pioneer$i/py) $(rosparam get /pioneer$i/dx) $(rosparam get /pioneer$i/dy)" &
 	pid="$pid $!"

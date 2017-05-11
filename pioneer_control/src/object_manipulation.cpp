@@ -117,6 +117,7 @@ void ObjectManipulation::startMovementTracking()
 { 
 	totalOffset = Vec2d(0, 0);
 	totalAngle = 0;
+	totalLinear = 0;
 	prevLinearSpeed = 0;
 	prevAngularSpeed = 0;
 	isTrackingMovement = true;
@@ -277,7 +278,7 @@ void ObjectManipulation::handleFrontSensorsChange(pioneer_control::RangeArray ra
 			break;
 		case Action_go_forward:
 			driveApi.setDrive(0.2, 0);
-			if(totalLinear > 0.4)
+			if(totalLinear > 0.2)
 			{
 				action = Action_stop;
 			}
@@ -313,7 +314,7 @@ void ObjectManipulation::pickUpAction(const pioneer_control::ObjectManipulationP
 
 	startMovementTracking();
 	startMovePickUpAction();
-	while(!isActionDone());
+	while(!isActionDone() && ros::ok());
 	
 	moveForkService.request.amount = FORKLIFT_CARRYPOS;
 	if(!moveForkClient.call(moveForkService))
@@ -323,7 +324,7 @@ void ObjectManipulation::pickUpAction(const pioneer_control::ObjectManipulationP
 		return;
 	}
 	startTurnAroundAction();
-	while(!isActionDone());
+	while(!isActionDone() && ros::ok());
 	stopMovementTracking();
 
 	pickUpServer.setSucceeded();
@@ -343,7 +344,7 @@ void ObjectManipulation::releaseAction(const pioneer_control::ObjectManipulation
 
 	startMovementTracking();
 	startGoForward();
-	while(!isActionDone());
+	while(!isActionDone() && ros::ok());
 	moveForkService.request.amount = FORKLIFT_PICKPOS;
 	if(!moveForkClient.call(moveForkService))
 	{
@@ -353,7 +354,7 @@ void ObjectManipulation::releaseAction(const pioneer_control::ObjectManipulation
 	}
 
 	startMoveReleaseAction();
-	while(!isActionDone());
+	while(!isActionDone() && ros::ok());
 	moveForkService.request.amount = FORKLIFT_NAVPOS;
 	if(!moveForkClient.call(moveForkService))
 	{
@@ -363,7 +364,7 @@ void ObjectManipulation::releaseAction(const pioneer_control::ObjectManipulation
 	}
 
 	startTurnAroundAction();
-	while(!isActionDone());
+	while(!isActionDone() && ros::ok());
 	stopMovementTracking();
 
 	releaseServer.setSucceeded();

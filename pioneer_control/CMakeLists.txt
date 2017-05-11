@@ -17,42 +17,43 @@ find_package(catkin REQUIRED COMPONENTS
 ## Declare ROS messages, services and actions ##
 ## Generate messages in the 'msg' folder
 add_message_files(
-   FILES
-   Vec2i32.msg
-   Vec2i8.msg
-   PoseGrid.msg
-   TransportRequest.msg
-   TransportAccept.msg
-   TransportDone.msg
-   ChooseClosestMsg.msg
-   PAInformation.msg
-   UpdateMapMsg.msg
-   RangeArray.msg
+	FILES
+	Vec2i32.msg
+	Vec2i8.msg
+	PoseGrid.msg
+	TransportRequest.msg
+	TransportAccept.msg
+	TransportDone.msg
+	ChooseClosestMsg.msg
+	PAInformation.msg
+	UpdateMapMsg.msg
+	RangeArray.msg
 )
 
  add_service_files(
-   FILES
-   ForkliftLift.srv
-   ForkliftLower.srv
-   ForkliftMoveTo.srv
-   MapInformationGetMap.srv
-   MapInformationGetProductAreas.srv
-   MapInformationUpdateMap.srv
-   PathPlanningDefinePath.srv
-   PathPlanningCalculateDistance.srv
-   GetLocalization.srv
-   LocalizationInit.srv
-   #SonarSensorGetInformation.srv
+	FILES
+	ForkliftLift.srv
+	ForkliftLower.srv
+	ForkliftMoveTo.srv
+	MapInformationGetMap.srv
+	MapInformationGetProductAreas.srv
+	MapInformationUpdateMap.srv
+	PathPlanningDefinePath.srv
+	PathPlanningCalculateDistance.srv
+	GetLocalization.srv
+	LocalizationInit.srv
+	ProductManagerAddRequest.srv
+	#SonarSensorGetInformation.srv
  )
 ## Generate actions in the 'action' folder
 add_action_files(
-   FILES
-   NavigationDriveTo.action
-   NavigationExecutePath.action
-   ControlGoPickUpProduct.action
-   ControlGoDeliverProduct.action
-   ObjectManipulationPickUp.action
-   ObjectManipulationRelease.action
+	FILES
+	NavigationDriveTo.action
+	NavigationExecutePath.action
+	ControlGoPickUpProduct.action
+	ControlGoDeliverProduct.action
+	ObjectManipulationPickUp.action
+	ObjectManipulationRelease.action
 )
 
 generate_messages(
@@ -89,6 +90,7 @@ add_exec_dep_and_link(object_manipulation)
 add_exec_dep_and_link(control)
 add_exec_dep_and_link(robotic_agent)
 add_exec_dep_and_link(application)
+add_exec_dep_and_link(product_manager)
 
 install(DIRECTORY config
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})

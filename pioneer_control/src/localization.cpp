@@ -247,7 +247,7 @@ void Localization::getMap()
 
 void Localization::handleOdometry(const nav_msgs::OdometryConstPtr& odom)
 {
-	if(!isCrossing) return;
+	if(isCrossing) return;
 	Vec2i newPosition;
 	int newDirection;
 
@@ -362,14 +362,15 @@ void Localization::handleProcessedImage(const std_msgs::Int16MultiArrayConstPtr&
 	if(totalSum >= 0) isFollowing = true;
 	else isFollowing = false;
 
-	if(totalSum <= 28 && isCrossing == true)
+	if(totalSum <= 34 && isCrossing == true)
 	{ 
+		//printf("Localizatoin: Is NOT crossing\n");
 		isCrossing = false; 
 	}
 
 	if(totalSum >= 40 && isCrossing == false)
 	{
-		//printf("Is crossing\n");
+		//printf("Localizatoin: Is crossing\n");
 		isCrossing = true;
 		//Updating position
 		//pos += dirs[currentDirection];

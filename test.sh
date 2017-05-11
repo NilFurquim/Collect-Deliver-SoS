@@ -2,6 +2,21 @@
 
 my_pid=$$
 
+if [ $1 = "" ]; then
+	echo "arg1 Provide number of robots"
+	exit 1
+fi
+
+if [ $2 = "" ]; then
+	echo "arg1 Provide test file name"
+	exit 1
+fi
+
+if [ ! -f $2.test ]; then
+	echo "File not found!"
+	exit 1
+fi
+
 echo "My process ID is $my_pid"
 
 echo "Launching roscore..."
@@ -12,7 +27,7 @@ pid=$!
 sleep 3s
 echo "Launching Gazebo..."
 sleep 3s
-roslaunch pioneer_gazebo world.launch &
+roslaunch pioneer_gazebo world.launch gui:=false&
 pid="$pid $!"
 
 sleep 5s
@@ -33,8 +48,10 @@ done
 echo "Launching MapInformation 1..."
 rosrun pioneer_control map_information &
 pid="$pid $!"
-rosrun pioneer_control product_manager &
+sleep 1s
+rosrun pioneer_control product_manager 2> result_$2.out&
 pid="$pid $!"
+sleep 1s
 
 for i in `seq 1 $1`;
 do
@@ -47,6 +64,18 @@ do
 	sleep 1s
 done
 
+
+echo "Launching pioneer control..."
+sleep 10s
+for i in `seq 1 $1`;
+do
+	roslaunch pioneer_control robotic_agent_full.launch id:="$i" gridpos:="$(rosparam get /pioneer$i/px) $(rosparam get /pioneer$i/py) $(rosparam get /pioneer$i/dx) $(rosparam get /pioneer$i/dy)" &
+	pid="$pid $!"
+	sleep 2s
+done
+
+sleep 5s
+rosrun pioneer_control application < $2_$1_$3.test
 #sleep 5s
 #for i in `seq 1 5`;
 #do
